@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Gaji & Absensi Otomatis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        
+        /* Modifikasi perbaikan layout print */
+        @media print {
+            body * { visibility: hidden; }
+            html, body, #screen-admin, main, .flex-1, .tab-content, #slip-container {
+                height: auto !important; 
+                overflow: visible !important; 
+                position: static !important;
+            }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 100%; 
+                padding: 20px; 
+                background: white; 
+                margin: 0;
+            }
+            .no-print { display: none !important; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="h-[100dvh] w-screen overflow-hidden text-slate-700 bg-[#f8fafc] flex flex-col relative antialiased">
+
+    <div id="toast" class="fixed top-5 right-5 transform translate-x-full transition-transform duration-300 bg-emerald-500 text-white px-6 py-3 rounded-xl shadow-lg z-[100] flex items-center font-semibold text-sm">
+        <i class="fas fa-info-circle mr-2"></i> <span id="toast-msg">Pesan</span>
+    </div>
+
+    <div id="screen-login" class="flex-1 flex items-center justify-center bg-slate-900 z-50 absolute inset-0 overflow-y-auto p-4 md:p-8">
+        <div class="bg-white p-8 md:p-10 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-blue-500 my-auto relative">
+            <div class="text-center mb-8 text-slate-800">
+                <h1 class="text-3xl font-bold tracking-tight"><i class="fas fa-wallet text-blue-500 mr-2"></i>Pay<span class="text-blue-500">Roll</span></h1>
+                <p class="text-slate-400 text-xs font-medium mt-2">Login Portal Enterprise</p>
+            </div>
+            <form id="form-login" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Pilih Cabang (Khusus Karyawan)</label>
+                    <select id="login-cabang" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Username</label>
+                    <input type="text" id="login-user" required placeholder="Gunakan 'admin' untuk HRD" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Password</label>
+                    <input type="password" id="login-pass" required placeholder="Gunakan 'admin' untuk HRD" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                </div>
+                <button type="submit" id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-blue-500/20 transition-all mt-6 text-sm">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Masuk Sekarang
+                </button>
+            </form>
+            <div class="mt-6 text-[10px] text-center text-slate-400 font-medium">Pastikan GPS / Lokasi aktif untuk absensi karyawan.</div>
+        </div>
+    </div>
+
+    <div id="screen-employee" class="hidden flex-1 flex flex-col h-full absolute inset-0 bg-[#f8fafc] z-40">
+        <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 p-4 sm:px-8 sm:py-4 flex justify-between items-center shrink-0 sticky top-0 z-10 shadow-sm">
+            <h1 class="text-base font-bold text-slate-900 tracking-tight truncate mr-2"><i class="fas fa-user-circle text-blue-500 mr-1.5"></i> Portal Karyawan</h1>
+            <button onclick="logout()" class="text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/60 px-4 py-2 rounded-xl transition-all shrink-0"><i class="fas fa-sign-out-alt mr-1"></i>Keluar</button>
+        </header>
+        <div class="flex-1 p-4 sm:p-8 flex flex-col items-center justify-center overflow-y-auto pb-24">
+            <div class="bg-white p-8 sm:p-10 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.01)] border border-slate-100 text-center max-w-sm w-full my-auto">
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 truncate tracking-tight" id="emp-welcome">Halo, Nama</h2>
+                <p class="text-slate-400 text-xs sm:text-sm font-medium mb-8 truncate" id="emp-jabatan">Jabatan - Cabang</p>
+                
+                <div class="text-4xl sm:text-5xl font-mono font-bold text-blue-600 mb-2 tracking-tight" id="emp-clock">00:00:00</div>
+                <div class="text-xs sm:text-sm text-slate-500 mb-10 font-medium" id="emp-date">Senin, 1 Jan 2026</div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="absenMandiri('Masuk')" class="py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-md shadow-emerald-500/20 text-sm transition-all transform active:scale-95">
+                        <i class="fas fa-sign-in-alt text-xl mb-1.5 block"></i> Absen Masuk
+                    </button>
+                    <button onclick="absenMandiri('Pulang')" class="py-4 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold shadow-md shadow-rose-500/20 text-sm transition-all transform active:scale-95">
+                        <i class="fas fa-sign-out-alt text-xl mb-1.5 block"></i> Absen Pulang
+                    </button>
+                </div>
+                <p id="emp-status-absen" class="mt-8 text-[11px] sm:text-xs font-semibold text-slate-500 bg-slate-50 border border-slate-100 p-3 rounded-xl break-words"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-admin" class="hidden flex-1 flex h-full absolute inset-0 z-30 overflow-hidden">
+        
+        <aside class="w-64 bg-slate-900 text-white flex flex-col no-print transition-transform duration-300 fixed md:relative h-full z-50 -translate-x-full md:translate-x-0 shrink-0" id="sidebar">
+            <div class="p-5 border-b border-slate-800 flex justify-between items-center shrink-0">
+                <h1 class="text-xl font-bold tracking-tight text-white"><i class="fas fa-wallet text-blue-500 mr-2"></i>Pay<span class="text-blue-500">Roll</span></h1>
+                <button class="md:hidden text-slate-400 hover:text-white p-1 text-lg transition-colors" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-5 custom-scrollbar">
+                <ul class="space-y-1.5 px-3">
+                    <li><a href="#" onclick="switchTab('dashboard')" class="menu-item flex items-center px-4 py-3 rounded-xl bg-slate-800 text-blue-400 font-semibold transition-colors text-sm" data-target="dashboard"><i class="fas fa-chart-pie w-6"></i> Dashboard</a></li>
+                    <li><a href="#" onclick="switchTab('karyawan')" class="menu-item flex items-center px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-colors text-sm" data-target="karyawan"><i class="fas fa-users w-6"></i> Data Karyawan</a></li>
+                    <li><a href="#" onclick="switchTab('cabang')" class="menu-item flex items-center px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-colors text-sm" data-target="cabang"><i class="fas fa-building w-6"></i> Data Cabang</a></li>
+                    <li><a href="#" onclick="switchTab('absensi')" class="menu-item flex items-center px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-colors text-sm" data-target="absensi"><i class="fas fa-calendar-check w-6"></i> Data Absensi</a></li>
+                    <li><a href="#" onclick="switchTab('penggajian')" class="menu-item flex items-center px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-colors text-sm" data-target="penggajian"><i class="fas fa-file-invoice-dollar w-6"></i> Perhitungan Gaji</a></li>
+                    <li><a href="#" onclick="switchTab('laporan')" class="menu-item flex items-center px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-colors text-sm" data-target="laporan"><i class="fas fa-chart-line w-6"></i> Laporan & Riwayat</a></li>
+                    <li><a href="#" onclick="switchTab('parameter')" class="menu-item flex items-center px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-colors text-sm border-t border-slate-700 mt-2" data-target="parameter"><i class="fas fa-cogs w-6"></i> Parameter Sistem</a></li>
+                </ul>
+            </nav>
+            <div class="p-5 border-t border-slate-800 shrink-0">
+                <button onclick="logout()" class="w-full bg-rose-600 hover:bg-rose-700 text-white py-2.5 rounded-xl text-sm font-bold shadow-md shadow-rose-500/20 transition-all"><i class="fas fa-sign-out-alt mr-2"></i> Keluar</button>
+            </div>
+        </aside>
+
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden transition-opacity"></div>
+
+        <main class="flex-1 flex flex-col h-full min-w-0 overflow-hidden relative bg-[#f8fafc]">
+            <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 py-3 sm:px-8 sm:py-4 flex justify-between items-center no-print z-10 shrink-0 sticky top-0">
+                <div class="flex items-center">
+                    <button class="mr-4 text-slate-500 hover:text-slate-800 p-1 md:hidden transition-colors" onclick="toggleSidebar()"><i class="fas fa-bars text-xl"></i></button>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight truncate" id="header-title">Dashboard</h2>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <span class="text-[11px] sm:text-xs text-slate-500 font-semibold hidden sm:inline-flex items-center"><i class="far fa-clock mr-1.5"></i> <span class="current-time-display"></span></span>
+                    <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shadow-sm flex items-center justify-center font-bold text-sm shrink-0">A</div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#f8fafc] min-h-0 pb-32 md:pb-32 space-y-6">
+                
+                <div id="dashboard" class="tab-content active">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                        <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] p-6 flex justify-between items-center relative overflow-hidden">
+                            <div class="absolute w-2 h-full bg-blue-500 left-0 top-0"></div>
+                            <div class="pl-2">
+                                <p class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Total Karyawan</p>
+                                <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 mt-1" id="dash-karyawan">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 text-xl border border-blue-100"><i class="fas fa-users"></i></div>
+                        </div>
+                        <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] p-6 flex justify-between items-center relative overflow-hidden">
+                            <div class="absolute w-2 h-full bg-emerald-500 left-0 top-0"></div>
+                            <div class="pl-2">
+                                <p class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Pengeluaran Bulan Ini</p>
+                                <h3 class="text-xl sm:text-2xl font-bold text-slate-900 mt-1" id="dash-pengeluaran">Rp 0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-xl border border-emerald-100"><i class="fas fa-money-bill-wave"></i></div>
+                        </div>
+                        <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] p-6 flex justify-between items-center relative overflow-hidden sm:col-span-2 lg:col-span-1">
+                            <div class="absolute w-2 h-full bg-amber-500 left-0 top-0"></div>
+                            <div class="pl-2">
+                                <p class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Absensi Hari Ini</p>
+                                <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 mt-1" id="dash-absensi">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 text-xl border border-amber-100"><i class="fas fa-calendar-check"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="karyawan" class="tab-content space-y-6">
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden">
+                        <div class="p-5 md:p-6 border-b border-slate-50 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-900">Manajemen Data Karyawan</h3>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Atur profil dan kredensial login staf</p>
+                            </div>
+                        </div>
+                        <div class="p-5 md:p-6 space-y-5">
+                            <form id="form-karyawan" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <input type="hidden" id="kar-id">
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">NIK</label><input type="text" id="kar-nik" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Nama Lengkap</label><input type="text" id="kar-nama" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Jabatan</label><input type="text" id="kar-jabatan" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Tanggal Bergabung</label><input type="date" id="kar-tgl" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-600"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Nama Bank & Norek</label><input type="text" id="kar-rek" placeholder="BCA - 123456" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Gaji Pokok (Rp)</label>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
+                                        <input type="number" id="kar-gapok" required class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-span-1 sm:col-span-2 lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-100 pt-4 mt-2">
+                                    <div class="sm:col-span-2">
+                                        <span class="block text-[11px] font-bold text-slate-900 uppercase">Informasi Login Portal</span>
+                                    </div>
+                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Username Login</label><input type="text" id="kar-user" required class="w-full px-3 py-2 bg-blue-50/50 border border-blue-100 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Password Login</label><input type="text" id="kar-pass" required class="w-full px-3 py-2 bg-blue-50/50 border border-blue-100 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                </div>
+                                
+                                <div class="sm:col-span-2 lg:col-span-3 flex justify-end gap-2 mt-4 pt-2">
+                                    <button type="button" onclick="resetFormKaryawan()" class="px-5 py-2.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"><i class="fas fa-undo mr-1.5"></i> Batal</button>
+                                    <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 rounded-xl transition-all"><i class="fas fa-save mr-1.5"></i> Simpan Karyawan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.01)] border border-slate-100 flex flex-col sm:flex-row sm:items-center gap-3">
+                        <div class="relative flex-1">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                <i class="fas fa-search text-[11px]"></i>
+                            </span>
+                            <input type="text" id="search-karyawan" oninput="handleSearchKaryawan()" placeholder="Cari karyawan berdasarkan nama atau NIK..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-600">
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden flex flex-col">
+                        <div class="overflow-x-auto w-full">
+                            <table class="w-full text-left border-collapse relative">
+                                <thead class="sticky top-0 bg-slate-50 border-b border-slate-100 z-10">
+                                    <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                        <th class="py-3.5 px-5">NIK & Info</th>
+                                        <th class="py-3.5 px-4">Tgl Bergabung</th>
+                                        <th class="py-3.5 px-4">Akun Login</th>
+                                        <th class="py-3.5 px-4">Rekening</th>
+                                        <th class="py-3.5 px-4">Gaji Pokok</th>
+                                        <th class="py-3.5 px-4 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-karyawan" class="text-xs divide-y divide-slate-100 bg-white"></tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 bg-slate-50/50 border-t border-slate-100 flex flex-col sm:flex-row gap-3 justify-between items-center" id="pagination-karyawan">
+                            <span class="text-[11px] font-medium text-slate-400" id="page-info">Menampilkan x dari y</span>
+                            <div class="flex gap-1.5" id="page-numbers"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cabang" class="tab-content space-y-6">
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden">
+                        <div class="p-5 md:p-6 border-b border-slate-50">
+                            <h3 class="text-sm font-bold text-slate-900">Manajemen Lokasi Cabang (Geofencing)</h3>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Atur titik batas radius untuk validasi absensi karyawan</p>
+                        </div>
+                        <div class="p-5 md:p-6">
+                            <form id="form-cabang" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                                <input type="hidden" id="cab-id">
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Nama Cabang</label><input type="text" id="cab-nama" required placeholder="Contoh: Pusat Sudirman" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                
+                                <div class="relative">
+                                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Latitude</label>
+                                    <input type="number" step="any" id="cab-lat" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                                </div>
+                                <div class="relative">
+                                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Longitude</label>
+                                    <div class="flex gap-2">
+                                        <input type="number" step="any" id="cab-lng" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                                        <button type="button" onclick="detectLocation()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition-colors" title="Deteksi Lokasi Otomatis"><i class="fas fa-map-marker-alt"></i></button>
+                                    </div>
+                                </div>
+
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Radius Geofence (Meter)</label><input type="number" id="cab-radius" required placeholder="Misal: 50" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                
+                                <div class="lg:col-span-4 flex justify-end gap-2 mt-2 pt-2">
+                                    <button type="button" onclick="resetFormCabang()" class="px-5 py-2.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"><i class="fas fa-undo mr-1.5"></i> Batal</button>
+                                    <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 rounded-xl transition-all"><i class="fas fa-save mr-1.5"></i> Simpan Cabang</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden flex flex-col">
+                        <div class="overflow-x-auto w-full">
+                            <table class="w-full text-left border-collapse relative">
+                                <thead class="sticky top-0 bg-slate-50 border-b border-slate-100 z-10">
+                                    <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                        <th class="py-3.5 px-5">Nama Cabang</th>
+                                        <th class="py-3.5 px-4">Latitude</th>
+                                        <th class="py-3.5 px-4">Longitude</th>
+                                        <th class="py-3.5 px-4">Radius (m)</th>
+                                        <th class="py-3.5 px-4 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-cabang" class="text-xs divide-y divide-slate-100 bg-white"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="absensi" class="tab-content space-y-6">
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden">
+                        <div class="p-5 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 w-full">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-900">Rekap Log Absensi</h3>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Tercatat otomatis dari portal self-service karyawan</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="exportAbsenExcel()" class="bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 transition-colors"><i class="fas fa-file-excel mr-1"></i> Excel</button>
+                                <button onclick="exportAbsenPDF()" class="bg-rose-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-rose-700 transition-colors"><i class="fas fa-file-pdf mr-1"></i> PDF</button>
+                                <input type="date" id="filter-absensi-tgl" class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-600" onchange="renderTableAbsensi()">
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto w-full" id="export-absen-area">
+                            <table class="w-full text-left border-collapse relative">
+                                <thead class="sticky top-0 bg-slate-50 border-b border-slate-100 z-10">
+                                    <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                        <th class="py-3.5 px-5">Tanggal</th>
+                                        <th class="py-3.5 px-4">Karyawan</th>
+                                        <th class="py-3.5 px-4">Masuk</th>
+                                        <th class="py-3.5 px-4">Pulang</th>
+                                        <th class="py-3.5 px-4">Terlambat</th>
+                                        <th class="py-3.5 px-4 text-center no-print-export">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-absensi" class="text-xs divide-y divide-slate-100 bg-white"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="penggajian" class="tab-content space-y-6">
+                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+                        <div class="xl:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden">
+                            <div class="p-5 md:p-6 border-b border-slate-50">
+                                <h3 class="text-sm font-bold text-slate-900">Kalkulator Gaji & Tunjangan</h3>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Proses dan cetak slip gaji perorangan</p>
+                            </div>
+                            <div class="p-5 md:p-6">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Cari / Pilih Karyawan</label>
+                                        <input list="karyawan-list" id="pay-karyawan-input" onchange="pullDataKaryawan()" placeholder="Ketik nama karyawan..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                                        <datalist id="karyawan-list"></datalist>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <div class="flex-1">
+                                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Periode Bulan</label>
+                                            <input type="month" id="pay-periode" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-600">
+                                        </div>
+                                        <div class="pt-5 flex items-end">
+                                            <button onclick="autoFillDeductions()" class="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors h-[34px] shadow-sm flex items-center justify-center" title="Tarik data absensi & parameter otomatis"><i class="fas fa-sync-alt"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+                                    <div>
+                                        <h4 class="font-bold text-emerald-600 border-b border-slate-100 pb-2 mb-4 text-[13px] flex items-center"><i class="fas fa-plus-circle mr-1.5"></i> Pendapatan</h4>
+                                        <div class="space-y-4">
+                                            <div>
+                                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Gaji Pokok</label>
+                                                <div class="relative">
+                                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
+                                                    <input type="number" id="pay-gapok" readonly class="w-full pl-9 pr-3 py-2 bg-slate-100/50 border border-slate-200 rounded-xl text-xs font-bold text-slate-500 cursor-not-allowed outline-none">
+                                                </div>
+                                            </div>
+                                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Bonus Kinerja (Rp)</label><input type="number" id="pay-bonus" value="0" class="pay-input w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-emerald-500 transition-colors"></div>
+                                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tunjangan Hari Raya (Rp)</label><input type="number" id="pay-thr" value="0" class="pay-input w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-emerald-500 transition-colors"></div>
+                                            
+                                            <div class="p-4 bg-emerald-50/50 border border-emerald-100 rounded-xl">
+                                                <label class="block text-[11px] font-bold text-emerald-700 uppercase mb-2">Tunjangan Ekstra</label>
+                                                <div class="flex gap-2 mb-3">
+                                                    <input type="text" id="tunj-nama" placeholder="Misal: Uang Makan" class="w-1/2 px-2.5 py-1.5 border border-emerald-200 rounded-lg text-[11px] font-medium outline-none focus:border-emerald-500">
+                                                    <input type="number" id="tunj-nominal" placeholder="Nominal Rp" class="w-1/2 px-2.5 py-1.5 border border-emerald-200 rounded-lg text-[11px] font-medium outline-none focus:border-emerald-500">
+                                                    <button type="button" onclick="addTunjangan()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 font-bold transition-colors shrink-0"><i class="fas fa-plus"></i></button>
+                                                </div>
+                                                <ul id="list-tunjangan" class="text-xs space-y-1.5"></ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-rose-600 border-b border-slate-100 pb-2 mb-4 text-[13px] flex items-center"><i class="fas fa-minus-circle mr-1.5"></i> Potongan</h4>
+                                        <div class="space-y-4">
+                                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Denda Telat (Rp)</label><input type="number" id="pot-telat" value="0" class="pay-input w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-rose-500 transition-colors text-rose-600"></div>
+                                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Absen / Alfa (Rp)</label><input type="number" id="pot-alfa" value="0" class="pay-input w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-rose-500 transition-colors text-rose-600"></div>
+                                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Potongan Izin (Rp)</label><input type="number" id="pot-izin" value="0" class="pay-input w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-rose-500 transition-colors text-rose-600"></div>
+                                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Kasbon/Pinjaman (Rp)</label><input type="number" id="pot-pinjam" value="0" class="pay-input w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-rose-500 transition-colors text-rose-600"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-10 pt-5 border-t border-slate-100 flex flex-col sm:flex-row gap-3 justify-end items-center">
+                                    <button onclick="calculateAndPreview()" class="w-full sm:w-auto px-6 py-2.5 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 shadow-md text-xs transition-colors"><i class="fas fa-calculator mr-1.5"></i> Proses & Preview Slip</button>
+                                    <button onclick="savePayrollData()" id="btn-save-payroll" class="hidden w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-md shadow-blue-500/20 text-xs transition-colors"><i class="fas fa-save mr-1.5"></i> Simpan Histori</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden relative" id="slip-container">
+                            <div class="p-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center shrink-0">
+                                <h3 class="font-bold text-sm text-slate-800"><i class="fas fa-receipt mr-1.5 text-slate-400"></i> Output Slip</h3>
+                                <button onclick="window.print()" class="text-[11px] font-bold bg-white border border-slate-200 text-slate-600 px-3 py-1.5 rounded-lg hover:bg-slate-50 shadow-sm transition-colors"><i class="fas fa-print mr-1"></i>Cetak</button>
+                            </div>
+                            
+                            <div id="print-area" class="p-5 sm:p-6 text-xs bg-white overflow-x-auto w-full text-slate-800 font-sans">
+                                <div class="text-center mb-6 border-b-2 border-slate-800 pb-4">
+                                    <h2 class="text-sm sm:text-lg font-bold uppercase tracking-widest text-slate-900">PT. Bintang Teknologi Nusantara</h2>
+                                    <p class="text-[10px] text-slate-500 mt-0.5">Jl. Sudirman No.10, Jakarta | Telp: (021) 123456</p>
+                                    <h3 class="text-xs sm:text-sm font-bold mt-4 border border-slate-800 inline-block px-3 py-1 uppercase rounded-md">Slip Gaji Karyawan</h3>
+                                    <p class="text-[11px] font-semibold mt-2">Periode: <span id="slip-periode">-</span></p>
+                                </div>
+                                
+                                <table class="w-full mb-6 text-[11px] sm:text-xs font-medium">
+                                    <tr>
+                                        <td class="py-1.5 w-1/4 text-slate-500">Nama Lengkap</td><td class="w-1/4 truncate font-bold text-slate-900">: <span id="slip-nama">-</span></td>
+                                        <td class="py-1.5 w-1/4 text-slate-500">Jabatan</td><td class="w-1/4 truncate font-bold text-slate-900">: <span id="slip-jabatan">-</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-1.5 w-1/4 text-slate-500">Nomor Induk (NIK)</td><td class="w-1/4 font-bold text-slate-900">: <span id="slip-nik">-</span></td>
+                                        <td class="py-1.5 w-1/4 text-slate-500">Rek. Bank</td><td class="w-1/4 truncate font-bold text-slate-900">: <span id="slip-rek">-</span></td>
+                                    </tr>
+                                </table>
+
+                                <div class="flex flex-col sm:flex-row gap-6 mb-6">
+                                    <div class="w-full sm:w-1/2">
+                                        <h4 class="font-bold border-b-2 border-slate-200 pb-1 mb-2 text-[10px] sm:text-[11px] text-slate-500">RINCIAN PENDAPATAN</h4>
+                                        <table class="w-full text-[11px] sm:text-xs">
+                                            <tr><td class="py-1.5 text-slate-600">Gaji Pokok</td><td class="text-right font-bold" id="slip-gapok">Rp 0</td></tr>
+                                            <tr><td class="py-1.5 text-slate-600">Bonus Kinerja</td><td class="text-right font-bold" id="slip-bonus">Rp 0</td></tr>
+                                            <tr><td class="py-1.5 text-slate-600">THR</td><td class="text-right font-bold" id="slip-thr">Rp 0</td></tr>
+                                            <tbody id="slip-tunjangan-list"></tbody>
+                                        </table>
+                                    </div>
+                                    <div class="w-full sm:w-1/2">
+                                        <h4 class="font-bold border-b-2 border-slate-200 pb-1 mb-2 text-[10px] sm:text-[11px] text-slate-500">RINCIAN POTONGAN</h4>
+                                        <table class="w-full text-[11px] sm:text-xs">
+                                            <tr><td class="py-1.5 text-slate-600">Keterlambatan</td><td class="text-right text-rose-600 font-bold" id="slip-pot-telat">Rp 0</td></tr>
+                                            <tr><td class="py-1.5 text-slate-600">Mangkir / Alfa</td><td class="text-right text-rose-600 font-bold" id="slip-pot-alfa">Rp 0</td></tr>
+                                            <tr><td class="py-1.5 text-slate-600">Potongan Izin</td><td class="text-right text-rose-600 font-bold" id="slip-pot-izin">Rp 0</td></tr>
+                                            <tr><td class="py-1.5 text-slate-600">Kasbon / Pinjaman</td><td class="text-right text-rose-600 font-bold" id="slip-pot-pinjam">Rp 0</td></tr>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="border-t border-slate-300 border-dashed pt-4 mb-4">
+                                    <table class="w-full font-bold text-[11px] sm:text-xs">
+                                        <tr>
+                                            <td class="w-full sm:w-1/2 block sm:table-cell mb-2 sm:mb-0 text-slate-600">Subtotal Pendapatan <span class="float-right mr-0 sm:mr-6 font-bold text-slate-900" id="slip-tot-pendapatan">Rp 0</span></td>
+                                            <td class="w-full sm:w-1/2 block sm:table-cell text-slate-600">Subtotal Potongan <span class="float-right text-rose-600 font-bold" id="slip-tot-potongan">Rp 0</span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <div class="p-4 bg-emerald-50 rounded-xl text-center border border-emerald-100">
+                                    <span class="block text-[10px] font-bold text-emerald-700/70 uppercase mb-1 tracking-widest">Take Home Pay (Gaji Bersih)</span>
+                                    <span class="text-xl sm:text-2xl font-bold text-emerald-600" id="slip-netto">Rp 0</span>
+                                </div>
+
+                                <div class="mt-10 flex justify-between text-center text-[10px] sm:text-[11px] font-medium text-slate-500">
+                                    <div><p class="mb-14">Diterima Oleh,</p><p class="font-bold text-slate-800 underline truncate max-w-[120px] decoration-slate-300 underline-offset-4" id="slip-sign-nama">( .................... )</p></div>
+                                    <div><p class="mb-14">Disetujui Oleh,</p><p class="font-bold text-slate-800 underline decoration-slate-300 underline-offset-4">HRD / Manager</p></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="laporan" class="tab-content space-y-6">
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden">
+                        <div class="p-5 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-900">Riwayat Penggajian (Laporan)</h3>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Arsip seluruh rekam jejak slip gaji yang sudah di-generate</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="month" id="filter-lap-bln" class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-600" onchange="renderLaporan()">
+                                <button onclick="clearRiwayat()" class="bg-rose-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-rose-600 transition-colors"><i class="fas fa-trash-alt mr-1"></i> Bersihkan</button>
+                            </div>
+                        </div>
+                        
+                        <div class="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-slate-50 bg-slate-50/30">
+                            <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm text-center">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Gaji Dibayarkan</p>
+                                <h4 class="text-lg sm:text-xl font-bold text-emerald-600 mt-1" id="lap-tot-gaji">Rp 0</h4>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm text-center">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Potongan Dikenakan</p>
+                                <h4 class="text-lg sm:text-xl font-bold text-rose-600 mt-1" id="lap-tot-pot">Rp 0</h4>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm text-center">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Keterlambatan</p>
+                                <h4 class="text-lg sm:text-xl font-bold text-amber-500 mt-1" id="lap-tot-telat">0 Menit</h4>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto w-full">
+                            <table class="w-full text-left border-collapse relative">
+                                <thead class="sticky top-0 bg-slate-50 border-b border-slate-100 z-10">
+                                    <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                        <th class="py-3.5 px-5">Karyawan Penerima</th>
+                                        <th class="py-3.5 px-4">Gaji Pokok</th>
+                                        <th class="py-3.5 px-4">Total Tunjangan</th>
+                                        <th class="py-3.5 px-4">Total Potongan</th>
+                                        <th class="py-3.5 px-4">Net (Gaji Bersih)</th>
+                                        <th class="py-3.5 px-4 text-center"><i class="fas fa-print"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-laporan" class="text-xs divide-y divide-slate-100 bg-white font-medium"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="parameter" class="tab-content space-y-6">
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden">
+                        <div class="p-5 md:p-6 border-b border-slate-50">
+                            <h3 class="text-sm font-bold text-slate-900">Parameter & Kebijakan Sistem</h3>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Tentukan variabel dasar otomatisasi penggajian perusahaan</p>
+                        </div>
+                        <div class="p-5 md:p-6">
+                            <form id="form-parameter" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Total Hari Kerja Normal (Per Bulan)</label><input type="number" id="param-harikerja" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Batas Toleransi Telat (Berapa Kali)</label><input type="number" id="param-toleransitelat" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Denda Telat per Hari (% dari Gaji Sehari)</label><input type="number" id="param-dendatelat" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Jam Masuk</label><input type="time" id="param-jammasuk" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Jam Pulang</label><input type="time" id="param-jampulang" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                </div>
+                                <div class="md:col-span-2 flex justify-end gap-2 mt-4 pt-2 border-t border-slate-100">
+                                    <button type="button" onclick="loadParameter()" class="px-5 py-2.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"><i class="fas fa-undo mr-1.5"></i> Batal</button>
+                                    <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 rounded-xl transition-all"><i class="fas fa-save mr-1.5"></i> Simpan Konfigurasi</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- 1. DATA & STATE ---
+        let data = {
+            karyawan: JSON.parse(localStorage.getItem('payroll_karyawan')) || [],
+            absensi: JSON.parse(localStorage.getItem('payroll_absensi')) || [],
+            penggajian: JSON.parse(localStorage.getItem('payroll_penggajian')) || [],
+            cabang: JSON.parse(localStorage.getItem('payroll_cabang')) || [],
+            parameter: JSON.parse(localStorage.getItem('payroll_parameter')) || {
+                hariKerja: 26,
+                jamMasuk: '08:00',
+                jamPulang: '17:00',
+                toleransiTelat: 3,
+                dendaTelatPersen: 20
+            }
+        };
+        let currentTunjangan = [];
+        let currentCalcResult = null;
+        let loggedInUser = null; 
+        let searchQueryKaryawan = ""; 
+
+        // Pagination State
+        let currentPageKar = 1;
+        const itemsPerPage = 5;
+
+        // Init Dummy Data Cabang & Karyawan
+        if(data.cabang.length === 0) {
+            data.cabang.push({ id: 'b1', name: 'Cabang Setiabudi (Medan)', lat: 3.5658, lng: 98.6364, radius: 20 });
+            data.cabang.push({ id: 'b2', name: 'Cabang Pusat (Medan)', lat: 3.5952, lng: 98.6722, radius: 20 });
+            data.cabang.push({ id: 'b3', name: 'Cabang Test Bebas (Bisa dimana saja)', lat: 0, lng: 0, radius: 99999999 });
+            saveData();
+        }
+
+        if(data.karyawan.length === 0) {
+            data.karyawan.push({ 
+                id: generateId(), nik: "1001", nama: "Budi Santoso", jabatan: "Manager IT", tglMasuk: "2020-01-15", rekBank: "BCA - 11223344", gapok: 8500000, 
+                username: "budi123", password: "123" 
+            });
+            data.karyawan.push({ 
+                id: generateId(), nik: "1002", nama: "Siti Aminah", jabatan: "Staff Admin", tglMasuk: "2022-03-10", rekBank: "BNI - 99887766", gapok: 4500000, 
+                username: "siti123", password: "123" 
+            });
+            saveData();
+        }
+
+        // --- 2. UTILITY & JAM ---
+        function generateId() { return '_' + Math.random().toString(36).substr(2, 9); }
+        function formatRupiah(angka) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka); }
+        function formatDate(dateStr) { const d = new Date(dateStr); return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`; }
+        function saveData() {
+            localStorage.setItem('payroll_karyawan', JSON.stringify(data.karyawan));
+            localStorage.setItem('payroll_absensi', JSON.stringify(data.absensi));
+            localStorage.setItem('payroll_penggajian', JSON.stringify(data.penggajian));
+            localStorage.setItem('payroll_cabang', JSON.stringify(data.cabang));
+            localStorage.setItem('payroll_parameter', JSON.stringify(data.parameter));
+        }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            t.classList.remove('translate-x-full');
+            setTimeout(() => t.classList.add('translate-x-full'), 3000);
+        }
+        
+        // Update Semua Jam di layar
+        setInterval(() => {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('id-ID');
+            document.querySelectorAll('.current-time-display').forEach(el => el.innerText = timeStr + " WIB");
+            
+            if(document.getElementById('emp-clock')) {
+                document.getElementById('emp-clock').innerText = timeStr;
+                const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+                document.getElementById('emp-date').innerText = now.toLocaleDateString('id-ID', options);
+            }
+        }, 1000);
+
+        // --- 3. SISTEM LOGIN & GEOFENCING ---
+        window.onload = () => { 
+            updateBranchDropdowns();
+            loadParameter();
+        };
+
+        function updateBranchDropdowns() {
+            const loginCabangSelect = document.getElementById('login-cabang');
+            if (loginCabangSelect) {
+                loginCabangSelect.innerHTML = '<option value="">-- Pilih Cabang --</option>' + data.cabang.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+            }
+        }
+
+        // Deteksi Lokasi Otomatis
+        function detectLocation() {
+            if(navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    document.getElementById('cab-lat').value = pos.coords.latitude;
+                    document.getElementById('cab-lng').value = pos.coords.longitude;
+                    showToast("Lokasi otomatis didapatkan!");
+                }, err => alert("Gagal mendapatkan lokasi. Pastikan izin akses GPS diberikan."));
+            } else { alert("Browser tidak mendukung Geolocation."); }
+        }
+
+        // Rumus Haversine
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; 
+            const φ1 = lat1 * Math.PI/180;
+            const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180;
+            const Δλ = (lon2-lon1) * Math.PI/180;
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        document.getElementById('form-login').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const u = document.getElementById('login-user').value;
+            const p = document.getElementById('login-pass').value;
+            const cab = document.getElementById('login-cabang').value;
+
+            // Akses Admin Utama
+            if(u === 'admin' && p === 'admin') {
+                loggedInUser = { role: 'admin' };
+                document.getElementById('screen-login').classList.add('hidden');
+                document.getElementById('screen-admin').classList.remove('hidden');
+                switchTab('dashboard');
+                showToast("Selamat datang, Admin");
+                return;
+            }
+
+            // Akses Karyawan
+            const emp = data.karyawan.find(k => k.username === u && k.password === p);
+            if(!emp) return alert("Username atau Password salah!");
+            
+            const branch = data.cabang.find(b => b.id === cab);
+            if(!branch) return alert("Silahkan pilih cabang terlebih dahulu untuk absensi!");
+            
+            document.getElementById('btn-login').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengecek GPS...';
+            
+            // Proses Geofencing
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const dist = getDistance(pos.coords.latitude, pos.coords.longitude, branch.lat, branch.lng);
+                        document.getElementById('btn-login').innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i> Masuk Sekarang';
+                        
+                        if (dist <= branch.radius) {
+                            loggedInUser = { role: 'karyawan', data: emp, cabangId: cab };
+                            document.getElementById('screen-login').classList.add('hidden');
+                            document.getElementById('screen-employee').classList.remove('hidden');
+                            initEmployeeDashboard();
+                        } else {
+                            alert(`Gagal Login! Anda berada ${Math.round(dist)} meter dari area cabang yang dipilih. Batas maksimal ${branch.radius} meter.`);
+                        }
+                    },
+                    (err) => {
+                        document.getElementById('btn-login').innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i> Masuk Sekarang';
+                        alert("Gagal mendapatkan lokasi. Pastikan GPS aktif dan Anda mengizinkan akses lokasi pada browser.");
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                alert("Browser tidak mendukung Geolocation.");
+            }
+        });
+
+        function logout() {
+            loggedInUser = null;
+            document.getElementById('screen-admin').classList.add('hidden');
+            document.getElementById('screen-employee').classList.add('hidden');
+            document.getElementById('screen-login').classList.remove('hidden');
+            document.getElementById('form-login').reset();
+            // Reset overlay & sidebar mobile state
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.add('hidden');
+        }
+
+        // --- 4. DASHBOARD KARYAWAN (SELF-SERVICE ABSEN) ---
+        function initEmployeeDashboard() {
+            const emp = loggedInUser.data;
+            const branchName = data.cabang.find(b => b.id === loggedInUser.cabangId)?.name;
+            document.getElementById('emp-welcome').innerText = `Halo, ${emp.nama}`;
+            document.getElementById('emp-jabatan').innerText = `${emp.jabatan} | Pilihan: ${branchName}`;
+            updateStatusAbsen();
+        }
+
+        function updateStatusAbsen() {
+            const today = new Date().toISOString().split('T')[0];
+            const empId = loggedInUser.data.id;
+            const absen = data.absensi.find(a => a.empId === empId && a.tgl === today);
+            
+            let statusText = "Belum ada rekam absensi hari ini.";
+            if(absen) {
+                statusText = `Tercatat: Masuk (${absen.jamMasuk}) `;
+                if(absen.jamPulang !== '-') statusText += ` | Pulang (${absen.jamPulang})`;
+            }
+            document.getElementById('emp-status-absen').innerText = statusText;
+        }
+
+        function absenMandiri(jenis) {
+            const today = new Date().toISOString().split('T')[0];
+            const timeNow = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const empId = loggedInUser.data.id;
+            
+            let absenIndex = data.absensi.findIndex(a => a.empId === empId && a.tgl === today);
+            
+            if(jenis === 'Masuk') {
+                if(absenIndex >= 0) return alert("Anda sudah absen masuk hari ini.");
+                let telat = 0;
+                let h = parseInt(timeNow.split(':')[0]);
+                let m = parseInt(timeNow.split(':')[1]);
+                
+                // Cek terlambat berdasarkan Parameter Jam Masuk
+                let paramHMasuk = parseInt(data.parameter.jamMasuk.split(':')[0]);
+                let paramMMasuk = parseInt(data.parameter.jamMasuk.split(':')[1]);
+                
+                if(h > paramHMasuk || (h === paramHMasuk && m > paramMMasuk)) {
+                    telat = ((h - paramHMasuk) * 60) + (m - paramMMasuk);
+                }
+                
+                data.absensi.push({
+                    id: generateId(), empId: empId, tgl: today, status: 'Hadir',
+                    jamMasuk: timeNow, jamPulang: '-', telat: telat
+                });
+                showToast("Absen Masuk Berhasil!");
+            } else {
+                if(absenIndex < 0) return alert("Anda belum absen masuk!");
+                if(data.absensi[absenIndex].jamPulang !== '-') return alert("Anda sudah absen pulang.");
+                data.absensi[absenIndex].jamPulang = timeNow;
+                showToast("Absen Pulang Berhasil!");
+            }
+            saveData();
+            updateStatusAbsen();
+        }
+
+        // --- 5. LOGIC MENU ADMIN & RESPONSIVE INTERACTION ---
+        function toggleSidebar() { 
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if(sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+        
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            document.querySelectorAll('.menu-item').forEach(el => {
+                el.classList.remove('bg-slate-800', 'text-blue-400'); el.classList.add('text-slate-400');
+            });
+            const activeMenu = document.querySelector(`.menu-item[data-target="${tabId}"]`);
+            if(activeMenu) {
+                activeMenu.classList.add('bg-slate-800', 'text-blue-400'); activeMenu.classList.remove('text-slate-400');
+                document.getElementById('header-title').innerText = activeMenu.innerText.trim();
+            }
+            
+            if(tabId === 'karyawan') { 
+                currentPageKar = 1; 
+                document.getElementById('search-karyawan').value = "";
+                searchQueryKaryawan = "";
+                renderKaryawan(); 
+            }
+            if(tabId === 'cabang') { renderCabang(); }
+            if(tabId === 'absensi') { populateDatalist(); setTglAbsensiToday(); renderTableAbsensi(); }
+            if(tabId === 'penggajian') { populateDatalist(); initBulanPenggajian(); }
+            if(tabId === 'laporan') { initBulanLaporan(); renderLaporan(); }
+            if(tabId === 'dashboard') renderDashboardAdmin();
+            if(tabId === 'parameter') loadParameter();
+            
+            // Auto close sidebar on mobile click
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.add('hidden');
+        }
+
+        // --- 6. MODUL KARYAWAN, SEARCH, & PAGINATION ---
+        function handleSearchKaryawan() {
+            searchQueryKaryawan = document.getElementById('search-karyawan').value.toLowerCase().trim();
+            currentPageKar = 1; 
+            renderKaryawan();
+        }
+
+        document.getElementById('form-karyawan').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('kar-id').value;
+            const newKar = {
+                id: id || generateId(),
+                nik: document.getElementById('kar-nik').value,
+                nama: document.getElementById('kar-nama').value,
+                jabatan: document.getElementById('kar-jabatan').value,
+                tglMasuk: document.getElementById('kar-tgl').value,
+                rekBank: document.getElementById('kar-rek').value,
+                gapok: parseFloat(document.getElementById('kar-gapok').value),
+                username: document.getElementById('kar-user').value,
+                password: document.getElementById('kar-pass').value
+            };
+
+            if(!id && data.karyawan.find(k => k.username === newKar.username)) {
+                return alert("Username sudah dipakai, ganti username lain.");
+            }
+
+            if(id) {
+                const idx = data.karyawan.findIndex(k => k.id === id);
+                data.karyawan[idx] = newKar; showToast("Data Karyawan Diperbarui");
+            } else {
+                data.karyawan.push(newKar); showToast("Karyawan Baru Ditambahkan");
+            }
+            saveData(); resetFormKaryawan(); renderKaryawan(); populateDatalist();
+        });
+
+        function renderKaryawan() {
+            const tb = document.getElementById('table-karyawan');
+            tb.innerHTML = '';
+            
+            const filteredData = data.karyawan.filter(k => 
+                k.nama.toLowerCase().includes(searchQueryKaryawan) || 
+                k.nik.toLowerCase().includes(searchQueryKaryawan)
+            );
+            
+            const totalItems = filteredData.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+            if(currentPageKar > totalPages && totalPages > 0) currentPageKar = totalPages;
+            
+            const start = (currentPageKar - 1) * itemsPerPage;
+            const paginatedData = filteredData.slice(start, start + itemsPerPage);
+
+            paginatedData.forEach(k => {
+                tb.innerHTML += `
+                    <tr class="hover:bg-slate-50/70 transition-colors">
+                        <td class="py-3.5 px-5"><div class="font-bold text-slate-900">${k.nama}</div><div class="text-[10px] text-slate-500 font-medium mt-0.5">NIK: ${k.nik} | ${k.jabatan}</div></td>
+                        <td class="py-3.5 px-4 text-xs font-semibold text-slate-600">${formatDate(k.tglMasuk)}</td>
+                        <td class="py-3.5 px-4 text-[11px]"><div class="text-slate-600"><span class="font-bold text-slate-400">User:</span> ${k.username}</div><div class="text-slate-600"><span class="font-bold text-slate-400">Pass:</span> ***</div></td>
+                        <td class="py-3.5 px-4 text-xs font-semibold text-slate-600">${k.rekBank}</td>
+                        <td class="py-3.5 px-4 font-bold text-emerald-600 text-xs">Rp ${k.gapok.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                            <button onclick="editKaryawan('${k.id}')" class="text-blue-500 hover:bg-blue-50 px-2 py-1.5 rounded-lg mr-1.5 text-[11px] font-bold transition-colors"><i class="fas fa-edit mr-1"></i>Edit</button>
+                            <button onclick="hapusKaryawan('${k.id}')" class="text-rose-500 hover:bg-rose-50 px-2 py-1.5 rounded-lg text-[11px] font-bold transition-colors"><i class="fas fa-trash mr-1"></i>Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            if(totalItems === 0) {
+                tb.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs font-medium">Tidak ditemukan data karyawan yang cocok.</td></tr>';
+            }
+            
+            renderPaginationKar(totalItems, totalPages);
+        }
+
+        function renderPaginationKar(total, pages) {
+            const pageDiv = document.getElementById('page-numbers');
+            document.getElementById('page-info').innerText = total > 0 ? `Menampilkan ${(currentPageKar-1)*itemsPerPage + 1} - ${Math.min(currentPageKar*itemsPerPage, total)} dari ${total}` : 'Data kosong';
+            
+            pageDiv.innerHTML = '';
+            if(pages <= 1) return;
+
+            pageDiv.innerHTML += `<button type="button" onclick="changePageKar(${currentPageKar-1})" class="w-7 h-7 flex items-center justify-center text-xs font-bold rounded-lg transition-all ${currentPageKar===1?'bg-slate-100 text-slate-400 cursor-not-allowed':'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}"><i class="fas fa-chevron-left"></i></button>`;
+            
+            for(let i=1; i<=pages; i++) {
+                pageDiv.innerHTML += `<button type="button" onclick="changePageKar(${i})" class="w-7 h-7 flex items-center justify-center text-xs font-bold rounded-lg transition-all ${currentPageKar===i?'bg-blue-600 text-white shadow-sm':'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">${i}</button>`;
+            }
+
+            pageDiv.innerHTML += `<button type="button" onclick="changePageKar(${currentPageKar+1})" class="w-7 h-7 flex items-center justify-center text-xs font-bold rounded-lg transition-all ${currentPageKar===pages?'bg-slate-100 text-slate-400 cursor-not-allowed':'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}"><i class="fas fa-chevron-right"></i></button>`;
+        }
+        
+        function changePageKar(page) {
+            const filteredData = data.karyawan.filter(k => 
+                k.nama.toLowerCase().includes(searchQueryKaryawan) || 
+                k.nik.toLowerCase().includes(searchQueryKaryawan)
+            );
+            const pages = Math.ceil(filteredData.length / itemsPerPage);
+            if(page < 1 || page > pages) return;
+            currentPageKar = page;
+            renderKaryawan();
+        }
+
+        function editKaryawan(id) {
+            const k = data.karyawan.find(x => x.id === id);
+            if(!k) return;
+            document.getElementById('kar-id').value = k.id;
+            document.getElementById('kar-nik').value = k.nik;
+            document.getElementById('kar-nama').value = k.nama;
+            document.getElementById('kar-jabatan').value = k.jabatan;
+            document.getElementById('kar-tgl').value = k.tglMasuk;
+            document.getElementById('kar-rek').value = k.rekBank;
+            document.getElementById('kar-gapok').value = k.gapok;
+            document.getElementById('kar-user').value = k.username || '';
+            document.getElementById('kar-pass').value = k.password || '';
+            
+            document.getElementById('form-karyawan').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function hapusKaryawan(id) {
+            if(confirm("Yakin hapus karyawan ini?")) {
+                data.karyawan = data.karyawan.filter(k => k.id !== id);
+                saveData(); renderKaryawan(); showToast("Karyawan Terhapus"); populateDatalist();
+            }
+        }
+        function resetFormKaryawan() { document.getElementById('form-karyawan').reset(); document.getElementById('kar-id').value = ''; }
+
+        // --- 6B. MODUL CABANG & MANAGEMENT ---
+        document.getElementById('form-cabang').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('cab-id').value;
+            const newCab = {
+                id: id || generateId(),
+                name: document.getElementById('cab-nama').value,
+                lat: parseFloat(document.getElementById('cab-lat').value),
+                lng: parseFloat(document.getElementById('cab-lng').value),
+                radius: parseFloat(document.getElementById('cab-radius').value)
+            };
+
+            if(id) {
+                const idx = data.cabang.findIndex(c => c.id === id);
+                data.cabang[idx] = newCab; showToast("Data Cabang Diperbarui");
+            } else {
+                data.cabang.push(newCab); showToast("Cabang Baru Ditambahkan");
+            }
+            saveData(); resetFormCabang(); renderCabang(); updateBranchDropdowns();
+        });
+
+        function renderCabang() {
+            const tb = document.getElementById('table-cabang');
+            if(!tb) return;
+            tb.innerHTML = '';
+            data.cabang.forEach(c => {
+                tb.innerHTML += `
+                    <tr class="hover:bg-slate-50/70 transition-colors">
+                        <td class="py-3.5 px-5 font-bold text-slate-900">${c.name}</td>
+                        <td class="py-3.5 px-4 text-[11px] font-mono text-slate-500">${c.lat}</td>
+                        <td class="py-3.5 px-4 text-[11px] font-mono text-slate-500">${c.lng}</td>
+                        <td class="py-3.5 px-4 font-bold text-blue-600 text-xs">${c.radius} m</td>
+                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                            <button onclick="editCabang('${c.id}')" class="text-blue-500 hover:bg-blue-50 px-2 py-1.5 rounded-lg mr-1.5 text-[11px] font-bold transition-colors"><i class="fas fa-edit mr-1"></i>Edit</button>
+                            <button onclick="hapusCabang('${c.id}')" class="text-rose-500 hover:bg-rose-50 px-2 py-1.5 rounded-lg text-[11px] font-bold transition-colors"><i class="fas fa-trash mr-1"></i>Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            if(data.cabang.length === 0) {
+                tb.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada data cabang terdaftar.</td></tr>';
+            }
+        }
+
+        function editCabang(id) {
+            const c = data.cabang.find(x => x.id === id);
+            if(!c) return;
+            document.getElementById('cab-id').value = c.id;
+            document.getElementById('cab-nama').value = c.name;
+            document.getElementById('cab-lat').value = c.lat;
+            document.getElementById('cab-lng').value = c.lng;
+            document.getElementById('cab-radius').value = c.radius;
+            document.getElementById('form-cabang').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function hapusCabang(id) {
+            if(confirm("Yakin hapus cabang ini?")) {
+                data.cabang = data.cabang.filter(c => c.id !== id);
+                saveData(); renderCabang(); showToast("Cabang Terhapus"); updateBranchDropdowns();
+            }
+        }
+        function resetFormCabang() { document.getElementById('form-cabang').reset(); document.getElementById('cab-id').value = ''; }
+
+        // --- 7. UTILITY PENCARIAN (DATALIST) ---
+        function populateDatalist() {
+            const dl = document.getElementById('karyawan-list');
+            dl.innerHTML = data.karyawan.map(k => `<option value="${k.nik} - ${k.nama}" data-id="${k.id}"></option>`).join('');
+        }
+        function getEmpIdFromInput(inputId) {
+            const val = document.getElementById(inputId).value;
+            const option = document.querySelector(`#karyawan-list option[value="${val}"]`);
+            return option ? option.getAttribute('data-id') : null;
+        }
+
+        // --- 8. MODUL ABSENSI (ADMIN VIEW) ---
+        function setTglAbsensiToday() {
+            if(!document.getElementById('filter-absensi-tgl').value) {
+                document.getElementById('filter-absensi-tgl').value = new Date().toISOString().split('T')[0];
+            }
+        }
+        function renderTableAbsensi() {
+            const filterTgl = document.getElementById('filter-absensi-tgl').value;
+            const tb = document.getElementById('table-absensi');
+            tb.innerHTML = '';
+            
+            // Filter by selected specific Date
+            const filtered = data.absensi.filter(a => a.tgl === filterTgl).sort((a,b) => a.tgl > b.tgl ? -1 : 1);
+            
+            filtered.forEach(a => {
+                const k = data.karyawan.find(x => x.id === a.empId);
+                tb.innerHTML += `
+                    <tr class="hover:bg-slate-50/70 transition-colors">
+                        <td class="py-3.5 px-5 font-semibold text-slate-700 whitespace-nowrap">${formatDate(a.tgl)}</td>
+                        <td class="py-3.5 px-4 font-bold text-blue-600">${k ? k.nama : 'Tidak diketahui'}</td>
+                        <td class="py-3.5 px-4 font-bold text-emerald-600">${a.jamMasuk}</td>
+                        <td class="py-3.5 px-4 font-bold ${a.jamPulang==='-'?'text-slate-300':'text-amber-500'}">${a.jamPulang}</td>
+                        <td class="py-3.5 px-4 ${a.telat>0?'text-rose-500 font-bold':'text-slate-400 font-medium'}">${a.telat} Menit</td>
+                        <td class="py-3.5 px-4 text-center no-print-export"><button onclick="hapusAbsen('${a.id}')" class="text-rose-500 hover:bg-rose-50 p-2 rounded-lg transition-colors"><i class="fas fa-trash"></i></button></td>
+                    </tr>
+                `;
+            });
+            if(filtered.length === 0) tb.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada rekam absensi pada tanggal ini.</td></tr>';
+        }
+        function hapusAbsen(id) { if(confirm("Hapus rekam absen ini?")) { data.absensi = data.absensi.filter(a => a.id !== id); saveData(); renderTableAbsensi(); } }
+
+        function exportAbsenExcel() {
+            let table = document.getElementById("table-absensi").parentElement.cloneNode(true);
+            // Hapus kolom aksi untuk export
+            const ths = table.querySelectorAll(".no-print-export");
+            ths.forEach(el => el.remove());
+            
+            let wb = XLSX.utils.table_to_book(table, {sheet: "Absensi"});
+            XLSX.writeFile(wb, "Rekap_Absensi.xlsx");
+        }
+        function exportAbsenPDF() {
+            const element = document.getElementById('export-absen-area').cloneNode(true);
+            element.querySelectorAll(".no-print-export").forEach(el => el.remove());
+            element.style.padding = "20px";
+            element.style.background = "white";
+
+            html2pdf().from(element).set({
+                margin: 1,
+                filename: 'Rekap_Absensi.pdf',
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
+            }).save();
+        }
+
+        // --- 8B. MODUL PARAMETER (ADMIN) ---
+        function loadParameter() {
+            document.getElementById('param-harikerja').value = data.parameter.hariKerja;
+            document.getElementById('param-jammasuk').value = data.parameter.jamMasuk;
+            document.getElementById('param-jampulang').value = data.parameter.jamPulang;
+            document.getElementById('param-toleransitelat').value = data.parameter.toleransiTelat;
+            document.getElementById('param-dendatelat').value = data.parameter.dendaTelatPersen;
+        }
+        
+        document.getElementById('form-parameter').addEventListener('submit', function(e) {
+            e.preventDefault();
+            data.parameter = {
+                hariKerja: parseFloat(document.getElementById('param-harikerja').value) || 26,
+                jamMasuk: document.getElementById('param-jammasuk').value,
+                jamPulang: document.getElementById('param-jampulang').value,
+                toleransiTelat: parseFloat(document.getElementById('param-toleransitelat').value) || 0,
+                dendaTelatPersen: parseFloat(document.getElementById('param-dendatelat').value) || 0
+            };
+            saveData();
+            showToast("Parameter sistem berhasil diperbarui!");
+        });
+
+
+        // --- 9. MODUL PENGGAJIAN ---
+        function initBulanPenggajian() { if(!document.getElementById('pay-periode').value) { document.getElementById('pay-periode').value = new Date().toISOString().slice(0,7); } }
+
+        function pullDataKaryawan() {
+            const empId = getEmpIdFromInput('pay-karyawan-input');
+            if(!empId) { document.getElementById('pay-gapok').value = 0; return; }
+            const k = data.karyawan.find(x => x.id === empId);
+            if(k) document.getElementById('pay-gapok').value = k.gapok;
+            
+            document.querySelectorAll('.pay-input').forEach(i => i.value = 0);
+            currentTunjangan = []; renderTunjanganList();
+            document.getElementById('btn-save-payroll').classList.add('hidden');
+        }
+
+        function addTunjangan() {
+            const nama = document.getElementById('tunj-nama').value;
+            const nominal = parseFloat(document.getElementById('tunj-nominal').value);
+            if(nama && nominal > 0) {
+                currentTunjangan.push({ name: nama, amount: nominal });
+                document.getElementById('tunj-nama').value = ''; document.getElementById('tunj-nominal').value = '';
+                renderTunjanganList();
+            }
+        }
+
+        function renderTunjanganList() {
+            const ul = document.getElementById('list-tunjangan'); ul.innerHTML = '';
+            currentTunjangan.forEach((t, index) => {
+                ul.innerHTML += `<li class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-emerald-100 text-[11px] shadow-sm">
+                    <span class="truncate max-w-[120px] font-semibold text-emerald-800">${t.name}</span> <span class="font-bold text-emerald-600 whitespace-nowrap">Rp ${t.amount.toLocaleString('id-ID')} <button type="button" onclick="hapusTunjangan(${index})" class="text-rose-500 hover:text-rose-700 ml-2 transition-colors"><i class="fas fa-times"></i></button></span></li>`;
+            });
+        }
+        function hapusTunjangan(idx) { currentTunjangan.splice(idx, 1); renderTunjanganList(); }
+
+        function autoFillDeductions() {
+            const empId = getEmpIdFromInput('pay-karyawan-input');
+            const periode = document.getElementById('pay-periode').value; 
+            if(!empId || !periode) return alert("Pilih Karyawan & Periode terlebih dahulu!");
+
+            const gapok = parseFloat(document.getElementById('pay-gapok').value) || 0;
+            let hariTelatCount = 0; 
+            let totalHadir = 0;
+            const absenBulanIni = data.absensi.filter(a => a.empId === empId && a.tgl.startsWith(periode));
+            
+            absenBulanIni.forEach(a => {
+                totalHadir++;
+                // Menghitung berapa kali dia telat
+                if(a.telat > 0) hariTelatCount++;
+            });
+
+            // Potongan Mangkir/Alfa (Sesuai parameter hari kerja)
+            const hariKerjaNormal = data.parameter.hariKerja;
+            let hariAlfa = (hariKerjaNormal - totalHadir) > 0 ? (hariKerjaNormal - totalHadir) : 0;
+            const gajiPerHari = gapok / hariKerjaNormal;
+            let potonganAlfa = hariAlfa * gajiPerHari;
+
+            // Potongan Denda Telat (Hanya jika melebih toleransi)
+            let potonganTelat = 0;
+            if(hariTelatCount > data.parameter.toleransiTelat) {
+                const hariKenaDenda = hariTelatCount - data.parameter.toleransiTelat;
+                const dendaPerHari = gajiPerHari * (data.parameter.dendaTelatPersen / 100);
+                potonganTelat = hariKenaDenda * dendaPerHari;
+            }
+
+            document.getElementById('pot-telat').value = Math.round(potonganTelat);
+            document.getElementById('pot-alfa').value = Math.round(potonganAlfa);
+            
+            showToast(`Tarikan otomatis: Hadir ${totalHadir} hr, Telat ${hariTelatCount}x (Toleransi ${data.parameter.toleransiTelat}x), Estimasi Alfa ${hariAlfa} hr.`);
+        }
+
+        function calculateAndPreview() {
+            const empId = getEmpIdFromInput('pay-karyawan-input');
+            const k = data.karyawan.find(x => x.id === empId);
+            if(!k) return alert("Pilih Karyawan dari daftar yang tersedia!");
+
+            const gapok = parseFloat(document.getElementById('pay-gapok').value) || 0;
+            const bonus = parseFloat(document.getElementById('pay-bonus').value) || 0;
+            const thr = parseFloat(document.getElementById('pay-thr').value) || 0;
+            
+            let totalTunjangan = 0; let htmlTunjangan = '';
+            currentTunjangan.forEach(t => { 
+                totalTunjangan += t.amount; 
+                htmlTunjangan += `<tr><td class="py-1.5 text-slate-600">${t.name}</td><td class="text-right font-bold">Rp ${t.amount.toLocaleString('id-ID')}</td></tr>`; 
+            });
+
+            const potTelat = parseFloat(document.getElementById('pot-telat').value) || 0;
+            const potAlfa = parseFloat(document.getElementById('pot-alfa').value) || 0;
+            const potIzin = parseFloat(document.getElementById('pot-izin').value) || 0;
+            const potPinjam = parseFloat(document.getElementById('pot-pinjam').value) || 0;
+
+            const totalPendapatan = gapok + bonus + thr + totalTunjangan;
+            const totalPotongan = potTelat + potAlfa + potIzin + potPinjam;
+            const netto = totalPendapatan - totalPotongan;
+
+            const periode = document.getElementById('pay-periode').value;
+            const tglStr = new Date(periode + '-01').toLocaleString('id-ID', {month: 'long', year:'numeric'});
+
+            document.getElementById('slip-periode').innerText = tglStr.toUpperCase();
+            document.getElementById('slip-nama').innerText = k.nama; document.getElementById('slip-jabatan').innerText = k.jabatan;
+            document.getElementById('slip-nik').innerText = k.nik; document.getElementById('slip-rek').innerText = k.rekBank;
+            
+            document.getElementById('slip-gapok').innerText = `Rp ${gapok.toLocaleString('id-ID')}`;
+            document.getElementById('slip-bonus').innerText = `Rp ${bonus.toLocaleString('id-ID')}`;
+            document.getElementById('slip-thr').innerText = `Rp ${thr.toLocaleString('id-ID')}`;
+            document.getElementById('slip-tunjangan-list').innerHTML = htmlTunjangan;
+
+            document.getElementById('slip-pot-telat').innerText = `Rp ${potTelat.toLocaleString('id-ID')}`;
+            document.getElementById('slip-pot-alfa').innerText = `Rp ${potAlfa.toLocaleString('id-ID')}`;
+            document.getElementById('slip-pot-izin').innerText = `Rp ${potIzin.toLocaleString('id-ID')}`;
+            document.getElementById('slip-pot-pinjam').innerText = `Rp ${potPinjam.toLocaleString('id-ID')}`;
+
+            document.getElementById('slip-tot-pendapatan').innerText = `Rp ${totalPendapatan.toLocaleString('id-ID')}`;
+            document.getElementById('slip-tot-potongan').innerText = `Rp ${totalPotongan.toLocaleString('id-ID')}`;
+            document.getElementById('slip-netto').innerText = `Rp ${netto.toLocaleString('id-ID')}`;
+            document.getElementById('slip-sign-nama').innerText = `( ${k.nama} )`;
+
+            currentCalcResult = {
+                id: generateId(), empId: empId, periode: periode, timestamp: new Date().toISOString(),
+                incomes: { gapok, bonus, thr, tunjangan: [...currentTunjangan] },
+                deductions: { potTelat, potAlfa, potIzin, potPinjam }, totalPendapatan, totalPotongan, netto
+            };
+            
+            document.getElementById('btn-save-payroll').classList.remove('hidden');
+            document.getElementById('slip-container').scrollIntoView({behavior: 'smooth', block: 'center'});
+        }
+
+        function savePayrollData() {
+            if(!currentCalcResult) return;
+            const exist = data.penggajian.findIndex(p => p.empId === currentCalcResult.empId && p.periode === currentCalcResult.periode);
+            if(exist >= 0) {
+                if(!confirm("Karyawan ini sudah digaji bulan ini. Timpa data?")) return;
+                data.penggajian[exist] = currentCalcResult;
+            } else { data.penggajian.push(currentCalcResult); }
+            saveData(); showToast("Riwayat Penggajian Tersimpan");
+        }
+
+        // --- 10. MODUL LAPORAN & DASHBOARD ---
+        function initBulanLaporan() { if(!document.getElementById('filter-lap-bln').value) { document.getElementById('filter-lap-bln').value = new Date().toISOString().slice(0,7); } }
+
+        function renderLaporan() {
+            const periode = document.getElementById('filter-lap-bln').value;
+            const tb = document.getElementById('table-laporan'); tb.innerHTML = '';
+            const listData = data.penggajian.filter(p => p.periode === periode);
+            let grandGaji = 0, grandPot = 0; let globalTelat = 0;
+            
+            data.absensi.filter(a => a.tgl.startsWith(periode)).forEach(a => globalTelat += a.telat);
+            
+            listData.forEach(p => {
+                const k = data.karyawan.find(x => x.id === p.empId);
+                grandGaji += p.netto; grandPot += p.totalPotongan;
+                const tunjDLL = p.totalPendapatan - p.incomes.gapok;
+                tb.innerHTML += `
+                    <tr class="hover:bg-slate-50/70 transition-colors">
+                        <td class="py-3.5 px-5 font-bold text-slate-900 truncate max-w-[120px]">${k ? k.nama : 'Unknown'}</td>
+                        <td class="py-3.5 px-4 font-semibold text-slate-500">Rp ${p.incomes.gapok.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-bold text-blue-600">Rp ${tunjDLL.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-bold text-rose-600">Rp ${p.totalPotongan.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-bold text-emerald-600 text-sm">Rp ${p.netto.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 text-center whitespace-nowrap"><button onclick="reprintSlip('${p.id}')" class="bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors"><i class="fas fa-print mr-1"></i>Cetak</button></td>
+                    </tr>`;
+            });
+
+            if(listData.length === 0) tb.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada riwayat penggajian tercetak pada bulan ini.</td></tr>`;
+            
+            document.getElementById('lap-tot-gaji').innerText = `Rp ${grandGaji.toLocaleString('id-ID')}`;
+            document.getElementById('lap-tot-pot').innerText = `Rp ${grandPot.toLocaleString('id-ID')}`;
+            document.getElementById('lap-tot-telat').innerText = globalTelat + " Menit";
+        }
+
+        function clearRiwayat() {
+            const bln = document.getElementById('filter-lap-bln').value;
+            if(!bln) return alert("Pilih bulan yang ingin dihapus terlebih dahulu.");
+            
+            if(confirm(`Yakin ingin menghapus seluruh rekapan gaji di bulan ${bln}? (Aksi ini tidak bisa dikembalikan)`)) {
+                data.penggajian = data.penggajian.filter(p => p.periode !== bln);
+                saveData(); 
+                renderLaporan();
+                showToast("Semua riwayat bulan tersebut telah dihapus!");
+            }
+        }
+
+        function reprintSlip(id) {
+            const p = data.penggajian.find(x => x.id === id);
+            if(!p) return;
+            const k = data.karyawan.find(x => x.id === p.empId);
+            if(!k) return alert("Karyawan sudah dihapus dari database sistem.");
+
+            let htmlTunjangan = '';
+            p.incomes.tunjangan.forEach(t => { htmlTunjangan += `<tr><td class="py-1.5 text-slate-600">${t.name}</td><td class="text-right font-bold">Rp ${t.amount.toLocaleString('id-ID')}</td></tr>`; });
+
+            const tglStr = new Date(p.periode + '-01').toLocaleString('id-ID', {month: 'long', year:'numeric'});
+
+            document.getElementById('slip-periode').innerText = tglStr.toUpperCase();
+            document.getElementById('slip-nama').innerText = k.nama; document.getElementById('slip-jabatan').innerText = k.jabatan;
+            document.getElementById('slip-nik').innerText = k.nik; document.getElementById('slip-rek').innerText = k.rekBank;
+            
+            document.getElementById('slip-gapok').innerText = `Rp ${p.incomes.gapok.toLocaleString('id-ID')}`;
+            document.getElementById('slip-bonus').innerText = `Rp ${p.incomes.bonus.toLocaleString('id-ID')}`;
+            document.getElementById('slip-thr').innerText = `Rp ${p.incomes.thr.toLocaleString('id-ID')}`;
+            document.getElementById('slip-tunjangan-list').innerHTML = htmlTunjangan;
+
+            document.getElementById('slip-pot-telat').innerText = `Rp ${p.deductions.potTelat.toLocaleString('id-ID')}`;
+            document.getElementById('slip-pot-alfa').innerText = `Rp ${p.deductions.potAlfa.toLocaleString('id-ID')}`;
+            document.getElementById('slip-pot-izin').innerText = `Rp ${p.deductions.potIzin.toLocaleString('id-ID')}`;
+            document.getElementById('slip-pot-pinjam').innerText = `Rp ${p.deductions.potPinjam.toLocaleString('id-ID')}`;
+
+            document.getElementById('slip-tot-pendapatan').innerText = `Rp ${p.totalPendapatan.toLocaleString('id-ID')}`;
+            document.getElementById('slip-tot-potongan').innerText = `Rp ${p.totalPotongan.toLocaleString('id-ID')}`;
+            document.getElementById('slip-netto').innerText = `Rp ${p.netto.toLocaleString('id-ID')}`;
+            document.getElementById('slip-sign-nama').innerText = `( ${k.nama} )`;
+
+            document.getElementById('slip-container').scrollIntoView({behavior: 'smooth', block: 'center'});
+            showToast("Slip dimuat ulang di jendela preview!");
+        }
+
+        function renderDashboardAdmin() {
+            document.getElementById('dash-karyawan').innerText = data.karyawan.length;
+            const bulanIni = new Date().toISOString().slice(0,7);
+            const hariIni = new Date().toISOString().split('T')[0];
+            
+            let pengeluaran = 0;
+            data.penggajian.filter(p => p.periode === bulanIni).forEach(p => pengeluaran += p.netto);
+            document.getElementById('dash-pengeluaran').innerText = `Rp ${pengeluaran.toLocaleString('id-ID')}`;
+            
+            const totalAbsenHariIni = data.absensi.filter(a => a.tgl === hariIni).length;
+            document.getElementById('dash-absensi').innerText = totalAbsenHariIni;
+        }
+
+    </script>
+</body>
+</html>
