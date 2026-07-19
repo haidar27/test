@@ -25,7 +25,6 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
         
-        /* Modifikasi perbaikan layout print */
         @media print {
             body * { visibility: hidden; }
             html, body, #screen-admin, main, .flex-1, .tab-content, #slip-container {
@@ -56,10 +55,22 @@
 </head>
 <body class="h-[100dvh] w-screen overflow-hidden text-slate-700 bg-[#f8fafc] flex flex-col relative antialiased">
 
-    <div id="toast" class="fixed top-5 right-5 transform translate-x-full transition-transform duration-300 bg-emerald-500 text-white px-6 py-3 rounded-xl shadow-lg z-[100] flex items-center font-semibold text-sm">
-        <i class="fas fa-info-circle mr-2"></i> <span id="toast-msg">Pesan</span>
+    <!-- Custom Modal Popup Perusahaan -->
+    <div id="custom-modal" class="hidden fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-sm text-center transform scale-100 transition-transform">
+            <div id="modal-icon" class="text-5xl mb-4"></div>
+            <h3 id="modal-title" class="text-xl font-bold text-slate-900 mb-2">Pemberitahuan</h3>
+            <p id="modal-message" class="text-sm font-medium text-slate-500 mb-8"></p>
+            <div class="flex justify-center gap-3" id="modal-buttons"></div>
+        </div>
     </div>
 
+    <!-- Toast -->
+    <div id="toast" class="fixed top-5 right-5 transform translate-x-full transition-transform duration-300 bg-emerald-500 text-white px-6 py-3 rounded-xl shadow-lg z-[100] flex items-center font-semibold text-sm">
+        <i class="fas fa-check-circle mr-2"></i> <span id="toast-msg">Pesan</span>
+    </div>
+
+    <!-- Halaman Login -->
     <div id="screen-login" class="flex-1 flex items-center justify-center bg-slate-900 z-50 absolute inset-0 overflow-y-auto p-4 md:p-8">
         <div class="bg-white p-8 md:p-10 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-blue-500 my-auto relative">
             <div class="text-center mb-8 text-slate-800">
@@ -74,11 +85,20 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Username</label>
-                    <input type="text" id="login-user" required placeholder="Gunakan 'admin' untuk HRD" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                    <input type="text" id="login-user" required placeholder="Username" autocomplete="username" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500 transition-colors">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Password</label>
-                    <input type="password" id="login-pass" required placeholder="Gunakan 'admin' untuk HRD" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                    <div class="relative">
+                        <input type="password" id="login-pass" required placeholder="Password" autocomplete="new-password" spellcheck="false" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500 transition-colors pr-10">
+                        <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors">
+                            <i class="fas fa-eye" id="eye-icon"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center mt-3">
+                    <input type="checkbox" id="login-remember" class="w-4 h-4 text-blue-600 bg-slate-50 border-slate-300 rounded focus:ring-blue-500">
+                    <label for="login-remember" class="ml-2 text-xs font-bold text-slate-500 cursor-pointer">Ingat Saya</label>
                 </div>
                 <button type="submit" id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-blue-500/20 transition-all mt-6 text-sm">
                     <i class="fas fa-sign-in-alt mr-2"></i> Masuk Sekarang
@@ -88,34 +108,65 @@
         </div>
     </div>
 
+    <!-- Halaman Karyawan -->
     <div id="screen-employee" class="hidden flex-1 flex flex-col h-full absolute inset-0 bg-[#f8fafc] z-40">
         <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 p-4 sm:px-8 sm:py-4 flex justify-between items-center shrink-0 sticky top-0 z-10 shadow-sm">
             <h1 class="text-base font-bold text-slate-900 tracking-tight truncate mr-2"><i class="fas fa-user-circle text-blue-500 mr-1.5"></i> Portal Karyawan</h1>
             <button onclick="logout()" class="text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/60 px-4 py-2 rounded-xl transition-all shrink-0"><i class="fas fa-sign-out-alt mr-1"></i>Keluar</button>
         </header>
         <div class="flex-1 p-4 sm:p-8 flex flex-col items-center justify-center overflow-y-auto pb-24">
-            <div class="bg-white p-8 sm:p-10 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.01)] border border-slate-100 text-center max-w-sm w-full my-auto">
-                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 truncate tracking-tight" id="emp-welcome">Halo, Nama</h2>
-                <p class="text-slate-400 text-xs sm:text-sm font-medium mb-8 truncate" id="emp-jabatan">Jabatan - Cabang</p>
+            <div class="bg-white p-6 sm:p-10 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.01)] border border-slate-100 text-center max-w-sm w-full my-auto flex flex-col items-center">
                 
-                <div class="text-4xl sm:text-5xl font-mono font-bold text-blue-600 mb-2 tracking-tight" id="emp-clock">00:00:00</div>
-                <div class="text-xs sm:text-sm text-slate-500 mb-10 font-medium" id="emp-date">Senin, 1 Jan 2026</div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 truncate tracking-tight w-full" id="emp-welcome">Halo, Nama</h2>
+                <p class="text-slate-400 text-xs sm:text-sm font-medium mb-6 truncate w-full" id="emp-jabatan">Jabatan - Cabang</p>
+                
+                <div class="text-4xl sm:text-5xl font-mono font-bold text-blue-600 mb-1 tracking-tight" id="emp-clock">00:00:00</div>
+                <div class="text-xs sm:text-sm text-slate-500 mb-6 font-semibold" id="emp-date">Senin, 1 Jan 2026</div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="absenMandiri('Masuk')" class="py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-md shadow-emerald-500/20 text-sm transition-all transform active:scale-95">
-                        <i class="fas fa-sign-in-alt text-xl mb-1.5 block"></i> Absen Masuk
-                    </button>
-                    <button onclick="absenMandiri('Pulang')" class="py-4 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold shadow-md shadow-rose-500/20 text-sm transition-all transform active:scale-95">
-                        <i class="fas fa-sign-out-alt text-xl mb-1.5 block"></i> Absen Pulang
-                    </button>
+                <div class="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-100 p-3 rounded-xl mb-6 w-full flex justify-around shadow-sm">
+                    <span>Masuk: <span id="emp-jam-masuk" class="text-blue-900">-</span></span>
+                    <span class="text-blue-300">|</span>
+                    <span>Pulang: <span id="emp-jam-pulang" class="text-blue-900">-</span></span>
                 </div>
-                <p id="emp-status-absen" class="mt-8 text-[11px] sm:text-xs font-semibold text-slate-500 bg-slate-50 border border-slate-100 p-3 rounded-xl break-words"></p>
+
+                <div class="w-full flex flex-col gap-3 relative">
+                    <button id="btn-aksi-absen" onclick="handleAksiAbsen()" class="py-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-md shadow-emerald-500/20 text-sm transition-all transform active:scale-95">
+                        <i class="fas fa-fingerprint text-xl mb-1.5 block"></i> <span id="lbl-aksi-absen">Absen Masuk</span>
+                    </button>
+                    
+                    <button id="btn-aksi-izin" onclick="toggleFormIzin()" class="py-3 w-full bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-100 rounded-xl font-bold text-xs transition-all transform active:scale-95">
+                        <i class="fas fa-clipboard-list mr-1.5"></i> Ajukan Izin
+                    </button>
+                    
+                    <div id="form-izin-container" class="hidden flex-col gap-2 mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl w-full transition-all text-left">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Keterangan Izin</label>
+                        <input type="text" id="keterangan-izin" placeholder="Contoh: Sakit / Urusan Keluarga" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-amber-500">
+                        <button onclick="submitIzin()" class="py-2.5 mt-1 bg-amber-500 hover:bg-amber-600 shadow-md shadow-amber-500/20 text-white rounded-lg font-bold text-xs transition-colors">Kirim Pengajuan Izin</button>
+                    </div>
+                </div>
+
+                <div class="mt-8 grid grid-cols-3 gap-2 w-full text-center border-t border-slate-100 pt-5">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hadir</p>
+                        <p class="text-lg font-bold text-emerald-600 mt-1" id="stat-hadir">0</p>
+                    </div>
+                    <div class="border-x border-slate-100">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Telat</p>
+                        <p class="text-lg font-bold text-rose-500 mt-1" id="stat-telat">0</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Izin</p>
+                        <p class="text-lg font-bold text-amber-500 mt-1" id="stat-izin">0</p>
+                    </div>
+                </div>
+
+                <p id="emp-status-absen" class="mt-6 text-[10px] sm:text-[11px] font-semibold text-slate-400 bg-transparent text-center"></p>
             </div>
         </div>
     </div>
 
+    <!-- Halaman Admin -->
     <div id="screen-admin" class="hidden flex-1 flex h-full absolute inset-0 z-30 overflow-hidden">
-        
         <aside class="w-64 bg-slate-900 text-white flex flex-col no-print transition-transform duration-300 fixed md:relative h-full z-50 -translate-x-full md:translate-x-0 shrink-0" id="sidebar">
             <div class="p-5 border-b border-slate-800 flex justify-between items-center shrink-0">
                 <h1 class="text-xl font-bold tracking-tight text-white"><i class="fas fa-wallet text-blue-500 mr-2"></i>Pay<span class="text-blue-500">Roll</span></h1>
@@ -152,7 +203,7 @@
             </header>
 
             <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#f8fafc] min-h-0 pb-32 md:pb-32 space-y-6">
-                
+                <!-- Tab Dashboard -->
                 <div id="dashboard" class="tab-content active">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] p-6 flex justify-between items-center relative overflow-hidden">
@@ -182,6 +233,7 @@
                     </div>
                 </div>
 
+                <!-- Tab Karyawan -->
                 <div id="karyawan" class="tab-content space-y-6">
                     <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden">
                         <div class="p-5 md:p-6 border-b border-slate-50 flex justify-between items-center">
@@ -210,8 +262,8 @@
                                     <div class="sm:col-span-2">
                                         <span class="block text-[11px] font-bold text-slate-900 uppercase">Informasi Login Portal</span>
                                     </div>
-                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Username Login</label><input type="text" id="kar-user" required class="w-full px-3 py-2 bg-blue-50/50 border border-blue-100 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
-                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Password Login</label><input type="text" id="kar-pass" required class="w-full px-3 py-2 bg-blue-50/50 border border-blue-100 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Username Login</label><input type="text" id="kar-user" autocomplete="off" required class="w-full px-3 py-2 bg-blue-50/50 border border-blue-100 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Password Login</label><input type="text" id="kar-pass" autocomplete="new-password" required class="w-full px-3 py-2 bg-blue-50/50 border border-blue-100 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
                                 </div>
                                 
                                 <div class="sm:col-span-2 lg:col-span-3 flex justify-end gap-2 mt-4 pt-2">
@@ -254,6 +306,7 @@
                     </div>
                 </div>
 
+                <!-- Tab Cabang -->
                 <div id="cabang" class="tab-content space-y-6">
                     <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden">
                         <div class="p-5 md:p-6 border-b border-slate-50">
@@ -305,6 +358,7 @@
                     </div>
                 </div>
 
+                <!-- Tab Absensi -->
                 <div id="absensi" class="tab-content space-y-6">
                     <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden">
                         <div class="p-5 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 w-full">
@@ -327,6 +381,7 @@
                                         <th class="py-3.5 px-4">Masuk</th>
                                         <th class="py-3.5 px-4">Pulang</th>
                                         <th class="py-3.5 px-4">Terlambat</th>
+                                        <th class="py-3.5 px-4">Ket/Status</th>
                                         <th class="py-3.5 px-4 text-center no-print-export">Aksi</th>
                                     </tr>
                                 </thead>
@@ -336,6 +391,7 @@
                     </div>
                 </div>
 
+                <!-- Tab Penggajian -->
                 <div id="penggajian" class="tab-content space-y-6">
                     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
                         <div class="xl:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden">
@@ -373,7 +429,7 @@
                                                 </div>
                                             </div>
                                             <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Bonus Kinerja (Rp)</label><input type="number" id="pay-bonus" value="0" class="pay-input w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-emerald-500 transition-colors"></div>
-                                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tunjangan Hari Raya (Rp)</label><input type="number" id="pay-thr" value="0" class="pay-input w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-emerald-500 transition-colors"></div>
+                                            <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">THR (Rp)</label><input type="number" id="pay-thr" value="0" class="pay-input w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-emerald-500 transition-colors"></div>
                                             
                                             <div class="p-4 bg-emerald-50/50 border border-emerald-100 rounded-xl">
                                                 <label class="block text-[11px] font-bold text-emerald-700 uppercase mb-2">Tunjangan Ekstra</label>
@@ -472,6 +528,7 @@
                     </div>
                 </div>
 
+                <!-- Tab Laporan -->
                 <div id="laporan" class="tab-content space-y-6">
                     <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden">
                         <div class="p-5 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -518,6 +575,7 @@
                     </div>
                 </div>
 
+                <!-- Tab Parameter -->
                 <div id="parameter" class="tab-content space-y-6">
                     <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] overflow-hidden">
                         <div class="p-5 md:p-6 border-b border-slate-50">
@@ -601,6 +659,41 @@
             localStorage.setItem('payroll_cabang', JSON.stringify(data.cabang));
             localStorage.setItem('payroll_parameter', JSON.stringify(data.parameter));
         }
+
+        // --- PERBAIKAN BUG TANGGAL --- (Memastikan tidak meleset karna UTC timezone offset)
+        function getLocalToday() {
+            const d = new Date();
+            d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+            return d.toISOString().split('T')[0];
+        }
+        function getLocalTime() {
+            const d = new Date();
+            return d.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // --- KUSTOMISASI MODAL ALERT ---
+        function customAlert(msg) {
+            document.getElementById('modal-icon').innerHTML = '<i class="fas fa-info-circle text-blue-500"></i>';
+            document.getElementById('modal-title').innerText = 'Pemberitahuan';
+            document.getElementById('modal-message').innerText = msg;
+            document.getElementById('modal-buttons').innerHTML = `<button onclick="closeModal()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md">Mengerti</button>`;
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        function customConfirm(msg, onConfirm) {
+            document.getElementById('modal-icon').innerHTML = '<i class="fas fa-question-circle text-amber-500"></i>';
+            document.getElementById('modal-title').innerText = 'Konfirmasi Tindakan';
+            document.getElementById('modal-message').innerText = msg;
+            document.getElementById('modal-buttons').innerHTML = `
+                <button onclick="closeModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition-colors">Batal</button>
+                <button id="btn-confirm-ok" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 rounded-xl font-bold text-xs transition-colors">Ya, Lanjutkan</button>
+            `;
+            document.getElementById('custom-modal').classList.remove('hidden');
+            document.getElementById('btn-confirm-ok').onclick = function() { closeModal(); onConfirm(); };
+        }
+
+        function closeModal() { document.getElementById('custom-modal').classList.add('hidden'); }
+
         function showToast(msg) {
             const t = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
@@ -611,21 +704,73 @@
         // Update Semua Jam di layar
         setInterval(() => {
             const now = new Date();
-            const timeStr = now.toLocaleTimeString('id-ID');
+            const timeStr = getLocalTime();
             document.querySelectorAll('.current-time-display').forEach(el => el.innerText = timeStr + " WIB");
             
             if(document.getElementById('emp-clock')) {
                 document.getElementById('emp-clock').innerText = timeStr;
-                const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 document.getElementById('emp-date').innerText = now.toLocaleDateString('id-ID', options);
             }
+
+            // AUTO PULANG CHECK (10 Menit Lewat)
+            if (loggedInUser && loggedInUser.role === 'karyawan') {
+                const today = getLocalToday();
+                let absen = data.absensi.find(a => a.empId === loggedInUser.data.id && a.tgl === today);
+                
+                if (absen && absen.status === 'Hadir' && absen.jamPulang === '-') {
+                    let hNow = parseInt(timeStr.split(':')[0]);
+                    let mNow = parseInt(timeStr.split(':')[1]);
+                    let paramHPulang = parseInt(data.parameter.jamPulang.split(':')[0]);
+                    let paramMPulang = parseInt(data.parameter.jamPulang.split(':')[1]);
+                    
+                    let nowInMinutes = hNow * 60 + mNow;
+                    let batasPulangInMinutes = paramHPulang * 60 + paramMPulang + 10; 
+                    
+                    if (nowInMinutes >= batasPulangInMinutes) {
+                        absen.jamPulang = timeStr; 
+                        absen.keterangan = "Pulang Otomatis";
+                        saveData();
+                        updateStatusAbsen();
+                        showToast("Sistem otomatis menyelesaikan absensi pulang Anda.");
+                    }
+                }
+            }
+
         }, 1000);
 
         // --- 3. SISTEM LOGIN & GEOFENCING ---
         window.onload = () => { 
             updateBranchDropdowns();
             loadParameter();
+            
+            // Cek status sesi login (Remember Me)
+            const session = localStorage.getItem('payroll_session');
+            if (session) {
+                loggedInUser = JSON.parse(session);
+                if (loggedInUser.role === 'admin') {
+                    document.getElementById('screen-login').classList.add('hidden');
+                    document.getElementById('screen-admin').classList.remove('hidden');
+                    switchTab('dashboard');
+                } else {
+                    document.getElementById('screen-login').classList.add('hidden');
+                    document.getElementById('screen-employee').classList.remove('hidden');
+                    initEmployeeDashboard();
+                }
+            }
         };
+
+        function togglePassword() {
+            const pwd = document.getElementById('login-pass');
+            const icon = document.getElementById('eye-icon');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                pwd.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
 
         function updateBranchDropdowns() {
             const loginCabangSelect = document.getElementById('login-cabang');
@@ -641,8 +786,8 @@
                     document.getElementById('cab-lat').value = pos.coords.latitude;
                     document.getElementById('cab-lng').value = pos.coords.longitude;
                     showToast("Lokasi otomatis didapatkan!");
-                }, err => alert("Gagal mendapatkan lokasi. Pastikan izin akses GPS diberikan."));
-            } else { alert("Browser tidak mendukung Geolocation."); }
+                }, err => customAlert("Gagal mendapatkan lokasi. Pastikan izin akses GPS diberikan."));
+            } else { customAlert("Browser tidak mendukung Geolocation."); }
         }
 
         // Rumus Haversine
@@ -662,10 +807,13 @@
             const u = document.getElementById('login-user').value;
             const p = document.getElementById('login-pass').value;
             const cab = document.getElementById('login-cabang').value;
+            const isRemember = document.getElementById('login-remember').checked;
 
             // Akses Admin Utama
             if(u === 'admin' && p === 'admin') {
                 loggedInUser = { role: 'admin' };
+                if(isRemember) localStorage.setItem('payroll_session', JSON.stringify(loggedInUser));
+                
                 document.getElementById('screen-login').classList.add('hidden');
                 document.getElementById('screen-admin').classList.remove('hidden');
                 switchTab('dashboard');
@@ -675,10 +823,10 @@
 
             // Akses Karyawan
             const emp = data.karyawan.find(k => k.username === u && k.password === p);
-            if(!emp) return alert("Username atau Password salah!");
+            if(!emp) return customAlert("Username atau Password salah!");
             
             const branch = data.cabang.find(b => b.id === cab);
-            if(!branch) return alert("Silahkan pilih cabang terlebih dahulu untuk absensi!");
+            if(!branch) return customAlert("Silahkan pilih cabang terlebih dahulu untuk absensi!");
             
             document.getElementById('btn-login').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengecek GPS...';
             
@@ -691,31 +839,34 @@
                         
                         if (dist <= branch.radius) {
                             loggedInUser = { role: 'karyawan', data: emp, cabangId: cab };
+                            if(isRemember) localStorage.setItem('payroll_session', JSON.stringify(loggedInUser));
+                            
                             document.getElementById('screen-login').classList.add('hidden');
                             document.getElementById('screen-employee').classList.remove('hidden');
                             initEmployeeDashboard();
                         } else {
-                            alert(`Gagal Login! Anda berada ${Math.round(dist)} meter dari area cabang yang dipilih. Batas maksimal ${branch.radius} meter.`);
+                            customAlert(`Gagal Login! Anda berada ${Math.round(dist)} meter dari area cabang. Batas maksimal ${branch.radius} meter.`);
                         }
                     },
                     (err) => {
                         document.getElementById('btn-login').innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i> Masuk Sekarang';
-                        alert("Gagal mendapatkan lokasi. Pastikan GPS aktif dan Anda mengizinkan akses lokasi pada browser.");
+                        customAlert("Gagal mendapatkan lokasi. Pastikan GPS aktif dan Anda mengizinkan akses lokasi pada browser.");
                     },
                     { enableHighAccuracy: true, timeout: 10000 }
                 );
             } else {
-                alert("Browser tidak mendukung Geolocation.");
+                customAlert("Browser tidak mendukung Geolocation.");
             }
         });
 
         function logout() {
             loggedInUser = null;
+            localStorage.removeItem('payroll_session'); // Hapus sesi jika keluar
+            
             document.getElementById('screen-admin').classList.add('hidden');
             document.getElementById('screen-employee').classList.add('hidden');
             document.getElementById('screen-login').classList.remove('hidden');
             document.getElementById('form-login').reset();
-            // Reset overlay & sidebar mobile state
             document.getElementById('sidebar').classList.add('-translate-x-full');
             document.getElementById('sidebar-overlay').classList.add('hidden');
         }
@@ -723,39 +874,74 @@
         // --- 4. DASHBOARD KARYAWAN (SELF-SERVICE ABSEN) ---
         function initEmployeeDashboard() {
             const emp = loggedInUser.data;
-            const branchName = data.cabang.find(b => b.id === loggedInUser.cabangId)?.name;
-            document.getElementById('emp-welcome').innerText = `Halo, ${emp.nama}`;
-            document.getElementById('emp-jabatan').innerText = `${emp.jabatan} | Pilihan: ${branchName}`;
+            const branchName = data.cabang.find(b => b.id === loggedInUser.cabangId)?.name || 'Bebas';
+            document.getElementById('emp-welcome').innerText = `Selamat Datang, ${emp.nama}`;
+            document.getElementById('emp-jabatan').innerText = `${emp.jabatan} | ${branchName}`;
+            
             updateStatusAbsen();
+            updateStatistikBulanan();
         }
 
         function updateStatusAbsen() {
-            const today = new Date().toISOString().split('T')[0];
+            const today = getLocalToday();
             const empId = loggedInUser.data.id;
             const absen = data.absensi.find(a => a.empId === empId && a.tgl === today);
             
-            let statusText = "Belum ada rekam absensi hari ini.";
-            if(absen) {
-                statusText = `Tercatat: Masuk (${absen.jamMasuk}) `;
-                if(absen.jamPulang !== '-') statusText += ` | Pulang (${absen.jamPulang})`;
+            const btnAbsen = document.getElementById('btn-aksi-absen');
+            const lblAbsen = document.getElementById('lbl-aksi-absen');
+            const btnIzin = document.getElementById('btn-aksi-izin');
+            const boxIzin = document.getElementById('form-izin-container');
+            
+            document.getElementById('emp-jam-masuk').innerText = '-';
+            document.getElementById('emp-jam-pulang').innerText = '-';
+            
+            if(!absen) {
+                // Kondisi Belum Absen
+                lblAbsen.innerText = 'Klik Untuk Absen Masuk';
+                btnAbsen.className = "py-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-md shadow-emerald-500/20 text-sm transition-all transform active:scale-95";
+                btnAbsen.disabled = false;
+                btnIzin.classList.remove('hidden');
+                document.getElementById('emp-status-absen').innerText = "Belum ada rekam absensi Anda untuk hari ini.";
+            } else {
+                document.getElementById('emp-jam-masuk').innerText = absen.jamMasuk;
+                btnIzin.classList.add('hidden'); 
+                boxIzin.classList.add('hidden');
+
+                if (absen.status === 'Izin') {
+                    // Kondisi Izin
+                    lblAbsen.innerText = 'Status: Izin';
+                    btnAbsen.className = "py-4 w-full bg-slate-200 text-slate-400 rounded-xl font-bold text-sm cursor-not-allowed";
+                    btnAbsen.disabled = true;
+                    document.getElementById('emp-status-absen').innerText = `Keterangan: ${absen.keterangan}`;
+                } else if(absen.jamPulang === '-') {
+                    // Sudah masuk, waktunya pulang
+                    lblAbsen.innerText = 'Klik Untuk Absen Pulang';
+                    btnAbsen.className = "py-4 w-full bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold shadow-md shadow-rose-500/20 text-sm transition-all transform active:scale-95";
+                    btnAbsen.disabled = false;
+                    document.getElementById('emp-status-absen').innerText = `Anda sudah tercatat hadir masuk pada ${absen.jamMasuk} WIB.`;
+                } else {
+                    // Sudah Selesai
+                    document.getElementById('emp-jam-pulang').innerText = absen.jamPulang;
+                    lblAbsen.innerText = 'Absensi Selesai';
+                    btnAbsen.className = "py-4 w-full bg-slate-200 text-slate-400 rounded-xl font-bold text-sm cursor-not-allowed";
+                    btnAbsen.disabled = true;
+                    document.getElementById('emp-status-absen').innerText = `Seluruh aktivitas absensi hari ini telah diselesaikan.`;
+                }
             }
-            document.getElementById('emp-status-absen').innerText = statusText;
         }
 
-        function absenMandiri(jenis) {
-            const today = new Date().toISOString().split('T')[0];
-            const timeNow = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+        function handleAksiAbsen() {
+            const today = getLocalToday();
+            const timeNow = getLocalTime();
             const empId = loggedInUser.data.id;
             
             let absenIndex = data.absensi.findIndex(a => a.empId === empId && a.tgl === today);
             
-            if(jenis === 'Masuk') {
-                if(absenIndex >= 0) return alert("Anda sudah absen masuk hari ini.");
+            if(absenIndex < 0) {
+                // Proses Absen Masuk
                 let telat = 0;
                 let h = parseInt(timeNow.split(':')[0]);
                 let m = parseInt(timeNow.split(':')[1]);
-                
-                // Cek terlambat berdasarkan Parameter Jam Masuk
                 let paramHMasuk = parseInt(data.parameter.jamMasuk.split(':')[0]);
                 let paramMMasuk = parseInt(data.parameter.jamMasuk.split(':')[1]);
                 
@@ -765,17 +951,65 @@
                 
                 data.absensi.push({
                     id: generateId(), empId: empId, tgl: today, status: 'Hadir',
-                    jamMasuk: timeNow, jamPulang: '-', telat: telat
+                    jamMasuk: timeNow, jamPulang: '-', telat: telat, keterangan: ''
                 });
-                showToast("Absen Masuk Berhasil!");
+                showToast("Absen Masuk Berhasil Direkam!");
             } else {
-                if(absenIndex < 0) return alert("Anda belum absen masuk!");
-                if(data.absensi[absenIndex].jamPulang !== '-') return alert("Anda sudah absen pulang.");
+                // Proses Absen Pulang
                 data.absensi[absenIndex].jamPulang = timeNow;
-                showToast("Absen Pulang Berhasil!");
+                showToast("Absen Pulang Berhasil Direkam!");
             }
             saveData();
             updateStatusAbsen();
+            updateStatistikBulanan();
+        }
+
+        function toggleFormIzin() {
+            const form = document.getElementById('form-izin-container');
+            form.classList.toggle('hidden');
+            form.classList.toggle('flex');
+        }
+
+        function submitIzin() {
+            const ket = document.getElementById('keterangan-izin').value;
+            if(!ket) return customAlert("Silahkan isi keterangan detail pengajuan izin Anda!");
+            
+            const today = getLocalToday();
+            const empId = loggedInUser.data.id;
+            
+            data.absensi.push({
+                id: generateId(), empId: empId, tgl: today, status: 'Izin',
+                jamMasuk: '-', jamPulang: '-', telat: 0, keterangan: ket
+            });
+            
+            showToast("Pengajuan Izin Diterima!");
+            document.getElementById('keterangan-izin').value = '';
+            document.getElementById('form-izin-container').classList.add('hidden');
+            document.getElementById('form-izin-container').classList.remove('flex');
+            
+            saveData();
+            updateStatusAbsen();
+            updateStatistikBulanan();
+        }
+
+        function updateStatistikBulanan() {
+            if(!loggedInUser || loggedInUser.role !== 'karyawan') return;
+            const empId = loggedInUser.data.id;
+            const blnIni = getLocalToday().slice(0, 7);
+            
+            let hadir = 0, telat = 0, izin = 0;
+            data.absensi.filter(a => a.empId === empId && a.tgl.startsWith(blnIni)).forEach(a => {
+                if(a.status === 'Hadir') {
+                    hadir++;
+                    if(a.telat > 0) telat++;
+                } else if(a.status === 'Izin') {
+                    izin++;
+                }
+            });
+            
+            document.getElementById('stat-hadir').innerText = hadir;
+            document.getElementById('stat-telat').innerText = telat;
+            document.getElementById('stat-izin').innerText = izin;
         }
 
         // --- 5. LOGIC MENU ADMIN & RESPONSIVE INTERACTION ---
@@ -845,7 +1079,7 @@
             };
 
             if(!id && data.karyawan.find(k => k.username === newKar.username)) {
-                return alert("Username sudah dipakai, ganti username lain.");
+                return customAlert("Username sudah dipakai, ganti username lain.");
             }
 
             if(id) {
@@ -940,10 +1174,10 @@
         }
 
         function hapusKaryawan(id) {
-            if(confirm("Yakin hapus karyawan ini?")) {
+            customConfirm("Yakin hapus karyawan ini dari database?", () => {
                 data.karyawan = data.karyawan.filter(k => k.id !== id);
                 saveData(); renderKaryawan(); showToast("Karyawan Terhapus"); populateDatalist();
-            }
+            });
         }
         function resetFormKaryawan() { document.getElementById('form-karyawan').reset(); document.getElementById('kar-id').value = ''; }
 
@@ -1003,10 +1237,10 @@
         }
 
         function hapusCabang(id) {
-            if(confirm("Yakin hapus cabang ini?")) {
+            customConfirm("Yakin hapus area cabang ini?", () => {
                 data.cabang = data.cabang.filter(c => c.id !== id);
                 saveData(); renderCabang(); showToast("Cabang Terhapus"); updateBranchDropdowns();
-            }
+            });
         }
         function resetFormCabang() { document.getElementById('form-cabang').reset(); document.getElementById('cab-id').value = ''; }
 
@@ -1024,7 +1258,7 @@
         // --- 8. MODUL ABSENSI (ADMIN VIEW) ---
         function setTglAbsensiToday() {
             if(!document.getElementById('filter-absensi-tgl').value) {
-                document.getElementById('filter-absensi-tgl').value = new Date().toISOString().split('T')[0];
+                document.getElementById('filter-absensi-tgl').value = getLocalToday();
             }
         }
         function renderTableAbsensi() {
@@ -1032,29 +1266,39 @@
             const tb = document.getElementById('table-absensi');
             tb.innerHTML = '';
             
-            // Filter by selected specific Date
             const filtered = data.absensi.filter(a => a.tgl === filterTgl).sort((a,b) => a.tgl > b.tgl ? -1 : 1);
             
             filtered.forEach(a => {
                 const k = data.karyawan.find(x => x.id === a.empId);
+                const isIzin = a.status === 'Izin';
+                const statusHtml = isIzin 
+                    ? `<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded-md text-[10px] uppercase font-bold">Izin (${a.keterangan || '-'})</span>` 
+                    : `<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md text-[10px] uppercase font-bold">Hadir</span>`;
+                
                 tb.innerHTML += `
                     <tr class="hover:bg-slate-50/70 transition-colors">
                         <td class="py-3.5 px-5 font-semibold text-slate-700 whitespace-nowrap">${formatDate(a.tgl)}</td>
-                        <td class="py-3.5 px-4 font-bold text-blue-600">${k ? k.nama : 'Tidak diketahui'}</td>
+                        <td class="py-3.5 px-4 font-bold text-blue-600">${k ? k.nama : 'Karyawan (Dihapus)'}</td>
                         <td class="py-3.5 px-4 font-bold text-emerald-600">${a.jamMasuk}</td>
-                        <td class="py-3.5 px-4 font-bold ${a.jamPulang==='-'?'text-slate-300':'text-amber-500'}">${a.jamPulang}</td>
+                        <td class="py-3.5 px-4 font-bold ${a.jamPulang==='-'?'text-slate-300':'text-blue-500'}">${a.jamPulang}</td>
                         <td class="py-3.5 px-4 ${a.telat>0?'text-rose-500 font-bold':'text-slate-400 font-medium'}">${a.telat} Menit</td>
+                        <td class="py-3.5 px-4">${statusHtml}</td>
                         <td class="py-3.5 px-4 text-center no-print-export"><button onclick="hapusAbsen('${a.id}')" class="text-rose-500 hover:bg-rose-50 p-2 rounded-lg transition-colors"><i class="fas fa-trash"></i></button></td>
                     </tr>
                 `;
             });
-            if(filtered.length === 0) tb.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada rekam absensi pada tanggal ini.</td></tr>';
+            if(filtered.length === 0) tb.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada rekam absensi pada tanggal ini.</td></tr>';
         }
-        function hapusAbsen(id) { if(confirm("Hapus rekam absen ini?")) { data.absensi = data.absensi.filter(a => a.id !== id); saveData(); renderTableAbsensi(); } }
+        
+        function hapusAbsen(id) { 
+            customConfirm("Hapus log absensi spesifik ini?", () => { 
+                data.absensi = data.absensi.filter(a => a.id !== id); 
+                saveData(); renderTableAbsensi(); 
+            }); 
+        }
 
         function exportAbsenExcel() {
             let table = document.getElementById("table-absensi").parentElement.cloneNode(true);
-            // Hapus kolom aksi untuk export
             const ths = table.querySelectorAll(".no-print-export");
             ths.forEach(el => el.remove());
             
@@ -1099,7 +1343,7 @@
 
 
         // --- 9. MODUL PENGGAJIAN ---
-        function initBulanPenggajian() { if(!document.getElementById('pay-periode').value) { document.getElementById('pay-periode').value = new Date().toISOString().slice(0,7); } }
+        function initBulanPenggajian() { if(!document.getElementById('pay-periode').value) { document.getElementById('pay-periode').value = getLocalToday().slice(0,7); } }
 
         function pullDataKaryawan() {
             const empId = getEmpIdFromInput('pay-karyawan-input');
@@ -1134,26 +1378,31 @@
         function autoFillDeductions() {
             const empId = getEmpIdFromInput('pay-karyawan-input');
             const periode = document.getElementById('pay-periode').value; 
-            if(!empId || !periode) return alert("Pilih Karyawan & Periode terlebih dahulu!");
+            if(!empId || !periode) return customAlert("Pilih Karyawan & Periode terlebih dahulu!");
 
             const gapok = parseFloat(document.getElementById('pay-gapok').value) || 0;
             let hariTelatCount = 0; 
             let totalHadir = 0;
+            let totalIzin = 0;
+            
             const absenBulanIni = data.absensi.filter(a => a.empId === empId && a.tgl.startsWith(periode));
             
             absenBulanIni.forEach(a => {
-                totalHadir++;
-                // Menghitung berapa kali dia telat
-                if(a.telat > 0) hariTelatCount++;
+                if(a.status === 'Hadir') {
+                    totalHadir++;
+                    if(a.telat > 0) hariTelatCount++;
+                } else if(a.status === 'Izin') {
+                    totalIzin++;
+                }
             });
 
-            // Potongan Mangkir/Alfa (Sesuai parameter hari kerja)
+            // Potongan Mangkir/Alfa
             const hariKerjaNormal = data.parameter.hariKerja;
-            let hariAlfa = (hariKerjaNormal - totalHadir) > 0 ? (hariKerjaNormal - totalHadir) : 0;
+            let hariAlfa = (hariKerjaNormal - (totalHadir + totalIzin)) > 0 ? (hariKerjaNormal - (totalHadir + totalIzin)) : 0;
             const gajiPerHari = gapok / hariKerjaNormal;
             let potonganAlfa = hariAlfa * gajiPerHari;
 
-            // Potongan Denda Telat (Hanya jika melebih toleransi)
+            // Potongan Telat
             let potonganTelat = 0;
             if(hariTelatCount > data.parameter.toleransiTelat) {
                 const hariKenaDenda = hariTelatCount - data.parameter.toleransiTelat;
@@ -1164,13 +1413,13 @@
             document.getElementById('pot-telat').value = Math.round(potonganTelat);
             document.getElementById('pot-alfa').value = Math.round(potonganAlfa);
             
-            showToast(`Tarikan otomatis: Hadir ${totalHadir} hr, Telat ${hariTelatCount}x (Toleransi ${data.parameter.toleransiTelat}x), Estimasi Alfa ${hariAlfa} hr.`);
+            showToast(`Ditarik: Hadir ${totalHadir}, Izin ${totalIzin}, Telat ${hariTelatCount}x, Alfa ${hariAlfa}hr.`);
         }
 
         function calculateAndPreview() {
             const empId = getEmpIdFromInput('pay-karyawan-input');
             const k = data.karyawan.find(x => x.id === empId);
-            if(!k) return alert("Pilih Karyawan dari daftar yang tersedia!");
+            if(!k) return customAlert("Pilih Karyawan dari daftar yang tersedia!");
 
             const gapok = parseFloat(document.getElementById('pay-gapok').value) || 0;
             const bonus = parseFloat(document.getElementById('pay-bonus').value) || 0;
@@ -1226,15 +1475,25 @@
         function savePayrollData() {
             if(!currentCalcResult) return;
             const exist = data.penggajian.findIndex(p => p.empId === currentCalcResult.empId && p.periode === currentCalcResult.periode);
+            
             if(exist >= 0) {
-                if(!confirm("Karyawan ini sudah digaji bulan ini. Timpa data?")) return;
-                data.penggajian[exist] = currentCalcResult;
-            } else { data.penggajian.push(currentCalcResult); }
-            saveData(); showToast("Riwayat Penggajian Tersimpan");
+                customConfirm("Karyawan ini sudah digaji pada bulan tersebut. Apakah Anda ingin menimpanya?", () => {
+                    data.penggajian[exist] = currentCalcResult;
+                    finishSavePayroll();
+                });
+            } else { 
+                data.penggajian.push(currentCalcResult); 
+                finishSavePayroll();
+            }
+        }
+        
+        function finishSavePayroll() {
+            saveData(); 
+            showToast("Riwayat Penggajian Tersimpan");
         }
 
         // --- 10. MODUL LAPORAN & DASHBOARD ---
-        function initBulanLaporan() { if(!document.getElementById('filter-lap-bln').value) { document.getElementById('filter-lap-bln').value = new Date().toISOString().slice(0,7); } }
+        function initBulanLaporan() { if(!document.getElementById('filter-lap-bln').value) { document.getElementById('filter-lap-bln').value = getLocalToday().slice(0,7); } }
 
         function renderLaporan() {
             const periode = document.getElementById('filter-lap-bln').value;
@@ -1268,21 +1527,21 @@
 
         function clearRiwayat() {
             const bln = document.getElementById('filter-lap-bln').value;
-            if(!bln) return alert("Pilih bulan yang ingin dihapus terlebih dahulu.");
+            if(!bln) return customAlert("Pilih bulan yang ingin dihapus terlebih dahulu.");
             
-            if(confirm(`Yakin ingin menghapus seluruh rekapan gaji di bulan ${bln}? (Aksi ini tidak bisa dikembalikan)`)) {
+            customConfirm(`Yakin ingin menghapus seluruh rekapan slip gaji di bulan ${bln}? (Aksi ini tidak bisa dikembalikan)`, () => {
                 data.penggajian = data.penggajian.filter(p => p.periode !== bln);
                 saveData(); 
                 renderLaporan();
                 showToast("Semua riwayat bulan tersebut telah dihapus!");
-            }
+            });
         }
 
         function reprintSlip(id) {
             const p = data.penggajian.find(x => x.id === id);
             if(!p) return;
             const k = data.karyawan.find(x => x.id === p.empId);
-            if(!k) return alert("Karyawan sudah dihapus dari database sistem.");
+            if(!k) return customAlert("Karyawan sudah dihapus dari database sistem.");
 
             let htmlTunjangan = '';
             p.incomes.tunjangan.forEach(t => { htmlTunjangan += `<tr><td class="py-1.5 text-slate-600">${t.name}</td><td class="text-right font-bold">Rp ${t.amount.toLocaleString('id-ID')}</td></tr>`; });
@@ -1314,8 +1573,8 @@
 
         function renderDashboardAdmin() {
             document.getElementById('dash-karyawan').innerText = data.karyawan.length;
-            const bulanIni = new Date().toISOString().slice(0,7);
-            const hariIni = new Date().toISOString().split('T')[0];
+            const bulanIni = getLocalToday().slice(0,7);
+            const hariIni = getLocalToday();
             
             let pengeluaran = 0;
             data.penggajian.filter(p => p.periode === bulanIni).forEach(p => pengeluaran += p.netto);
