@@ -666,9 +666,14 @@
             d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
             return d.toISOString().split('T')[0];
         }
+        
+        // --- PERBAIKAN BUG WAKTU --- (Memastikan output mutlak menggunakan : agar parameter tersinkron)
         function getLocalTime() {
             const d = new Date();
-            return d.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const h = d.getHours().toString().padStart(2, '0');
+            const m = d.getMinutes().toString().padStart(2, '0');
+            const s = d.getSeconds().toString().padStart(2, '0');
+            return `${h}:${m}:${s}`;
         }
         
         // --- KUSTOMISASI MODAL ALERT ---
@@ -1513,77 +1518,63 @@
                         <td class="py-3.5 px-4 font-semibold text-slate-500">Rp ${p.incomes.gapok.toLocaleString('id-ID')}</td>
                         <td class="py-3.5 px-4 font-bold text-blue-600">Rp ${tunjDLL.toLocaleString('id-ID')}</td>
                         <td class="py-3.5 px-4 font-bold text-rose-600">Rp ${p.totalPotongan.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 font-bold text-emerald-600 text-sm">Rp ${p.netto.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 text-center whitespace-nowrap"><button onclick="reprintSlip('${p.id}')" class="bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors"><i class="fas fa-print mr-1"></i>Cetak</button></td>
-                    </tr>`;
+                        <td class="py-3.5 px-4 font-bold text-emerald-600">Rp ${p.netto.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 text-center">
+                            <button onclick="cetakUlangSlip('${p.id}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors"><i class="fas fa-print"></i></button>
+                        </td>
+                    </tr>
+                `;
             });
 
-            if(listData.length === 0) tb.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada riwayat penggajian tercetak pada bulan ini.</td></tr>`;
-            
+            if(listData.length === 0) tb.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada riwayat penggajian di bulan ini.</td></tr>';
+
             document.getElementById('lap-tot-gaji').innerText = `Rp ${grandGaji.toLocaleString('id-ID')}`;
             document.getElementById('lap-tot-pot').innerText = `Rp ${grandPot.toLocaleString('id-ID')}`;
-            document.getElementById('lap-tot-telat').innerText = globalTelat + " Menit";
+            document.getElementById('lap-tot-telat').innerText = `${globalTelat} Menit`;
         }
 
-        function clearRiwayat() {
-            const bln = document.getElementById('filter-lap-bln').value;
-            if(!bln) return customAlert("Pilih bulan yang ingin dihapus terlebih dahulu.");
-            
-            customConfirm(`Yakin ingin menghapus seluruh rekapan slip gaji di bulan ${bln}? (Aksi ini tidak bisa dikembalikan)`, () => {
-                data.penggajian = data.penggajian.filter(p => p.periode !== bln);
-                saveData(); 
-                renderLaporan();
-                showToast("Semua riwayat bulan tersebut telah dihapus!");
-            });
-        }
-
-        function reprintSlip(id) {
+        function cetakUlangSlip(id) {
             const p = data.penggajian.find(x => x.id === id);
             if(!p) return;
             const k = data.karyawan.find(x => x.id === p.empId);
-            if(!k) return customAlert("Karyawan sudah dihapus dari database sistem.");
-
-            let htmlTunjangan = '';
-            p.incomes.tunjangan.forEach(t => { htmlTunjangan += `<tr><td class="py-1.5 text-slate-600">${t.name}</td><td class="text-right font-bold">Rp ${t.amount.toLocaleString('id-ID')}</td></tr>`; });
-
-            const tglStr = new Date(p.periode + '-01').toLocaleString('id-ID', {month: 'long', year:'numeric'});
-
-            document.getElementById('slip-periode').innerText = tglStr.toUpperCase();
-            document.getElementById('slip-nama').innerText = k.nama; document.getElementById('slip-jabatan').innerText = k.jabatan;
-            document.getElementById('slip-nik').innerText = k.nik; document.getElementById('slip-rek').innerText = k.rekBank;
             
-            document.getElementById('slip-gapok').innerText = `Rp ${p.incomes.gapok.toLocaleString('id-ID')}`;
-            document.getElementById('slip-bonus').innerText = `Rp ${p.incomes.bonus.toLocaleString('id-ID')}`;
-            document.getElementById('slip-thr').innerText = `Rp ${p.incomes.thr.toLocaleString('id-ID')}`;
-            document.getElementById('slip-tunjangan-list').innerHTML = htmlTunjangan;
+            document.getElementById('pay-karyawan-input').value = k ? `${k.nik} - ${k.nama}` : '';
+            document.getElementById('pay-periode').value = p.periode;
+            document.getElementById('pay-gapok').value = p.incomes.gapok;
+            document.getElementById('pay-bonus').value = p.incomes.bonus;
+            document.getElementById('pay-thr').value = p.incomes.thr;
+            
+            currentTunjangan = p.incomes.tunjangan || []; renderTunjanganList();
+            
+            document.getElementById('pot-telat').value = p.deductions.potTelat;
+            document.getElementById('pot-alfa').value = p.deductions.potAlfa;
+            document.getElementById('pot-izin').value = p.deductions.potIzin;
+            document.getElementById('pot-pinjam').value = p.deductions.potPinjam;
+            
+            switchTab('penggajian');
+            setTimeout(() => calculateAndPreview(), 300);
+        }
 
-            document.getElementById('slip-pot-telat').innerText = `Rp ${p.deductions.potTelat.toLocaleString('id-ID')}`;
-            document.getElementById('slip-pot-alfa').innerText = `Rp ${p.deductions.potAlfa.toLocaleString('id-ID')}`;
-            document.getElementById('slip-pot-izin').innerText = `Rp ${p.deductions.potIzin.toLocaleString('id-ID')}`;
-            document.getElementById('slip-pot-pinjam').innerText = `Rp ${p.deductions.potPinjam.toLocaleString('id-ID')}`;
-
-            document.getElementById('slip-tot-pendapatan').innerText = `Rp ${p.totalPendapatan.toLocaleString('id-ID')}`;
-            document.getElementById('slip-tot-potongan').innerText = `Rp ${p.totalPotongan.toLocaleString('id-ID')}`;
-            document.getElementById('slip-netto').innerText = `Rp ${p.netto.toLocaleString('id-ID')}`;
-            document.getElementById('slip-sign-nama').innerText = `( ${k.nama} )`;
-
-            document.getElementById('slip-container').scrollIntoView({behavior: 'smooth', block: 'center'});
-            showToast("Slip dimuat ulang di jendela preview!");
+        function clearRiwayat() {
+            const periode = document.getElementById('filter-lap-bln').value;
+            customConfirm(`Yakin hapus SEMUA riwayat penggajian di bulan ${periode}?`, () => {
+                data.penggajian = data.penggajian.filter(p => p.periode !== periode);
+                saveData(); renderLaporan(); showToast("Riwayat bulan tersebut telah dihapus");
+            });
         }
 
         function renderDashboardAdmin() {
             document.getElementById('dash-karyawan').innerText = data.karyawan.length;
-            const bulanIni = getLocalToday().slice(0,7);
-            const hariIni = getLocalToday();
             
+            const blnIni = getLocalToday().slice(0, 7);
             let pengeluaran = 0;
-            data.penggajian.filter(p => p.periode === bulanIni).forEach(p => pengeluaran += p.netto);
+            data.penggajian.filter(p => p.periode === blnIni).forEach(p => pengeluaran += p.netto);
             document.getElementById('dash-pengeluaran').innerText = `Rp ${pengeluaran.toLocaleString('id-ID')}`;
             
-            const totalAbsenHariIni = data.absensi.filter(a => a.tgl === hariIni).length;
-            document.getElementById('dash-absensi').innerText = totalAbsenHariIni;
+            const hariIni = getLocalToday();
+            const jmlAbsen = data.absensi.filter(a => a.tgl === hariIni).length;
+            document.getElementById('dash-absensi').innerText = jmlAbsen;
         }
-
     </script>
 </body>
 </html>
