@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Gaji & Absensi Otomatis</title>
+    <title>Sistem Gaji & Absensi Otomatis - Abba Bento</title>
+    
+    <!-- Favicon Abba Bento -->
+    <link rel="icon" type="image/svg+xml" href="logo.jpg">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -72,35 +76,35 @@
 
     <!-- Halaman Login -->
     <div id="screen-login" class="flex-1 flex items-center justify-center bg-slate-900 z-50 absolute inset-0 overflow-y-auto p-4 md:p-8">
-        <div class="bg-white p-8 md:p-10 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-blue-500 my-auto relative">
+        <div class="bg-white p-8 md:p-10 rounded-2xl shadow-2xl w-full max-w-md border-t-4 border-red-500 my-auto relative">
             <div class="text-center mb-8 text-slate-800">
-                <h1 class="text-3xl font-bold tracking-tight"><i class="fas fa-wallet text-blue-500 mr-2"></i>Pay<span class="text-blue-500">Roll</span></h1>
+                <h1 class="text-3xl font-bold tracking-tight"><i class="fas fa-utensils text-red-500 mr-2"></i>Abba <span class="text-red-500">Bento</span></h1>
                 <p class="text-slate-400 text-xs font-medium mt-2">Login Portal Enterprise</p>
             </div>
             <form id="form-login" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Pilih Cabang (Khusus Karyawan)</label>
-                    <select id="login-cabang" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Pilih Cabang</label>
+                    <select id="login-cabang" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-red-500 transition-colors">
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Username</label>
-                    <input type="text" id="login-user" required placeholder="Username" autocomplete="username" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                    <input type="text" id="login-user" required placeholder="Username" autocomplete="username" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-red-500 transition-colors">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Password</label>
                     <div class="relative">
-                        <input type="password" id="login-pass" required placeholder="Password" autocomplete="new-password" spellcheck="false" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500 transition-colors pr-10">
-                        <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors">
+                        <input type="password" id="login-pass" required placeholder="Password" autocomplete="new-password" spellcheck="false" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-red-500 transition-colors pr-10">
+                        <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-600 transition-colors">
                             <i class="fas fa-eye" id="eye-icon"></i>
                         </button>
                     </div>
                 </div>
                 <div class="flex items-center mt-3">
-                    <input type="checkbox" id="login-remember" class="w-4 h-4 text-blue-600 bg-slate-50 border-slate-300 rounded focus:ring-blue-500">
+                    <input type="checkbox" id="login-remember" class="w-4 h-4 text-red-600 bg-slate-50 border-slate-300 rounded focus:ring-red-500">
                     <label for="login-remember" class="ml-2 text-xs font-bold text-slate-500 cursor-pointer">Ingat Saya</label>
                 </div>
-                <button type="submit" id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-blue-500/20 transition-all mt-6 text-sm">
+                <button type="submit" id="btn-login" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-red-500/20 transition-all mt-6 text-sm">
                     <i class="fas fa-sign-in-alt mr-2"></i> Masuk Sekarang
                 </button>
             </form>
@@ -111,7 +115,7 @@
     <!-- Halaman Karyawan -->
     <div id="screen-employee" class="hidden flex-1 flex flex-col h-full absolute inset-0 bg-[#f8fafc] z-40">
         <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 p-4 sm:px-8 sm:py-4 flex justify-between items-center shrink-0 sticky top-0 z-10 shadow-sm">
-            <h1 class="text-base font-bold text-slate-900 tracking-tight truncate mr-2"><i class="fas fa-user-circle text-blue-500 mr-1.5"></i> Portal Karyawan</h1>
+            <h1 class="text-base font-bold text-slate-900 tracking-tight truncate mr-2"><i class="fas fa-user-circle text-red-500 mr-1.5"></i> Portal Karyawan</h1>
             <button onclick="logout()" class="text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/60 px-4 py-2 rounded-xl transition-all shrink-0"><i class="fas fa-sign-out-alt mr-1"></i>Keluar</button>
         </header>
         <div class="flex-1 p-4 sm:p-8 flex flex-col items-center justify-center overflow-y-auto pb-24">
@@ -120,13 +124,13 @@
                 <h2 class="text-xl sm:text-2xl font-bold text-slate-900 truncate tracking-tight w-full" id="emp-welcome">Halo, Nama</h2>
                 <p class="text-slate-400 text-xs sm:text-sm font-medium mb-6 truncate w-full" id="emp-jabatan">Jabatan - Cabang</p>
                 
-                <div class="text-4xl sm:text-5xl font-mono font-bold text-blue-600 mb-1 tracking-tight" id="emp-clock">00:00:00</div>
+                <div class="text-4xl sm:text-5xl font-mono font-bold text-red-600 mb-1 tracking-tight" id="emp-clock">00:00:00</div>
                 <div class="text-xs sm:text-sm text-slate-500 mb-6 font-semibold" id="emp-date">Senin, 1 Jan 2026</div>
 
-                <div class="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-100 p-3 rounded-xl mb-6 w-full flex justify-around shadow-sm">
-                    <span>Masuk: <span id="emp-jam-masuk" class="text-blue-900">-</span></span>
-                    <span class="text-blue-300">|</span>
-                    <span>Pulang: <span id="emp-jam-pulang" class="text-blue-900">-</span></span>
+                <div class="text-[11px] font-bold text-red-700 bg-red-50 border border-red-100 p-3 rounded-xl mb-6 w-full flex justify-around shadow-sm">
+                    <span>Masuk: <span id="emp-jam-masuk" class="text-red-900">-</span></span>
+                    <span class="text-red-300">|</span>
+                    <span>Pulang: <span id="emp-jam-pulang" class="text-red-900">-</span></span>
                 </div>
 
                 <div class="w-full flex flex-col gap-3 relative">
@@ -134,7 +138,7 @@
                         <i class="fas fa-fingerprint text-xl mb-1.5 block"></i> <span id="lbl-aksi-absen">Absen Masuk</span>
                     </button>
                     
-                    <!-- Tombol Izin Setengah Hari (Mod 5) -->
+                    <!-- Tombol Izin Setengah Hari -->
                     <button id="btn-aksi-izin-setengah" onclick="handleIzinSetengahHari()" class="hidden py-3 w-full bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100 rounded-xl font-bold text-xs transition-all transform active:scale-95">
                         <i class="fas fa-sign-out-alt mr-1.5"></i> Izin Setengah Hari (Pulang Cepat)
                     </button>
@@ -174,12 +178,12 @@
     <div id="screen-admin" class="hidden flex-1 flex h-full absolute inset-0 z-30 overflow-hidden">
         <aside class="w-64 bg-slate-900 text-white flex flex-col no-print transition-transform duration-300 fixed md:relative h-full z-50 -translate-x-full md:translate-x-0 shrink-0" id="sidebar">
             <div class="p-5 border-b border-slate-800 flex justify-between items-center shrink-0">
-                <h1 class="text-xl font-bold tracking-tight text-white"><i class="fas fa-wallet text-blue-500 mr-2"></i>Pay<span class="text-blue-500">Roll</span></h1>
+                <h1 class="text-xl font-bold tracking-tight text-white"><i class="fas fa-utensils text-red-500 mr-2"></i>Abba <span class="text-red-500">Bento</span></h1>
                 <button class="md:hidden text-slate-400 hover:text-white p-1 text-lg transition-colors" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
             </div>
             <nav class="flex-1 overflow-y-auto py-5 custom-scrollbar">
                 <ul class="space-y-1.5 px-3">
-                    <li><a href="#" onclick="switchTab('dashboard')" class="menu-item flex items-center px-4 py-3 rounded-xl bg-slate-800 text-blue-400 font-semibold transition-colors text-sm" data-target="dashboard"><i class="fas fa-chart-pie w-6"></i> Dashboard</a></li>
+                    <li><a href="#" onclick="switchTab('dashboard')" class="menu-item flex items-center px-4 py-3 rounded-xl bg-slate-800 text-red-400 font-semibold transition-colors text-sm" data-target="dashboard"><i class="fas fa-chart-pie w-6"></i> Dashboard</a></li>
                     <li><a href="#" onclick="switchTab('karyawan')" class="menu-item flex items-center px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-colors text-sm" data-target="karyawan"><i class="fas fa-users w-6"></i> Data Karyawan</a></li>
                     <li><a href="#" onclick="switchTab('cabang')" class="menu-item flex items-center px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-colors text-sm" data-target="cabang"><i class="fas fa-building w-6"></i> Data Cabang</a></li>
                     <li><a href="#" onclick="switchTab('absensi')" class="menu-item flex items-center px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-colors text-sm" data-target="absensi"><i class="fas fa-calendar-check w-6"></i> Data Absensi</a></li>
@@ -203,7 +207,7 @@
                 </div>
                 <div class="flex items-center gap-3 sm:gap-4">
                     <span class="text-[11px] sm:text-xs text-slate-500 font-semibold hidden sm:inline-flex items-center"><i class="far fa-clock mr-1.5"></i> <span class="current-time-display"></span></span>
-                    <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shadow-sm flex items-center justify-center font-bold text-sm shrink-0">A</div>
+                    <div class="w-8 h-8 rounded-xl bg-red-50 text-red-600 border border-red-100 shadow-sm flex items-center justify-center font-bold text-sm shrink-0">A</div>
                 </div>
             </header>
 
@@ -212,12 +216,12 @@
                 <div id="dashboard" class="tab-content active">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] p-6 flex justify-between items-center relative overflow-hidden">
-                            <div class="absolute w-2 h-full bg-blue-500 left-0 top-0"></div>
+                            <div class="absolute w-2 h-full bg-red-500 left-0 top-0"></div>
                             <div class="pl-2">
                                 <p class="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Total Karyawan</p>
                                 <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 mt-1" id="dash-karyawan">0</h3>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 text-xl border border-blue-100"><i class="fas fa-users"></i></div>
+                            <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-500 text-xl border border-red-100"><i class="fas fa-users"></i></div>
                         </div>
                         <div class="bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.01)] p-6 flex justify-between items-center relative overflow-hidden">
                             <div class="absolute w-2 h-full bg-emerald-500 left-0 top-0"></div>
@@ -250,16 +254,16 @@
                         <div class="p-5 md:p-6 space-y-5">
                             <form id="form-karyawan" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <input type="hidden" id="kar-id">
-                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">NIK</label><input type="text" id="kar-nik" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
-                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Nama Lengkap</label><input type="text" id="kar-nama" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
-                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Jabatan</label><input type="text" id="kar-jabatan" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
-                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Tanggal Bergabung</label><input type="date" id="kar-tgl" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-600"></div>
-                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Nama Bank & Norek</label><input type="text" id="kar-rek" placeholder="BCA - 123456" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">NIK</label><input type="text" id="kar-nik" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Nama Lengkap</label><input type="text" id="kar-nama" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Jabatan</label><input type="text" id="kar-jabatan" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Tanggal Bergabung</label><input type="date" id="kar-tgl" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors text-slate-600"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Nama Bank & Norek</label><input type="text" id="kar-rek" placeholder="BCA - 123456" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors"></div>
                                 <div>
                                     <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Gaji Pokok (Rp)</label>
                                     <div class="relative">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
-                                        <input type="number" id="kar-gapok" required class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                                        <input type="number" id="kar-gapok" required class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors">
                                     </div>
                                 </div>
                                 
@@ -267,13 +271,13 @@
                                     <div class="sm:col-span-2">
                                         <span class="block text-[11px] font-bold text-slate-900 uppercase">Informasi Login Portal</span>
                                     </div>
-                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Username Login</label><input type="text" id="kar-user" autocomplete="off" required class="w-full px-3 py-2 bg-blue-50/50 border border-blue-100 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
-                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Password Login</label><input type="text" id="kar-pass" autocomplete="new-password" required class="w-full px-3 py-2 bg-blue-50/50 border border-blue-100 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Username Login</label><input type="text" id="kar-user" autocomplete="off" required class="w-full px-3 py-2 bg-red-50/50 border border-red-100 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors"></div>
+                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Password Login</label><input type="text" id="kar-pass" autocomplete="new-password" required class="w-full px-3 py-2 bg-red-50/50 border border-red-100 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors"></div>
                                 </div>
                                 
                                 <div class="sm:col-span-2 lg:col-span-3 flex justify-end gap-2 mt-4 pt-2">
                                     <button type="button" onclick="resetFormKaryawan()" class="px-5 py-2.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"><i class="fas fa-undo mr-1.5"></i> Batal</button>
-                                    <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 rounded-xl transition-all"><i class="fas fa-save mr-1.5"></i> Simpan Karyawan</button>
+                                    <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-md shadow-red-500/20 rounded-xl transition-all"><i class="fas fa-save mr-1.5"></i> Simpan Karyawan</button>
                                 </div>
                             </form>
                         </div>
@@ -284,7 +288,7 @@
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
                                 <i class="fas fa-search text-[11px]"></i>
                             </span>
-                            <input type="text" id="search-karyawan" oninput="handleSearchKaryawan()" placeholder="Cari karyawan berdasarkan nama atau NIK..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-600">
+                            <input type="text" id="search-karyawan" oninput="handleSearchKaryawan()" placeholder="Cari karyawan berdasarkan nama atau NIK..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors text-slate-600">
                         </div>
                     </div>
                     
@@ -321,25 +325,25 @@
                         <div class="p-5 md:p-6">
                             <form id="form-cabang" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
                                 <input type="hidden" id="cab-id">
-                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Nama Cabang</label><input type="text" id="cab-nama" required placeholder="Contoh: Pusat Sudirman" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Nama Cabang</label><input type="text" id="cab-nama" required placeholder="Contoh: Pusat Sudirman" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors"></div>
                                 
                                 <div class="relative">
                                     <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Latitude</label>
-                                    <input type="number" step="any" id="cab-lat" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                                    <input type="number" step="any" id="cab-lat" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors">
                                 </div>
                                 <div class="relative">
                                     <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Longitude</label>
                                     <div class="flex gap-2">
-                                        <input type="number" step="any" id="cab-lng" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                                        <input type="number" step="any" id="cab-lng" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors">
                                         <button type="button" onclick="detectLocation()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition-colors" title="Deteksi Lokasi Otomatis"><i class="fas fa-map-marker-alt"></i></button>
                                     </div>
                                 </div>
 
-                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Radius Geofence (Meter)</label><input type="number" id="cab-radius" required placeholder="Misal: 50" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Radius Geofence (Meter)</label><input type="number" id="cab-radius" required placeholder="Misal: 50" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors"></div>
                                 
                                 <div class="lg:col-span-4 flex justify-end gap-2 mt-2 pt-2">
                                     <button type="button" onclick="resetFormCabang()" class="px-5 py-2.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"><i class="fas fa-undo mr-1.5"></i> Batal</button>
-                                    <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 rounded-xl transition-all"><i class="fas fa-save mr-1.5"></i> Simpan Cabang</button>
+                                    <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-md shadow-red-500/20 rounded-xl transition-all"><i class="fas fa-save mr-1.5"></i> Simpan Cabang</button>
                                 </div>
                             </form>
                         </div>
@@ -374,7 +378,7 @@
                             <div class="flex gap-2">
                                 <button onclick="exportAbsenExcel()" class="bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 transition-colors"><i class="fas fa-file-excel mr-1"></i> Excel</button>
                                 <button onclick="exportAbsenPDF()" class="bg-rose-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-rose-700 transition-colors"><i class="fas fa-file-pdf mr-1"></i> PDF</button>
-                                <input type="date" id="filter-absensi-tgl" class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-600" onchange="renderTableAbsensi()">
+                                <input type="date" id="filter-absensi-tgl" class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors text-slate-600" onchange="renderTableAbsensi()">
                             </div>
                         </div>
                         <div class="overflow-x-auto w-full" id="export-absen-area">
@@ -409,16 +413,16 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Cari / Pilih Karyawan</label>
-                                        <input list="karyawan-list" id="pay-karyawan-input" onchange="pullDataKaryawan()" placeholder="Ketik nama karyawan..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                                        <input list="karyawan-list" id="pay-karyawan-input" onchange="pullDataKaryawan()" placeholder="Ketik nama karyawan..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors">
                                         <datalist id="karyawan-list"></datalist>
                                     </div>
                                     <div class="flex gap-2">
                                         <div class="flex-1">
                                             <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Periode (Mulai - Selesai)</label>
                                             <div class="flex items-center gap-2">
-                                                <input type="date" id="pay-periode-start" class="w-full px-2 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-600">
+                                                <input type="date" id="pay-periode-start" class="w-full px-2 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors text-slate-600">
                                                 <span class="text-slate-400 font-bold">-</span>
-                                                <input type="date" id="pay-periode-end" class="w-full px-2 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-600">
+                                                <input type="date" id="pay-periode-end" class="w-full px-2 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors text-slate-600">
                                             </div>
                                         </div>
                                         <div class="pt-5 flex items-end shrink-0">
@@ -464,7 +468,7 @@
                                 </div>
                                 <div class="mt-10 pt-5 border-t border-slate-100 flex flex-col sm:flex-row gap-3 justify-end items-center">
                                     <button onclick="calculateAndPreview()" class="w-full sm:w-auto px-6 py-2.5 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 shadow-md text-xs transition-colors"><i class="fas fa-calculator mr-1.5"></i> Proses & Preview Slip</button>
-                                    <button onclick="savePayrollData()" id="btn-save-payroll" class="hidden w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-md shadow-blue-500/20 text-xs transition-colors"><i class="fas fa-save mr-1.5"></i> Simpan Histori</button>
+                                    <button onclick="savePayrollData()" id="btn-save-payroll" class="hidden w-full sm:w-auto px-6 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 shadow-md shadow-red-500/20 text-xs transition-colors"><i class="fas fa-save mr-1.5"></i> Proses</button>
                                 </div>
                             </div>
                         </div>
@@ -546,7 +550,7 @@
                                 <p class="text-[11px] text-slate-400 mt-0.5">Arsip seluruh rekam jejak slip gaji yang sudah di-generate</p>
                             </div>
                             <div class="flex gap-2">
-                                <input type="month" id="filter-lap-bln" class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors text-slate-600" onchange="renderLaporan()">
+                                <input type="month" id="filter-lap-bln" class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors text-slate-600" onchange="renderLaporan()">
                                 <button onclick="clearRiwayat()" class="bg-rose-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-rose-600 transition-colors"><i class="fas fa-trash-alt mr-1"></i> Bersihkan</button>
                             </div>
                         </div>
@@ -560,10 +564,9 @@
                                 <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Potongan Dikenakan</p>
                                 <h4 class="text-lg sm:text-xl font-bold text-rose-600 mt-1" id="lap-tot-pot">Rp 0</h4>
                             </div>
-                            <!-- Modifikasi 1: Mengganti total keterlambatan dengan jumlah karyawan digaji -->
                             <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm text-center">
                                 <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Karyawan Digaji</p>
-                                <h4 class="text-lg sm:text-xl font-bold text-blue-600 mt-1" id="lap-tot-karyawan">0</h4>
+                                <h4 class="text-lg sm:text-xl font-bold text-red-600 mt-1" id="lap-tot-karyawan">0</h4>
                             </div>
                         </div>
 
@@ -595,16 +598,16 @@
                         </div>
                         <div class="p-5 md:p-6">
                             <form id="form-parameter" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Total Hari Kerja Normal (Per Bulan)</label><input type="number" id="param-harikerja" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
-                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Batas Toleransi Telat (Berapa Kali)</label><input type="number" id="param-toleransitelat" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
-                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Denda Telat per Hari (% dari Gaji Sehari)</label><input type="number" id="param-dendatelat" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Total Hari Kerja Normal (Per Bulan)</label><input type="number" id="param-harikerja" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Batas Toleransi Telat (Berapa Kali)</label><input type="number" id="param-toleransitelat" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors"></div>
+                                <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Denda Telat per Hari (% dari Gaji Sehari)</label><input type="number" id="param-dendatelat" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors"></div>
                                 <div class="grid grid-cols-2 gap-4">
-                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Jam Masuk</label><input type="time" id="param-jammasuk" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
-                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Jam Pulang</label><input type="time" id="param-jampulang" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"></div>
+                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Jam Masuk</label><input type="time" id="param-jammasuk" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors"></div>
+                                    <div><label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Jam Pulang</label><input type="time" id="param-jampulang" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-red-500 transition-colors"></div>
                                 </div>
                                 <div class="md:col-span-2 flex justify-end gap-2 mt-4 pt-2 border-t border-slate-100">
                                     <button type="button" onclick="loadParameter()" class="px-5 py-2.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"><i class="fas fa-undo mr-1.5"></i> Batal</button>
-                                    <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 rounded-xl transition-all"><i class="fas fa-save mr-1.5"></i> Simpan Konfigurasi</button>
+                                    <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-md shadow-red-500/20 rounded-xl transition-all"><i class="fas fa-save mr-1.5"></i> Simpan Konfigurasi</button>
                                 </div>
                             </form>
                         </div>
@@ -705,10 +708,10 @@
         
         // --- KUSTOMISASI MODAL ALERT ---
         function customAlert(msg) {
-            document.getElementById('modal-icon').innerHTML = '<i class="fas fa-info-circle text-blue-500"></i>';
+            document.getElementById('modal-icon').innerHTML = '<i class="fas fa-info-circle text-red-500"></i>';
             document.getElementById('modal-title').innerText = 'Pemberitahuan';
             document.getElementById('modal-message').innerText = msg;
-            document.getElementById('modal-buttons').innerHTML = `<button onclick="closeModal()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md">Mengerti</button>`;
+            document.getElementById('modal-buttons').innerHTML = `<button onclick="closeModal()" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-xs shadow-md">Mengerti</button>`;
             document.getElementById('custom-modal').classList.remove('hidden');
         }
 
@@ -718,7 +721,7 @@
             document.getElementById('modal-message').innerText = msg;
             document.getElementById('modal-buttons').innerHTML = `
                 <button onclick="closeModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition-colors">Batal</button>
-                <button id="btn-confirm-ok" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 rounded-xl font-bold text-xs transition-colors">Ya, Lanjutkan</button>
+                <button id="btn-confirm-ok" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-500/20 rounded-xl font-bold text-xs transition-colors">Ya, Lanjutkan</button>
             `;
             document.getElementById('custom-modal').classList.remove('hidden');
             document.getElementById('btn-confirm-ok').onclick = function() { closeModal(); onConfirm(); };
@@ -933,7 +936,6 @@
             let batasPulangInMinutes = paramHPulang * 60 + paramMPulang;
 
             if(!absen) {
-                // Modifikasi 4: Blokir jika absen masuk tapi sudah lewat jam pulang
                 if (nowInMinutes >= batasPulangInMinutes) {
                     lblAbsen.innerText = 'Di Luar Jam Kerja';
                     btnAbsen.className = "py-4 w-full bg-slate-200 text-slate-400 rounded-xl font-bold text-sm cursor-not-allowed";
@@ -992,7 +994,6 @@
                 let nowInMinutes = h * 60 + m;
                 let batasPulangInMinutes = paramHPulang * 60 + paramMPulang;
 
-                // Modifikasi 4: Keamanan ekstra blokir absen bypass
                 if (nowInMinutes >= batasPulangInMinutes) {
                     customAlert("Gagal Absen! Waktu kerja telah usai. Anda terhitung Alfa hari ini.");
                     updateStatusAbsen();
@@ -1101,11 +1102,11 @@
             document.getElementById(tabId).classList.add('active');
             
             document.querySelectorAll('.menu-item').forEach(el => {
-                el.classList.remove('bg-slate-800', 'text-blue-400'); el.classList.add('text-slate-400');
+                el.classList.remove('bg-slate-800', 'text-red-400'); el.classList.add('text-slate-400');
             });
             const activeMenu = document.querySelector(`.menu-item[data-target="${tabId}"]`);
             if(activeMenu) {
-                activeMenu.classList.add('bg-slate-800', 'text-blue-400'); activeMenu.classList.remove('text-slate-400');
+                activeMenu.classList.add('bg-slate-800', 'text-red-400'); activeMenu.classList.remove('text-slate-400');
                 document.getElementById('header-title').innerText = activeMenu.innerText.trim();
             }
             
@@ -1198,7 +1199,7 @@
                         <td class="py-3.5 px-4 text-xs font-semibold text-slate-600">${k.rekBank}</td>
                         <td class="py-3.5 px-4 font-bold text-emerald-600 text-xs">Rp ${k.gapok.toLocaleString('id-ID')}</td>
                         <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                            <button onclick="editKaryawan('${k.id}')" class="text-blue-500 hover:bg-blue-50 px-2 py-1.5 rounded-lg mr-1.5 text-[11px] font-bold transition-colors"><i class="fas fa-edit mr-1"></i>Edit</button>
+                            <button onclick="editKaryawan('${k.id}')" class="text-red-500 hover:bg-red-50 px-2 py-1.5 rounded-lg mr-1.5 text-[11px] font-bold transition-colors"><i class="fas fa-edit mr-1"></i>Edit</button>
                             <button onclick="hapusKaryawan('${k.id}')" class="text-rose-500 hover:bg-rose-50 px-2 py-1.5 rounded-lg text-[11px] font-bold transition-colors"><i class="fas fa-trash mr-1"></i>Hapus</button>
                         </td>
                     </tr>
@@ -1222,7 +1223,7 @@
             pageDiv.innerHTML += `<button type="button" onclick="changePageKar(${currentPageKar-1})" class="w-7 h-7 flex items-center justify-center text-xs font-bold rounded-lg transition-all ${currentPageKar===1?'bg-slate-100 text-slate-400 cursor-not-allowed':'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}"><i class="fas fa-chevron-left"></i></button>`;
             
             for(let i=1; i<=pages; i++) {
-                pageDiv.innerHTML += `<button type="button" onclick="changePageKar(${i})" class="w-7 h-7 flex items-center justify-center text-xs font-bold rounded-lg transition-all ${currentPageKar===i?'bg-blue-600 text-white shadow-sm':'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">${i}</button>`;
+                pageDiv.innerHTML += `<button type="button" onclick="changePageKar(${i})" class="w-7 h-7 flex items-center justify-center text-xs font-bold rounded-lg transition-all ${currentPageKar===i?'bg-red-600 text-white shadow-sm':'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">${i}</button>`;
             }
 
             pageDiv.innerHTML += `<button type="button" onclick="changePageKar(${currentPageKar+1})" class="w-7 h-7 flex items-center justify-center text-xs font-bold rounded-lg transition-all ${currentPageKar===pages?'bg-slate-100 text-slate-400 cursor-not-allowed':'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}"><i class="fas fa-chevron-right"></i></button>`;
@@ -1294,9 +1295,9 @@
                         <td class="py-3.5 px-5 font-bold text-slate-900">${c.name}</td>
                         <td class="py-3.5 px-4 text-[11px] font-mono text-slate-500">${c.lat}</td>
                         <td class="py-3.5 px-4 text-[11px] font-mono text-slate-500">${c.lng}</td>
-                        <td class="py-3.5 px-4 font-bold text-blue-600 text-xs">${c.radius} m</td>
+                        <td class="py-3.5 px-4 font-bold text-red-600 text-xs">${c.radius} m</td>
                         <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                            <button onclick="editCabang('${c.id}')" class="text-blue-500 hover:bg-blue-50 px-2 py-1.5 rounded-lg mr-1.5 text-[11px] font-bold transition-colors"><i class="fas fa-edit mr-1"></i>Edit</button>
+                            <button onclick="editCabang('${c.id}')" class="text-red-500 hover:bg-red-50 px-2 py-1.5 rounded-lg mr-1.5 text-[11px] font-bold transition-colors"><i class="fas fa-edit mr-1"></i>Edit</button>
                             <button onclick="hapusCabang('${c.id}')" class="text-rose-500 hover:bg-rose-50 px-2 py-1.5 rounded-lg text-[11px] font-bold transition-colors"><i class="fas fa-trash mr-1"></i>Hapus</button>
                         </td>
                     </tr>
@@ -1387,7 +1388,6 @@
                     }
                 }
                 
-                // Modifikasi 2: Hitung jumlah (count) keterlambatan di bulan ini hingga tanggal tersebut
                 let textTelat = '-';
                 if(a.telat > 0) {
                     let lateCount = 0;
@@ -1402,9 +1402,9 @@
                 tb.innerHTML += `
                     <tr class="hover:bg-slate-50/70 transition-colors">
                         <td class="py-3.5 px-5 font-semibold text-slate-700 whitespace-nowrap">${formatDate(a.tgl)}</td>
-                        <td class="py-3.5 px-4 font-bold text-blue-600">${k ? k.nama : 'Karyawan (Dihapus)'}</td>
+                        <td class="py-3.5 px-4 font-bold text-red-600">${k ? k.nama : 'Karyawan (Dihapus)'}</td>
                         <td class="py-3.5 px-4 font-bold text-emerald-600">${a.jamMasuk}</td>
-                        <td class="py-3.5 px-4 font-bold ${a.jamPulang==='-'?'text-slate-300':'text-blue-500'}">${a.jamPulang}</td>
+                        <td class="py-3.5 px-4 font-bold ${a.jamPulang==='-'?'text-slate-300':'text-red-500'}">${a.jamPulang}</td>
                         <td class="py-3.5 px-4 ${a.telat>0?'text-rose-500 font-bold':'text-slate-400 font-medium'}">${textTelat}</td>
                         <td class="py-3.5 px-4">${potText}</td>
                         <td class="py-3.5 px-4">${statusHtml}</td>
@@ -1482,7 +1482,6 @@
             if(!empId) { document.getElementById('pay-gapok').value = 0; return; }
             const k = data.karyawan.find(x => x.id === empId);
             
-            // Format nominal langsung saat ditarik 
             if(k) document.getElementById('pay-gapok').value = new Intl.NumberFormat('id-ID').format(k.gapok);
             
             document.querySelectorAll('.pay-input').forEach(i => i.value = 0);
@@ -1492,7 +1491,6 @@
 
         function addTunjangan() {
             const nama = document.getElementById('tunj-nama').value;
-            // Hapus titik sebelum diparsing
             const nominal = parseFloat(document.getElementById('tunj-nominal').value.replace(/\./g, '')) || 0;
             if(nama && nominal > 0) {
                 currentTunjangan.push({ name: nama, amount: nominal });
@@ -1565,7 +1563,6 @@
 
             let potonganAlfa = alfaCount * gajiPerHari;
 
-            // Masukkan data langsung dengan format rupiah (Modifikasi 1)
             document.getElementById('pot-telat').value = new Intl.NumberFormat('id-ID').format(Math.round(potonganTelat));
             document.getElementById('pot-alfa').value = new Intl.NumberFormat('id-ID').format(Math.round(potonganAlfa));
             document.getElementById('pot-izin').value = new Intl.NumberFormat('id-ID').format(Math.round(potonganIzin));
@@ -1578,7 +1575,6 @@
             const k = data.karyawan.find(x => x.id === empId);
             if(!k) return customAlert("Pilih Karyawan dari daftar yang tersedia!");
 
-            // Modifikasi parsing menghapus titik format ribuan terlebih dahulu
             const gapok = parseFloat(document.getElementById('pay-gapok').value.replace(/\./g, '')) || 0;
             const bonus = parseFloat(document.getElementById('pay-bonus').value.replace(/\./g, '')) || 0;
             const thr = parseFloat(document.getElementById('pay-thr').value.replace(/\./g, '')) || 0;
@@ -1629,7 +1625,7 @@
                 empId: k.id,
                 nama: k.nama,
                 periode: `${pStart} s/d ${pEnd}`,
-                periodeBulan: pEnd.substring(0, 7), // YYYY-MM
+                periodeBulan: pEnd.substring(0, 7),
                 gapok: gapok,
                 totalTunjangan: totalTunjangan + bonus + thr,
                 totalPotongan: totalPotongan,
@@ -1644,10 +1640,9 @@
             saveData();
             showToast("Data Penggajian Tersimpan!");
             document.getElementById('btn-save-payroll').classList.add('hidden');
-            renderLaporan();
-            renderDashboardAdmin();
         }
 
+        // --- 10. MODUL LAPORAN ---
         function initBulanLaporan() {
             if(!document.getElementById('filter-lap-bln').value) {
                 document.getElementById('filter-lap-bln').value = getLocalToday().substring(0, 7);
@@ -1656,49 +1651,83 @@
 
         function renderLaporan() {
             const bln = document.getElementById('filter-lap-bln').value;
+            const tb = document.getElementById('table-laporan');
+            if(!tb) return;
+            tb.innerHTML = '';
+
             const filtered = data.penggajian.filter(p => p.periodeBulan === bln || p.periode.includes(bln));
 
-            let totGaji = 0, totPot = 0;
-            const tb = document.getElementById('table-laporan');
-            tb.innerHTML = '';
+            let totGaji = 0;
+            let totPot = 0;
 
             filtered.forEach(p => {
                 totGaji += p.netto;
                 totPot += p.totalPotongan;
+
                 tb.innerHTML += `
                     <tr class="hover:bg-slate-50/70 transition-colors">
                         <td class="py-3.5 px-5 font-bold text-slate-900">${p.nama}</td>
-                        <td class="py-3.5 px-4 text-[11px] font-semibold text-slate-600">${p.periode}</td>
-                        <td class="py-3.5 px-4 font-semibold text-slate-600">${formatRupiah(p.gapok)}</td>
-                        <td class="py-3.5 px-4 font-semibold text-emerald-600">${formatRupiah(p.totalTunjangan)}</td>
-                        <td class="py-3.5 px-4 font-semibold text-rose-600">${formatRupiah(p.totalPotongan)}</td>
-                        <td class="py-3.5 px-4 font-bold text-blue-600">${formatRupiah(p.netto)}</td>
-                        <td class="py-3.5 px-4 text-center">
-                            <button onclick="cetakUlangSlip('${p.id}')" class="text-slate-400 hover:text-blue-500 transition-colors"><i class="fas fa-print"></i></button>
-                        </td>
+                        <td class="py-3.5 px-4 text-xs text-slate-600">${p.periode}</td>
+                        <td class="py-3.5 px-4 font-bold text-slate-700">Rp ${p.gapok.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-bold text-emerald-600">Rp ${p.totalTunjangan.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-bold text-rose-600">Rp ${p.totalPotongan.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-bold text-emerald-600">Rp ${p.netto.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 text-center"><button onclick="reprintSlip('${p.id}')" class="text-red-500 hover:bg-red-50 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors"><i class="fas fa-print mr-1"></i>Cetak</button></td>
                     </tr>
                 `;
             });
 
-            if(filtered.length === 0) tb.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada riwayat penggajian di bulan ini.</td></tr>';
-
-            document.getElementById('lap-tot-gaji').innerText = formatRupiah(totGaji);
-            document.getElementById('lap-tot-pot').innerText = formatRupiah(totPot);
+            document.getElementById('lap-tot-gaji').innerText = `Rp ${totGaji.toLocaleString('id-ID')}`;
+            document.getElementById('lap-tot-pot').innerText = `Rp ${totPot.toLocaleString('id-ID')}`;
             document.getElementById('lap-tot-karyawan').innerText = filtered.length;
+
+            if(filtered.length === 0) {
+                tb.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada riwayat penggajian pada bulan ini.</td></tr>';
+            }
+        }
+
+        function reprintSlip(id) {
+            const item = data.penggajian.find(p => p.id === id);
+            if(!item) return;
+            const k = data.karyawan.find(x => x.id === item.empId);
+
+            switchTab('penggajian');
+            if(k) {
+                document.getElementById('pay-karyawan-input').value = `${k.nik} - ${k.nama}`;
+            }
+
+            document.getElementById('slip-periode').innerText = item.periode;
+            document.getElementById('slip-nama').innerText = item.nama;
+            document.getElementById('slip-jabatan').innerText = k ? k.jabatan : '-';
+            document.getElementById('slip-nik').innerText = k ? k.nik : '-';
+            document.getElementById('slip-rek').innerText = k ? k.rekBank : '-';
+
+            document.getElementById('slip-gapok').innerText = formatRupiah(item.gapok);
+            document.getElementById('slip-bonus').innerText = formatRupiah(0);
+            document.getElementById('slip-thr').innerText = formatRupiah(0);
+            document.getElementById('slip-tunjangan-list').innerHTML = `<tr><td class="py-1.5 text-slate-600">Total Tunjangan/Bonus</td><td class="text-right font-bold">${formatRupiah(item.totalTunjangan)}</td></tr>`;
+
+            document.getElementById('slip-pot-telat').innerText = formatRupiah(item.totalPotongan);
+            document.getElementById('slip-pot-alfa').innerText = formatRupiah(0);
+            document.getElementById('slip-pot-izin').innerText = formatRupiah(0);
+            document.getElementById('slip-pot-pinjam').innerText = formatRupiah(0);
+
+            document.getElementById('slip-tot-pendapatan').innerText = formatRupiah(item.gapok + item.totalTunjangan);
+            document.getElementById('slip-tot-potongan').innerText = formatRupiah(item.totalPotongan);
+            document.getElementById('slip-netto').innerText = formatRupiah(item.netto);
+            document.getElementById('slip-sign-nama').innerText = `( ${item.nama} )`;
+
+            document.getElementById('slip-container').scrollIntoView({ behavior: 'smooth' });
         }
 
         function clearRiwayat() {
-            customConfirm("Yakin membersihkan SELURUH riwayat penggajian?", () => {
+            customConfirm("Apakah Anda yakin ingin menghapus seluruh arsip riwayat penggajian?", () => {
                 data.penggajian = [];
                 saveData();
                 renderLaporan();
                 renderDashboardAdmin();
-                showToast("Riwayat Penggajian Dibersihkan");
+                showToast("Riwayat penggajian telah dibersihkan");
             });
-        }
-
-        function cetakUlangSlip(id) {
-            customAlert("Fitur cetak ulang slip sedang dalam perbaikan untuk pengembangan ke versi PDF yang lebih rapi.");
         }
     </script>
 </body>
