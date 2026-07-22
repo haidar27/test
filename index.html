@@ -879,7 +879,15 @@
                     },
                     (err) => {
                         document.getElementById('btn-login').innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i> Masuk Sekarang';
-                        customAlert("Gagal mendapatkan lokasi. Pastikan perangkat memiliki koneksi aman (HTTPS) dan GPS aktif.");
+                        // BYPASS GPS UNTUK TESTING DI HP (Menghindari block HTTP)
+                        let bypass = confirm("GPS gagal diakses (mungkin karena tidak pakai HTTPS atau izin ditolak). Ingin login paksa (Bypass) untuk keperluan testing?");
+                        if(bypass) {
+                            loggedInUser = { role: 'karyawan', data: emp, cabangId: cab };
+                            if(isRemember) localStorage.setItem('payroll_session', JSON.stringify(loggedInUser));
+                            document.getElementById('screen-login').classList.add('hidden');
+                            document.getElementById('screen-employee').classList.remove('hidden');
+                            initEmployeeDashboard();
+                        }
                     },
                     { enableHighAccuracy: true, timeout: 10000 }
                 );
@@ -1560,128 +1568,119 @@
             }
 
             document.getElementById('pot-telat').value = new Intl.NumberFormat('id-ID').format(Math.round(potonganTelat));
-            document.getElementById('pot-izin').value = new Intl.NumberFormat('id-ID').format(Math.round(potonganIzin));
             document.getElementById('pot-alfa').value = new Intl.NumberFormat('id-ID').format(Math.round(alfaCount * gajiPerHari));
-            showToast("Data potongan berhasil ditarik otomatis!");
+            document.getElementById('pot-izin').value = new Intl.NumberFormat('id-ID').format(Math.round(potonganIzin));
+            
+            showToast("Data absensi & potongan berhasil ditarik!");
+            document.getElementById('btn-save-payroll').classList.add('hidden');
         }
 
-        // --- 10. CALCULATE, PREVIEW & REPORTS ---
         function calculateAndPreview() {
-            document.getElementById('slip-nama').innerText = document.getElementById('pay-karyawan-input').value.split('-')[1]?.trim() || '-';
-            document.getElementById('slip-periode').innerText = document.getElementById('pay-periode-start').value + " s/d " + document.getElementById('pay-periode-end').value;
-            
             const empId = getEmpIdFromInput('pay-karyawan-input');
+            if(!empId) return customAlert("Pilih karyawan terlebih dahulu!");
+            
             const k = data.karyawan.find(x => x.id === empId);
+            const pStart = document.getElementById('pay-periode-start').value;
+            const pEnd = document.getElementById('pay-periode-end').value;
+            if(!pStart || !pEnd) return customAlert("Tentukan periode penggajian!");
+
+            const parseRp = (id) => parseFloat(document.getElementById(id).value.replace(/\./g, '')) || 0;
             
-            if (k) {
-                document.getElementById('slip-nik').innerText = k.nik;
-                document.getElementById('slip-jabatan').innerText = k.jabatan;
-                document.getElementById('slip-rek').innerText = k.rekBank;
-            }
+            const gapok = parseRp('pay-gapok');
+            const bonus = parseRp('pay-bonus');
+            const thr = parseRp('pay-thr');
+            let totTunjangan = currentTunjangan.reduce((sum, t) => sum + t.amount, 0);
+            const kotor = gapok + bonus + thr + totTunjangan;
+
+            const pTelat = parseRp('pot-telat');
+            const pAlfa = parseRp('pot-alfa');
+            const pIzin = parseRp('pot-izin');
+            const pPinjam = parseRp('pot-pinjam');
+            const totPotongan = pTelat + pAlfa + pIzin + pPinjam;
+
+            const netto = kotor - totPotongan;
+
+            // Tampilkan ke Slip
+            document.getElementById('slip-periode').innerText = `${formatDate(pStart)} - ${formatDate(pEnd)}`;
+            document.getElementById('slip-nama').innerText = k.nama;
+            document.getElementById('slip-jabatan').innerText = k.jabatan;
+            document.getElementById('slip-nik').innerText = k.nik;
+            document.getElementById('slip-rek').innerText = k.rekBank;
             
-            const gapok = parseFloat(document.getElementById('pay-gapok').value.replace(/\./g, '')) || 0;
-            const bonus = parseFloat(document.getElementById('pay-bonus').value.replace(/\./g, '')) || 0;
-            const thr = parseFloat(document.getElementById('pay-thr').value.replace(/\./g, '')) || 0;
+            document.getElementById('slip-gapok').innerText = formatRupiah(gapok);
+            document.getElementById('slip-bonus').innerText = formatRupiah(bonus);
+            document.getElementById('slip-thr').innerText = formatRupiah(thr);
             
-            let tunjanganTotal = 0;
-            const tunjanganList = document.getElementById('slip-tunjangan-list');
-            tunjanganList.innerHTML = '';
+            const tl = document.getElementById('slip-tunjangan-list'); tl.innerHTML = '';
             currentTunjangan.forEach(t => {
-                tunjanganTotal += t.amount;
-                tunjanganList.innerHTML += `<tr><td class="py-1.5 text-slate-600">Tunj. ${t.name}</td><td class="text-right font-bold">Rp ${t.amount.toLocaleString('id-ID')}</td></tr>`;
+                tl.innerHTML += `<tr><td class="py-1.5 text-slate-600">${t.name}</td><td class="text-right font-bold">Rp ${t.amount.toLocaleString('id-ID')}</td></tr>`;
             });
 
-            const potTelat = parseFloat(document.getElementById('pot-telat').value.replace(/\./g, '')) || 0;
-            const potAlfa = parseFloat(document.getElementById('pot-alfa').value.replace(/\./g, '')) || 0;
-            const potIzin = parseFloat(document.getElementById('pot-izin').value.replace(/\./g, '')) || 0;
-            const potPinjam = parseFloat(document.getElementById('pot-pinjam').value.replace(/\./g, '')) || 0;
+            document.getElementById('slip-pot-telat').innerText = formatRupiah(pTelat);
+            document.getElementById('slip-pot-alfa').innerText = formatRupiah(pAlfa);
+            document.getElementById('slip-pot-izin').innerText = formatRupiah(pIzin);
+            document.getElementById('slip-pot-pinjam').innerText = formatRupiah(pPinjam);
 
-            const totPendapatan = gapok + bonus + thr + tunjanganTotal;
-            const totPotongan = potTelat + potAlfa + potIzin + potPinjam;
-            const netto = totPendapatan - totPotongan;
+            document.getElementById('slip-tot-pendapatan').innerText = formatRupiah(kotor);
+            document.getElementById('slip-tot-potongan').innerText = formatRupiah(totPotongan);
+            document.getElementById('slip-netto').innerText = formatRupiah(netto);
+            document.getElementById('slip-sign-nama').innerText = `( ${k.nama} )`;
 
-            document.getElementById('slip-gapok').innerText = `Rp ${gapok.toLocaleString('id-ID')}`;
-            document.getElementById('slip-bonus').innerText = `Rp ${bonus.toLocaleString('id-ID')}`;
-            document.getElementById('slip-thr').innerText = `Rp ${thr.toLocaleString('id-ID')}`;
+            currentCalcResult = { 
+                empId, periode: `${pStart} s/d ${pEnd}`, periodeBulan: pStart.slice(0,7), 
+                gapok, totTunjangan: bonus+thr+totTunjangan, totPotongan, netto 
+            };
             
-            document.getElementById('slip-pot-telat').innerText = `Rp ${potTelat.toLocaleString('id-ID')}`;
-            document.getElementById('slip-pot-alfa').innerText = `Rp ${potAlfa.toLocaleString('id-ID')}`;
-            document.getElementById('slip-pot-izin').innerText = `Rp ${potIzin.toLocaleString('id-ID')}`;
-            document.getElementById('slip-pot-pinjam').innerText = `Rp ${potPinjam.toLocaleString('id-ID')}`;
-
-            document.getElementById('slip-tot-pendapatan').innerText = `Rp ${totPendapatan.toLocaleString('id-ID')}`;
-            document.getElementById('slip-tot-potongan').innerText = `Rp ${totPotongan.toLocaleString('id-ID')}`;
-            document.getElementById('slip-netto').innerText = `Rp ${netto.toLocaleString('id-ID')}`;
-
             document.getElementById('btn-save-payroll').classList.remove('hidden');
-            
-            currentCalcResult = { totPendapatan, totPotongan, netto };
-            showToast("Preview slip berhasil di-generate!");
+            document.getElementById('slip-container').scrollIntoView({ behavior: 'smooth' });
         }
 
         function savePayrollData() {
             if(!currentCalcResult) return;
-            const empId = getEmpIdFromInput('pay-karyawan-input');
-            const k = data.karyawan.find(x => x.id === empId);
-            
-            data.penggajian.push({
-                id: generateId(),
-                empId: empId,
-                nama: k.nama,
-                periode: document.getElementById('pay-periode-start').value + " s/d " + document.getElementById('pay-periode-end').value,
-                periodeBulan: document.getElementById('pay-periode-start').value.slice(0, 7),
-                gapok: parseFloat(document.getElementById('pay-gapok').value.replace(/\./g, '')) || 0,
-                tunjangan: currentTunjangan,
-                totPendapatan: currentCalcResult.totPendapatan,
-                totPotongan: currentCalcResult.totPotongan,
-                netto: currentCalcResult.netto
-            });
-            saveData();
-            showToast("Data penggajian berhasil disimpan!");
+            data.penggajian.push({ id: generateId(), ...currentCalcResult });
+            saveData(); showToast("Slip Gaji Tersimpan ke Laporan!");
             document.getElementById('btn-save-payroll').classList.add('hidden');
         }
 
-        function initBulanLaporan() {
-            document.getElementById('filter-lap-bln').value = getLocalToday().slice(0, 7);
-        }
-
+        // --- 10. MODUL LAPORAN ---
+        function initBulanLaporan() { document.getElementById('filter-lap-bln').value = getLocalToday().slice(0,7); }
+        
         function renderLaporan() {
             const bln = document.getElementById('filter-lap-bln').value;
-            const tb = document.getElementById('table-laporan');
-            tb.innerHTML = '';
+            const tb = document.getElementById('table-laporan'); tb.innerHTML = '';
+            const filtered = data.penggajian.filter(p => p.periodeBulan === bln);
             
-            let filtered = data.penggajian.filter(p => p.periodeBulan === bln);
-            let totGaji = 0, totPot = 0;
-            
+            let tGaji = 0, tPot = 0;
             filtered.forEach(p => {
-                totGaji += p.totPendapatan;
-                totPot += p.totPotongan;
-                
+                const k = data.karyawan.find(x => x.id === p.empId);
+                tGaji += p.netto; tPot += p.totPotongan;
                 tb.innerHTML += `
                     <tr class="hover:bg-slate-50/70 transition-colors">
-                        <td class="py-3.5 px-5 font-bold text-slate-900">${p.nama}</td>
-                        <td class="py-3.5 px-4 font-semibold text-slate-600">${p.periode}</td>
-                        <td class="py-3.5 px-4 font-semibold text-slate-600">Rp ${p.gapok.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 font-bold text-emerald-600">Rp ${p.totPendapatan.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 font-bold text-rose-500">Rp ${p.totPotongan.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 font-bold text-slate-900">Rp ${p.netto.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 text-center"><button class="text-slate-400 hover:text-slate-800 transition-colors"><i class="fas fa-print"></i></button></td>
+                        <td class="py-3.5 px-5 font-bold text-slate-900">${k?k.nama:'Dihapus'}</td>
+                        <td class="py-3.5 px-4 text-slate-500">${p.periode}</td>
+                        <td class="py-3.5 px-4 text-slate-600">Rp ${p.gapok.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 text-emerald-600">+Rp ${p.totTunjangan.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 text-rose-600">-Rp ${p.totPotongan.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-bold text-emerald-600">Rp ${p.netto.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 text-center"><button class="text-slate-400 hover:text-slate-700 transition-colors" title="Cetak ulang slip tidak didukung di demo ini"><i class="fas fa-print"></i></button></td>
                     </tr>
                 `;
             });
             
-            document.getElementById('lap-tot-gaji').innerText = `Rp ${totGaji.toLocaleString('id-ID')}`;
-            document.getElementById('lap-tot-pot').innerText = `Rp ${totPot.toLocaleString('id-ID')}`;
-            document.getElementById('lap-tot-karyawan').innerText = filtered.length;
+            if(filtered.length === 0) {
+                tb.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400 text-xs">Belum ada riwayat penggajian di bulan ini.</td></tr>';
+            }
             
-            if(filtered.length === 0) tb.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada rekam penggajian di bulan ini.</td></tr>';
+            document.getElementById('lap-tot-gaji').innerText = formatRupiah(tGaji);
+            document.getElementById('lap-tot-pot').innerText = formatRupiah(tPot);
+            document.getElementById('lap-tot-karyawan').innerText = filtered.length;
         }
 
         function clearRiwayat() {
-            customConfirm("Yakin membersihkan riwayat penggajian bulan ini?", () => {
+            customConfirm("Hapus semua riwayat penggajian pada bulan ini?", () => {
                 const bln = document.getElementById('filter-lap-bln').value;
                 data.penggajian = data.penggajian.filter(p => p.periodeBulan !== bln);
-                saveData(); renderLaporan(); showToast("Riwayat dihapus!");
+                saveData(); renderLaporan(); showToast("Riwayat bulan ini dibersihkan.");
             });
         }
     </script>
