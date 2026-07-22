@@ -879,7 +879,7 @@
                     },
                     (err) => {
                         document.getElementById('btn-login').innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i> Masuk Sekarang';
-                        customAlert("Gagal mendapatkan lokasi. Pastikan GPS aktif dan Anda mengizinkan akses lokasi pada browser.");
+                        customAlert("Gagal mendapatkan lokasi. Pastikan perangkat memiliki koneksi aman (HTTPS) dan GPS aktif.");
                     },
                     { enableHighAccuracy: true, timeout: 10000 }
                 );
@@ -1548,41 +1548,47 @@
             let d = new Date(pStart);
             let endDate = new Date(pEnd);
             let today = new Date(getLocalToday());
-            let checkEnd = endDate < today ? endDate : today; 
+            let checkEnd = endDate < today ? endDate : today;
 
             while (d <= checkEnd) {
-                if (d.getDay() !== 0) { 
-                    let dateStr = d.toISOString().split('T')[0];
-                    let record = absenInRange.find(a => a.tgl === dateStr);
-                    if (!record) {
-                        alfaCount++;
-                    }
+                let tglStr = d.toISOString().split('T')[0];
+                let hasAbsen = absenInRange.find(a => a.tgl === tglStr);
+                if (!hasAbsen && d.getDay() !== 0) { 
+                    alfaCount++;
                 }
                 d.setDate(d.getDate() + 1);
             }
 
-            let potonganAlfa = alfaCount * gajiPerHari;
-
             document.getElementById('pot-telat').value = new Intl.NumberFormat('id-ID').format(Math.round(potonganTelat));
-            document.getElementById('pot-alfa').value = new Intl.NumberFormat('id-ID').format(Math.round(potonganAlfa));
             document.getElementById('pot-izin').value = new Intl.NumberFormat('id-ID').format(Math.round(potonganIzin));
-            
-            showToast(`Ditarik: Hadir ${totalHadir}, Izin ${totalIzin}, Alfa/Mangkir ${alfaCount}hr.`);
+            document.getElementById('pot-alfa').value = new Intl.NumberFormat('id-ID').format(Math.round(alfaCount * gajiPerHari));
+            showToast("Data potongan berhasil ditarik otomatis!");
         }
 
+        // --- 10. CALCULATE, PREVIEW & REPORTS ---
         function calculateAndPreview() {
+            document.getElementById('slip-nama').innerText = document.getElementById('pay-karyawan-input').value.split('-')[1]?.trim() || '-';
+            document.getElementById('slip-periode').innerText = document.getElementById('pay-periode-start').value + " s/d " + document.getElementById('pay-periode-end').value;
+            
             const empId = getEmpIdFromInput('pay-karyawan-input');
             const k = data.karyawan.find(x => x.id === empId);
-            if(!k) return customAlert("Pilih Karyawan dari daftar yang tersedia!");
-
+            
+            if (k) {
+                document.getElementById('slip-nik').innerText = k.nik;
+                document.getElementById('slip-jabatan').innerText = k.jabatan;
+                document.getElementById('slip-rek').innerText = k.rekBank;
+            }
+            
             const gapok = parseFloat(document.getElementById('pay-gapok').value.replace(/\./g, '')) || 0;
             const bonus = parseFloat(document.getElementById('pay-bonus').value.replace(/\./g, '')) || 0;
             const thr = parseFloat(document.getElementById('pay-thr').value.replace(/\./g, '')) || 0;
             
-            let totalTunjangan = 0; let htmlTunjangan = '';
-            currentTunjangan.forEach(t => { 
-                totalTunjangan += t.amount; 
-                htmlTunjangan += `<tr><td class="py-1.5 text-slate-600">${t.name}</td><td class="text-right font-bold">Rp ${t.amount.toLocaleString('id-ID')}</td></tr>`; 
+            let tunjanganTotal = 0;
+            const tunjanganList = document.getElementById('slip-tunjangan-list');
+            tunjanganList.innerHTML = '';
+            currentTunjangan.forEach(t => {
+                tunjanganTotal += t.amount;
+                tunjanganList.innerHTML += `<tr><td class="py-1.5 text-slate-600">Tunj. ${t.name}</td><td class="text-right font-bold">Rp ${t.amount.toLocaleString('id-ID')}</td></tr>`;
             });
 
             const potTelat = parseFloat(document.getElementById('pot-telat').value.replace(/\./g, '')) || 0;
@@ -1590,143 +1596,92 @@
             const potIzin = parseFloat(document.getElementById('pot-izin').value.replace(/\./g, '')) || 0;
             const potPinjam = parseFloat(document.getElementById('pot-pinjam').value.replace(/\./g, '')) || 0;
 
-            const totalPendapatan = gapok + bonus + thr + totalTunjangan;
-            const totalPotongan = potTelat + potAlfa + potIzin + potPinjam;
-            const netto = totalPendapatan - totalPotongan;
+            const totPendapatan = gapok + bonus + thr + tunjanganTotal;
+            const totPotongan = potTelat + potAlfa + potIzin + potPinjam;
+            const netto = totPendapatan - totPotongan;
 
-            const pStart = document.getElementById('pay-periode-start').value;
-            const pEnd = document.getElementById('pay-periode-end').value;
+            document.getElementById('slip-gapok').innerText = `Rp ${gapok.toLocaleString('id-ID')}`;
+            document.getElementById('slip-bonus').innerText = `Rp ${bonus.toLocaleString('id-ID')}`;
+            document.getElementById('slip-thr').innerText = `Rp ${thr.toLocaleString('id-ID')}`;
+            
+            document.getElementById('slip-pot-telat').innerText = `Rp ${potTelat.toLocaleString('id-ID')}`;
+            document.getElementById('slip-pot-alfa').innerText = `Rp ${potAlfa.toLocaleString('id-ID')}`;
+            document.getElementById('slip-pot-izin').innerText = `Rp ${potIzin.toLocaleString('id-ID')}`;
+            document.getElementById('slip-pot-pinjam').innerText = `Rp ${potPinjam.toLocaleString('id-ID')}`;
 
-            document.getElementById('slip-periode').innerText = `${formatDate(pStart)} - ${formatDate(pEnd)}`;
-            document.getElementById('slip-nama').innerText = k.nama;
-            document.getElementById('slip-jabatan').innerText = k.jabatan;
-            document.getElementById('slip-nik').innerText = k.nik;
-            document.getElementById('slip-rek').innerText = k.rekBank;
-
-            document.getElementById('slip-gapok').innerText = formatRupiah(gapok);
-            document.getElementById('slip-bonus').innerText = formatRupiah(bonus);
-            document.getElementById('slip-thr').innerText = formatRupiah(thr);
-            document.getElementById('slip-tunjangan-list').innerHTML = htmlTunjangan;
-
-            document.getElementById('slip-pot-telat').innerText = formatRupiah(potTelat);
-            document.getElementById('slip-pot-alfa').innerText = formatRupiah(potAlfa);
-            document.getElementById('slip-pot-izin').innerText = formatRupiah(potIzin);
-            document.getElementById('slip-pot-pinjam').innerText = formatRupiah(potPinjam);
-
-            document.getElementById('slip-tot-pendapatan').innerText = formatRupiah(totalPendapatan);
-            document.getElementById('slip-tot-potongan').innerText = formatRupiah(totalPotongan);
-            document.getElementById('slip-netto').innerText = formatRupiah(netto);
-            document.getElementById('slip-sign-nama').innerText = `( ${k.nama} )`;
+            document.getElementById('slip-tot-pendapatan').innerText = `Rp ${totPendapatan.toLocaleString('id-ID')}`;
+            document.getElementById('slip-tot-potongan').innerText = `Rp ${totPotongan.toLocaleString('id-ID')}`;
+            document.getElementById('slip-netto').innerText = `Rp ${netto.toLocaleString('id-ID')}`;
 
             document.getElementById('btn-save-payroll').classList.remove('hidden');
-
-            currentCalcResult = {
-                id: generateId(),
-                empId: k.id,
-                nama: k.nama,
-                periode: `${pStart} s/d ${pEnd}`,
-                periodeBulan: pEnd.substring(0, 7),
-                gapok: gapok,
-                totalTunjangan: totalTunjangan + bonus + thr,
-                totalPotongan: totalPotongan,
-                netto: netto,
-                tglCetak: getLocalToday()
-            };
+            
+            currentCalcResult = { totPendapatan, totPotongan, netto };
+            showToast("Preview slip berhasil di-generate!");
         }
 
         function savePayrollData() {
             if(!currentCalcResult) return;
-            data.penggajian.push(currentCalcResult);
+            const empId = getEmpIdFromInput('pay-karyawan-input');
+            const k = data.karyawan.find(x => x.id === empId);
+            
+            data.penggajian.push({
+                id: generateId(),
+                empId: empId,
+                nama: k.nama,
+                periode: document.getElementById('pay-periode-start').value + " s/d " + document.getElementById('pay-periode-end').value,
+                periodeBulan: document.getElementById('pay-periode-start').value.slice(0, 7),
+                gapok: parseFloat(document.getElementById('pay-gapok').value.replace(/\./g, '')) || 0,
+                tunjangan: currentTunjangan,
+                totPendapatan: currentCalcResult.totPendapatan,
+                totPotongan: currentCalcResult.totPotongan,
+                netto: currentCalcResult.netto
+            });
             saveData();
-            showToast("Data Penggajian Tersimpan!");
+            showToast("Data penggajian berhasil disimpan!");
             document.getElementById('btn-save-payroll').classList.add('hidden');
         }
 
-        // --- 10. MODUL LAPORAN ---
         function initBulanLaporan() {
-            if(!document.getElementById('filter-lap-bln').value) {
-                document.getElementById('filter-lap-bln').value = getLocalToday().substring(0, 7);
-            }
+            document.getElementById('filter-lap-bln').value = getLocalToday().slice(0, 7);
         }
 
         function renderLaporan() {
             const bln = document.getElementById('filter-lap-bln').value;
             const tb = document.getElementById('table-laporan');
-            if(!tb) return;
             tb.innerHTML = '';
-
-            const filtered = data.penggajian.filter(p => p.periodeBulan === bln || p.periode.includes(bln));
-
-            let totGaji = 0;
-            let totPot = 0;
-
+            
+            let filtered = data.penggajian.filter(p => p.periodeBulan === bln);
+            let totGaji = 0, totPot = 0;
+            
             filtered.forEach(p => {
-                totGaji += p.netto;
-                totPot += p.totalPotongan;
-
+                totGaji += p.totPendapatan;
+                totPot += p.totPotongan;
+                
                 tb.innerHTML += `
                     <tr class="hover:bg-slate-50/70 transition-colors">
                         <td class="py-3.5 px-5 font-bold text-slate-900">${p.nama}</td>
-                        <td class="py-3.5 px-4 text-xs text-slate-600">${p.periode}</td>
-                        <td class="py-3.5 px-4 font-bold text-slate-700">Rp ${p.gapok.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 font-bold text-emerald-600">Rp ${p.totalTunjangan.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 font-bold text-rose-600">Rp ${p.totalPotongan.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 font-bold text-emerald-600">Rp ${p.netto.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 text-center"><button onclick="reprintSlip('${p.id}')" class="text-red-500 hover:bg-red-50 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors"><i class="fas fa-print mr-1"></i>Cetak</button></td>
+                        <td class="py-3.5 px-4 font-semibold text-slate-600">${p.periode}</td>
+                        <td class="py-3.5 px-4 font-semibold text-slate-600">Rp ${p.gapok.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-bold text-emerald-600">Rp ${p.totPendapatan.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-bold text-rose-500">Rp ${p.totPotongan.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-bold text-slate-900">Rp ${p.netto.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 text-center"><button class="text-slate-400 hover:text-slate-800 transition-colors"><i class="fas fa-print"></i></button></td>
                     </tr>
                 `;
             });
-
+            
             document.getElementById('lap-tot-gaji').innerText = `Rp ${totGaji.toLocaleString('id-ID')}`;
             document.getElementById('lap-tot-pot').innerText = `Rp ${totPot.toLocaleString('id-ID')}`;
             document.getElementById('lap-tot-karyawan').innerText = filtered.length;
-
-            if(filtered.length === 0) {
-                tb.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada riwayat penggajian pada bulan ini.</td></tr>';
-            }
-        }
-
-        function reprintSlip(id) {
-            const item = data.penggajian.find(p => p.id === id);
-            if(!item) return;
-            const k = data.karyawan.find(x => x.id === item.empId);
-
-            switchTab('penggajian');
-            if(k) {
-                document.getElementById('pay-karyawan-input').value = `${k.nik} - ${k.nama}`;
-            }
-
-            document.getElementById('slip-periode').innerText = item.periode;
-            document.getElementById('slip-nama').innerText = item.nama;
-            document.getElementById('slip-jabatan').innerText = k ? k.jabatan : '-';
-            document.getElementById('slip-nik').innerText = k ? k.nik : '-';
-            document.getElementById('slip-rek').innerText = k ? k.rekBank : '-';
-
-            document.getElementById('slip-gapok').innerText = formatRupiah(item.gapok);
-            document.getElementById('slip-bonus').innerText = formatRupiah(0);
-            document.getElementById('slip-thr').innerText = formatRupiah(0);
-            document.getElementById('slip-tunjangan-list').innerHTML = `<tr><td class="py-1.5 text-slate-600">Total Tunjangan/Bonus</td><td class="text-right font-bold">${formatRupiah(item.totalTunjangan)}</td></tr>`;
-
-            document.getElementById('slip-pot-telat').innerText = formatRupiah(item.totalPotongan);
-            document.getElementById('slip-pot-alfa').innerText = formatRupiah(0);
-            document.getElementById('slip-pot-izin').innerText = formatRupiah(0);
-            document.getElementById('slip-pot-pinjam').innerText = formatRupiah(0);
-
-            document.getElementById('slip-tot-pendapatan').innerText = formatRupiah(item.gapok + item.totalTunjangan);
-            document.getElementById('slip-tot-potongan').innerText = formatRupiah(item.totalPotongan);
-            document.getElementById('slip-netto').innerText = formatRupiah(item.netto);
-            document.getElementById('slip-sign-nama').innerText = `( ${item.nama} )`;
-
-            document.getElementById('slip-container').scrollIntoView({ behavior: 'smooth' });
+            
+            if(filtered.length === 0) tb.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada rekam penggajian di bulan ini.</td></tr>';
         }
 
         function clearRiwayat() {
-            customConfirm("Apakah Anda yakin ingin menghapus seluruh arsip riwayat penggajian?", () => {
-                data.penggajian = [];
-                saveData();
-                renderLaporan();
-                renderDashboardAdmin();
-                showToast("Riwayat penggajian telah dibersihkan");
+            customConfirm("Yakin membersihkan riwayat penggajian bulan ini?", () => {
+                const bln = document.getElementById('filter-lap-bln').value;
+                data.penggajian = data.penggajian.filter(p => p.periodeBulan !== bln);
+                saveData(); renderLaporan(); showToast("Riwayat dihapus!");
             });
         }
     </script>
