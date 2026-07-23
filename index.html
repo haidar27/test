@@ -1552,130 +1552,135 @@
             const val = document.getElementById('pay-karyawan-input').value;
             const nikMatch = val.match(/NIK:\s*(\d+)/);
             if(!nikMatch) return customAlert("Pilih karyawan terlebih dahulu!");
+            
             const kar = data.karyawan.find(k => k.nik === nikMatch[1]);
             const startStr = document.getElementById('pay-periode-start').value;
             const endStr = document.getElementById('pay-periode-end').value;
-            
-            if(!startStr || !endStr) return customAlert("Tentukan rentang tanggal periode terlebih dahulu!");
 
-            let totalTelatMenit = 0;
-            let totalHadir = 0;
-            let totalIzinSetengahHari = 0; // Fitur Izin Setengah Hari
-            
+            if(!startStr || !endStr) return customAlert("Pilih periode (mulai & selesai) terlebih dahulu!");
+
             const startDate = new Date(startStr);
             const endDate = new Date(endStr);
             
-            data.absensi.filter(a => a.empId === kar.id && new Date(a.tgl) >= startDate && new Date(a.tgl) <= endDate).forEach(a => {
-                if(a.telat > 0) totalTelatMenit += a.telat;
-                
-                // Tambahkan sebagai kehadiran agar sistem tetap memberikan gaji pokok seharinya
-                if(a.status === 'Hadir' || a.keterangan === 'Izin Setengah Hari') {
-                    totalHadir++;
-                }
+            let telatMenit = 0;
+            let hariIzinPenuh = 0;
+            let hariIzinSetengah = 0;
 
-                // Jika Izin setengah hari, catat jumlah harinya
-                if(a.keterangan === 'Izin Setengah Hari') {
-                    totalIzinSetengahHari++;
+            data.absensi.forEach(a => {
+                if (a.empId === kar.id) {
+                    const d = new Date(a.tgl);
+                    if (d >= startDate && d <= endDate) {
+                        if (a.status === 'Hadir' && a.keterangan !== 'Izin Setengah Hari') {
+                            if (a.telat > 0) telatMenit += a.telat;
+                        } else if (a.status === 'Izin' && a.keterangan !== 'Izin Setengah Hari') {
+                            hariIzinPenuh++;
+                        } else if (a.keterangan === 'Izin Setengah Hari') {
+                            hariIzinSetengah++;
+                            // Jika saat absen masuk izin setengah hari rupanya telat juga
+                            if (a.telat > 0) telatMenit += a.telat;
+                        }
+                    }
                 }
             });
 
-            const gajiSehari = kar.gapok / data.parameter.hariKerja;
+            // Gaji harian = Gaji Pokok / Total Hari Kerja Parameter
+            const hariKerjaNormal = data.parameter.hariKerja || 26;
+            const gajiSehari = kar.gapok / hariKerjaNormal;
             
-            // SESUAI REQUEST: Gaji pokok disesuaikan prorate hanya untuk hari dia masuk kerja
-            const gajiMasukKerja = totalHadir * gajiSehari;
-            document.getElementById('pay-gapok').value = Math.round(gajiMasukKerja).toLocaleString('id-ID');
+            // Kalkulasi Denda Telat
+            let potTelat = (telatMenit / 60) * (gajiSehari * (data.parameter.dendaTelatPersen / 100));
 
-            // Perhitungan Denda Telat
-            let dendaTelatRp = 0;
-            if(totalTelatMenit > 0) {
-                dendaTelatRp = (totalTelatMenit / 60) * (gajiSehari * (data.parameter.dendaTelatPersen / 100));
-            }
-            document.getElementById('pot-telat').value = Math.round(dendaTelatRp).toLocaleString('id-ID');
+            // Kalkulasi Potongan Izin Setengah Hari dan Izin Penuh
+            const persenSetengahHari = data.parameter.potonganSetengahHariPersen || 50;
+            let potIzinSetengah = hariIzinSetengah * (gajiSehari * (persenSetengahHari / 100));
+            let potIzinFull = hariIzinPenuh * gajiSehari;
 
-            // Perhitungan Potongan Izin Setengah Hari
-            let potonganIzinSetengahHari = 0;
-            if (totalIzinSetengahHari > 0) {
-                const persenPotongan = data.parameter.potonganSetengahHariPersen || 50; 
-                potonganIzinSetengahHari = totalIzinSetengahHari * (gajiSehari * (persenPotongan / 100));
-            }
-            document.getElementById('pot-izin').value = Math.round(potonganIzinSetengahHari).toLocaleString('id-ID');
+            document.getElementById('pot-telat').value = Math.round(potTelat).toLocaleString('id-ID');
             
-            // Alfa di set 0 karena Gaji Pokok sudah murni hanya dari hari dia masuk
-            document.getElementById('pot-alfa').value = "0"; 
+            // Masukkan total akumulasi izin penuh & izin setengah hari ke input form pot-izin
+            document.getElementById('pot-izin').value = Math.round(potIzinFull + potIzinSetengah).toLocaleString('id-ID');
             
-            showToast("Data absensi & perhitungan potongan masuk berhasil ditarik otomatis!");
+            showToast("Tarik data otomatis berhasil. Potongan berhasil dihitung.");
         }
 
-        // --- PENYEMPURNAAN KODE YANG TERPOTONG SEBELUMNYA ---
+        // Fungsi Kalkulasi Akhir dan Validasi Cetak
         function calculateAndPreview() {
             const val = document.getElementById('pay-karyawan-input').value;
             const nikMatch = val.match(/NIK:\s*(\d+)/);
             if(!nikMatch) return customAlert("Pilih karyawan terlebih dahulu!");
             const kar = data.karyawan.find(k => k.nik === nikMatch[1]);
             
-            // UBAH INI AGAR MENGAMBIL NILAI GAPOK YANG SUDAH PRORATE DARI INPUT
-            const gapok = parseFloat(document.getElementById('pay-gapok').value.replace(/[^0-9]/g, '')) || 0;
-            const bonus = parseFloat(document.getElementById('pay-bonus').value.replace(/[^0-9]/g, '')) || 0;
-            const thr = parseFloat(document.getElementById('pay-thr').value.replace(/[^0-9]/g, '')) || 0;
-            const potTelat = parseFloat(document.getElementById('pot-telat').value.replace(/[^0-9]/g, '')) || 0;
-            const potAlfa = parseFloat(document.getElementById('pot-alfa').value.replace(/[^0-9]/g, '')) || 0;
-            const potIzin = parseFloat(document.getElementById('pot-izin').value.replace(/[^0-9]/g, '')) || 0;
-            const potPinjam = parseFloat(document.getElementById('pot-pinjam').value.replace(/[^0-9]/g, '')) || 0;
+            const startStr = document.getElementById('pay-periode-start').value;
+            const endStr = document.getElementById('pay-periode-end').value;
+            if(!startStr || !endStr) return customAlert("Pilih periode penggajian!");
 
+            const parseRp = (id) => parseFloat(document.getElementById(id).value.replace(/[^0-9]/g, '')) || 0;
+            
+            const gapok = parseRp('pay-gapok');
+            const bonus = parseRp('pay-bonus');
+            const thr = parseRp('pay-thr');
+            
             let totTunjangan = 0;
-            const listTunjanganHTML = currentTunjangan.map(t => {
+            const slipTunjangan = document.getElementById('slip-tunjangan-list');
+            slipTunjangan.innerHTML = '';
+            currentTunjangan.forEach(t => {
                 totTunjangan += t.nominal;
-                return `<tr><td class="py-1.5 text-slate-600">${t.nama}</td><td class="text-right font-bold text-emerald-600">Rp ${t.nominal.toLocaleString('id-ID')}</td></tr>`;
-            }).join('');
+                slipTunjangan.innerHTML += `<tr><td class="py-1.5 text-slate-600">Tunjangan ${t.nama}</td><td class="text-right font-bold">Rp ${t.nominal.toLocaleString('id-ID')}</td></tr>`;
+            });
+
+            const potTelat = parseRp('pot-telat');
+            const potAlfa = parseRp('pot-alfa');
+            const potIzin = parseRp('pot-izin');
+            const potPinjam = parseRp('pot-pinjam');
 
             const totPendapatan = gapok + bonus + thr + totTunjangan;
             const totPotongan = potTelat + potAlfa + potIzin + potPinjam;
             const netto = totPendapatan - totPotongan;
 
-            // Fill slip preview
-            document.getElementById('slip-periode').innerText = `${document.getElementById('pay-periode-start').value} s/d ${document.getElementById('pay-periode-end').value}`;
+            document.getElementById('slip-periode').innerText = `${formatDate(startStr)} - ${formatDate(endStr)}`;
             document.getElementById('slip-nama').innerText = kar.nama;
             document.getElementById('slip-jabatan').innerText = kar.jabatan;
             document.getElementById('slip-nik').innerText = kar.nik;
             document.getElementById('slip-rek').innerText = kar.rekBank;
+            
             document.getElementById('slip-gapok').innerText = `Rp ${gapok.toLocaleString('id-ID')}`;
             document.getElementById('slip-bonus').innerText = `Rp ${bonus.toLocaleString('id-ID')}`;
             document.getElementById('slip-thr').innerText = `Rp ${thr.toLocaleString('id-ID')}`;
-            document.getElementById('slip-tunjangan-list').innerHTML = listTunjanganHTML;
+            
             document.getElementById('slip-pot-telat').innerText = `Rp ${potTelat.toLocaleString('id-ID')}`;
             document.getElementById('slip-pot-alfa').innerText = `Rp ${potAlfa.toLocaleString('id-ID')}`;
             document.getElementById('slip-pot-izin').innerText = `Rp ${potIzin.toLocaleString('id-ID')}`;
             document.getElementById('slip-pot-pinjam').innerText = `Rp ${potPinjam.toLocaleString('id-ID')}`;
+            
             document.getElementById('slip-tot-pendapatan').innerText = `Rp ${totPendapatan.toLocaleString('id-ID')}`;
             document.getElementById('slip-tot-potongan').innerText = `Rp ${totPotongan.toLocaleString('id-ID')}`;
             document.getElementById('slip-netto').innerText = `Rp ${netto.toLocaleString('id-ID')}`;
             document.getElementById('slip-sign-nama').innerText = `( ${kar.nama} )`;
 
-            document.getElementById('btn-save-payroll').classList.remove('hidden');
-
             currentCalcResult = {
                 id: generateId(),
                 empId: kar.id,
                 nama: kar.nama,
-                periode: `${document.getElementById('pay-periode-start').value} s/d ${document.getElementById('pay-periode-end').value}`,
-                periodeBulan: getLocalToday().slice(0, 7),
-                gapok, bonus, thr, tunjangan: currentTunjangan, totTunjangan,
-                potTelat, potAlfa, potIzin, potPinjam, totPotongan,
+                periode: `${formatDate(startStr)} - ${formatDate(endStr)}`,
+                periodeBulan: startStr.slice(0, 7),
+                gapok,
+                totTunjangan: totTunjangan + bonus + thr,
+                totPotongan,
                 netto
             };
 
-            // Scroll to preview slip smoothly
-            window.scrollTo({ top: document.getElementById('slip-container').offsetTop, behavior: 'smooth' });
+            document.getElementById('btn-save-payroll').classList.remove('hidden');
+            showToast("Preview slip gaji berhasil dibuat");
+            window.scrollTo({ top: document.getElementById('slip-container').offsetTop - 50, behavior: 'smooth' });
         }
 
         function savePayrollData() {
             if(!currentCalcResult) return;
             saveDataToFirebase('penggajian', currentCalcResult.id, currentCalcResult);
-            showToast("Data Penggajian Berhasil Disimpan & Dicatat");
+            showToast("Data Penggajian Berhasil Disimpan ke Laporan");
             document.getElementById('btn-save-payroll').classList.add('hidden');
         }
 
-        // --- 10. MODUL LAPORAN PENGGAJIAN ---
         function initBulanLaporan() {
             document.getElementById('filter-lap-bln').value = getLocalToday().slice(0, 7);
         }
@@ -1685,66 +1690,67 @@
             const tb = document.getElementById('table-laporan');
             tb.innerHTML = '';
             
-            const filtered = data.penggajian.filter(p => p.periodeBulan === bln || (p.periode && p.periode.includes(bln)));
+            let totGaji = 0, totPot = 0, totKar = 0;
+            const filtered = data.penggajian.filter(p => !bln || p.periodeBulan === bln);
             
-            let totGaji = 0, totPot = 0, org = filtered.length;
             filtered.forEach(p => {
                 totGaji += p.netto;
                 totPot += p.totPotongan;
+                totKar++;
+                
                 tb.innerHTML += `
                     <tr class="hover:bg-slate-50/70 transition-colors">
                         <td class="py-3.5 px-5 font-bold text-slate-900">${p.nama}</td>
                         <td class="py-3.5 px-4 font-semibold text-slate-600">${p.periode}</td>
-                        <td class="py-3.5 px-4 font-bold text-slate-700">Rp ${p.gapok.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 font-bold text-emerald-600">Rp ${p.totTunjangan.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 font-bold text-rose-600">Rp ${p.totPotongan.toLocaleString('id-ID')}</td>
-                        <td class="py-3.5 px-4 font-bold text-emerald-600 text-sm">Rp ${p.netto.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-semibold text-slate-600">Rp ${p.gapok.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-semibold text-emerald-600">Rp ${p.totTunjangan.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-semibold text-rose-600">Rp ${p.totPotongan.toLocaleString('id-ID')}</td>
+                        <td class="py-3.5 px-4 font-bold text-emerald-600">Rp ${p.netto.toLocaleString('id-ID')}</td>
                     </tr>
                 `;
             });
             
-            if(filtered.length === 0) tb.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada riwayat penggajian pada bulan ini.</td></tr>';
-            
             document.getElementById('lap-tot-gaji').innerText = `Rp ${totGaji.toLocaleString('id-ID')}`;
             document.getElementById('lap-tot-pot').innerText = `Rp ${totPot.toLocaleString('id-ID')}`;
-            document.getElementById('lap-tot-karyawan').innerText = org;
+            document.getElementById('lap-tot-karyawan').innerText = totKar;
+            
+            if(filtered.length === 0) tb.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs font-medium">Belum ada data penggajian pada periode ini.</td></tr>';
         }
 
         function clearRiwayat() {
-            customConfirm("Yakin ingin membersihkan semua riwayat penggajian? Data di cloud akan hilang permanen.", () => {
-                const { db, ref, remove } = window.firebaseDB;
-                remove(ref(db, 'penggajian')).then(() => {
-                    showToast("Riwayat penggajian telah dibersihkan.");
-                    renderLaporan();
-                }).catch(err => customAlert("Gagal: " + err.message));
+            customConfirm("Yakin ingin mengosongkan seluruh riwayat penggajian pada bulan ini?", () => {
+                const bln = document.getElementById('filter-lap-bln').value;
+                if(!bln) return;
+                data.penggajian.forEach(p => {
+                    if(p.periodeBulan === bln) removeDataFromFirebase('penggajian', p.id);
+                });
+                showToast("Riwayat penggajian bulan terpilih telah dibersihkan.");
+                setTimeout(() => renderLaporan(), 500);
             });
         }
 
-        // --- 11. MODUL PARAMETER ---
         function loadParameter() {
-            document.getElementById('param-harikerja').value = data.parameter.hariKerja;
-            document.getElementById('param-toleransitelat').value = data.parameter.toleransiTelat;
-            document.getElementById('param-dendatelat').value = data.parameter.dendaTelatPersen;
-            document.getElementById('param-jammasuk').value = data.parameter.jamMasuk;
-            document.getElementById('param-jampulang').value = data.parameter.jamPulang;
-            document.getElementById('param-potongansetengahhari').value = data.parameter.potonganSetengahHariPersen || 50; // Load nilai potongan
+            document.getElementById('param-harikerja').value = data.parameter.hariKerja || 26;
+            document.getElementById('param-jammasuk').value = data.parameter.jamMasuk || '08:00';
+            document.getElementById('param-jampulang').value = data.parameter.jamPulang || '17:00';
+            document.getElementById('param-toleransitelat').value = data.parameter.toleransiTelat || 3;
+            document.getElementById('param-dendatelat').value = data.parameter.dendaTelatPersen || 20;
+            document.getElementById('param-potongansetengahhari').value = data.parameter.potonganSetengahHariPersen || 50;
         }
 
         document.getElementById('form-parameter').addEventListener('submit', function(e) {
             e.preventDefault();
             const p = {
                 hariKerja: parseInt(document.getElementById('param-harikerja').value),
-                toleransiTelat: parseInt(document.getElementById('param-toleransitelat').value),
-                dendaTelatPersen: parseFloat(document.getElementById('param-dendatelat').value),
                 jamMasuk: document.getElementById('param-jammasuk').value,
                 jamPulang: document.getElementById('param-jampulang').value,
-                potonganSetengahHariPersen: parseFloat(document.getElementById('param-potongansetengahhari').value) // Simpan nilai potongan
+                toleransiTelat: parseInt(document.getElementById('param-toleransitelat').value),
+                dendaTelatPersen: parseFloat(document.getElementById('param-dendatelat').value),
+                potonganSetengahHariPersen: parseFloat(document.getElementById('param-potongansetengahhari').value)
             };
-            
-            const { db, ref, set } = window.firebaseDB;
-            set(ref(db, 'parameter'), p).then(() => {
-                showToast("Parameter sistem berhasil diperbarui di Cloud.");
-            }).catch(err => customAlert("Gagal menyimpan parameter: " + err.message));
+            window.firebaseDB.set(window.firebaseDB.ref(window.firebaseDB.db, 'parameter'), p).then(() => {
+                showToast("Konfigurasi Parameter Sistem Tersimpan!");
+            });
         });
 
     </script>
