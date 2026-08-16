@@ -274,16 +274,22 @@
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm text-center min-w-[600px]" id="table-input-absen">
+                            <table class="w-full text-left text-sm text-center min-w-[700px]" id="table-input-absen">
                                 <thead>
                                     <tr class="table-header">
-                                        <th class="p-3 text-left">Nama Santri</th>
+                                        <th class="p-3 text-left w-1/3">Nama Santri</th>
                                         <th class="p-3">Senin</th><th class="p-3">Selasa</th><th class="p-3">Rabu</th><th class="p-3">Kamis</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="border-b" data-nama="Ahmad Zaki">
-                                        <td class="p-3 text-left">Ahmad Zaki</td>
+                                    <tr class="border-b">
+                                        <!-- Perbaikan: Kolom nama diubah menjadi dropdown datalist yang dilengkapi ikon search -->
+                                        <td class="p-3 text-left">
+                                            <div class="relative w-full min-w-[200px]">
+                                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                                <input type="text" id="input-nama-absen" list="list-santri" placeholder="Cari / Pilih Nama..." class="border border-gray-300 p-2 pl-9 rounded w-full text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-white">
+                                            </div>
+                                        </td>
                                         <td><select class="border p-1 rounded text-xs val-senin"><option>Hadir</option><option>Izin</option><option>Alpa</option></select></td>
                                         <td><select class="border p-1 rounded text-xs val-selasa"><option>Hadir</option><option>Izin</option><option>Alpa</option></select></td>
                                         <td><select class="border p-1 rounded text-xs val-rabu"><option>Hadir</option><option>Izin</option><option>Alpa</option></select></td>
@@ -293,7 +299,7 @@
                             </table>
                         </div>
                         <div class="mt-4">
-                            <button class="bg-secondary text-white px-4 py-2 rounded text-sm w-full md:w-auto" onclick="simpanAbsenPekanan()"><i class="fa-solid fa-save"></i> Simpan Absensi Pekanan</button>
+                            <button class="bg-secondary text-white px-4 py-2 rounded text-sm w-full md:w-auto hover:bg-green-600 transition" onclick="simpanAbsenPekanan()"><i class="fa-solid fa-save"></i> Simpan Absensi Pekanan</button>
                         </div>
                     </div>
 
@@ -321,17 +327,37 @@
 
                 <!-- VIEW: PROGRES & UJIAN SANTRI -->
                 <div id="view-progres" class="view-section hidden">
+                    <!-- Datalist untuk pencarian nama santri dan daftar nama surah -->
                     <datalist id="list-santri"></datalist>
-                    <datalist id="list-surat"><option value="Al-Fatihah"></option><option value="Al-Baqarah"></option></datalist>
+                    <datalist id="list-surat"></datalist>
 
+                    <!-- PERBAIKAN: Form Input Ujian Santri yang Hilang Sudah Dikembalikan -->
                     <div class="card mb-6 form-input-hafalan">
-                        <h3 class="font-bold mb-4">Input Capaian Hafalan (Per Pekan)</h3>
+                        <h3 class="font-bold mb-4 text-blue-700">Input Hasil Ujian Santri</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                            <input type="text" list="list-santri" placeholder="Cari Nama Santri..." class="border p-2 rounded bg-white">
+                            <select class="border p-2 rounded bg-white">
+                                <option value="">-- Pilih Jenis Ujian --</option>
+                                <option value="Tahsin">Ujian Tahsin</option>
+                                <option value="Tahfidz">Ujian Tahfidz (Kenaikan Juz)</option>
+                                <option value="Mutqin">Ujian Mutqin</option>
+                            </select>
+                            <input type="number" placeholder="Nilai (0-100)" class="border p-2 rounded">
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded transition" onclick="tampilkanNotif('Nilai Ujian Berhasil Disimpan!')">
+                                <i class="fa-solid fa-save"></i> Simpan Ujian
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Form Input Capaian Hafalan -->
+                    <div class="card mb-6 form-input-hafalan">
+                        <h3 class="font-bold mb-4 text-green-700">Input Capaian Hafalan (Per Pekan)</h3>
                         <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
-                            <input type="text" list="list-santri" placeholder="Cari Nama Santri..." class="border p-2 rounded md:col-span-2">
-                            <input type="text" list="list-surat" placeholder="Surat" class="border p-2 rounded">
+                            <input type="text" list="list-santri" placeholder="Cari Nama Santri..." class="border p-2 rounded md:col-span-2 bg-white">
+                            <input type="text" list="list-surat" placeholder="Surat (Ketik u/ Cari)" class="border p-2 rounded bg-white">
                             <input type="number" placeholder="Ayat Terakhir" class="border p-2 rounded">
                             <input type="number" placeholder="Total Baris" class="border p-2 rounded">
-                            <button class="bg-primary text-white p-2 rounded" onclick="tampilkanNotif('Capaian Hafalan Disimpan!')"><i class="fa-solid fa-save"></i> Simpan</button>
+                            <button class="bg-primary hover:bg-dark text-white p-2 rounded transition" onclick="tampilkanNotif('Capaian Hafalan Disimpan!')"><i class="fa-solid fa-save"></i> Simpan Hafalan</button>
                         </div>
                     </div>
 
@@ -414,13 +440,9 @@
                             <div></div> <!-- spacing -->
 
                             <div class="md:col-span-2 border-b pb-2 mt-4 mb-2"><h4 class="font-semibold text-gray-700"><i class="fa-solid fa-location-dot"></i> Pengaturan Geofencing</h4></div>
-                            <div>
-                                <label class="text-sm text-gray-600 block mb-1">Fitur Deteksi Lokasi Otomatis</label>
-                                <select id="set-geo-auto" class="w-full border p-2 rounded">
-                                    <option value="Aktif">Aktif</option>
-                                    <option value="Nonaktif">Nonaktif</option>
-                                </select>
-                            </div>
+                            
+                            <!-- PERBAIKAN: Form select deteksi otomatis dihapus, langsung hanya radius & lat/long saja -->
+                            
                             <div><label class="text-sm text-gray-600 block mb-1">Radius Maksimal (Meter)</label><input type="number" id="set-geo-radius" class="w-full border p-2 rounded" placeholder="Contoh: 10"></div>
                             <div>
                                 <label class="text-sm text-gray-600 block mb-1">Latitude Koordinat Pusat</label>
@@ -579,7 +601,7 @@
 
         // Pengaturan Global
         let dataSettings = JSON.parse(localStorage.getItem('rutasy_settings')) || {
-            jamMasuk: '07:30', potongan: '1000', hariKerja: '24', geoAuto: 'Aktif', geoRadius: '10', 
+            jamMasuk: '07:30', potongan: '1000', hariKerja: '24', geoRadius: '10', 
             geoLat: '-3.595196', geoLng: '98.672223',
             payBank: 'Transfer Bank BSI 12345678 a.n RUTASY',
             payEwallet: 'DANA / OVO / GoPay: 081234567890 a.n RUTASY',
@@ -604,6 +626,11 @@
             "2023": [{ nama: "Fatimah Zahra", total: "5 Juz", nilai: 92, kriteria: "Mumtaz" }],
             "2022": [{ nama: "Umar bin Khattab", total: "30 Juz", nilai: 88, kriteria: "Jayyid Jiddan" }]
         };
+
+        // PERBAIKAN: List 114 Surah
+        const daftarSurat = [
+            "Al-Fatihah", "Al-Baqarah", "Ali 'Imran", "An-Nisa'", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Taubah", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra'", "Al-Kahf", "Maryam", "Taha", "Al-Anbiya'", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan", "Asy-Syu'ara'", "An-Naml", "Al-Qasas", "Al-'Ankabut", "Ar-Rum", "Luqman", "As-Sajdah", "Al-Ahzab", "Saba'", "Fatir", "Yasin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Asy-Syura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jasiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Az-Zariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadilah", "Al-Hasyr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Tagabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddassir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba'", "An-Nazi'at", "'Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Insyiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Ghasyiyah", "Al-Fajr", "Al-Balad", "Asy-Syams", "Al-Lail", "Ad-Duha", "Asy-Syarh", "At-Tin", "Al-'Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-'Adiyat", "Al-Qari'ah", "At-Takasur", "Al-'Asr", "Al-Humazah", "Al-Fil", "Quraisy", "Al-Ma'un", "Al-Kausar", "Al-Kafirun", "An-Nasr", "Al-Lahab", "Al-Ikhlas", "Al-Falaq", "An-Nas"
+        ];
 
         const roleMenus = {
             admin_global: [
@@ -706,6 +733,13 @@
             renderTabelHaflah();
             renderTabelRiwayatAbsen();
             renderDatalistSantri();
+            
+            // Populate Datalist Surah
+            const listSuratEl = document.getElementById('list-surat');
+            if(listSuratEl) {
+                listSuratEl.innerHTML = daftarSurat.map(s => `<option value="${s}"></option>`).join('');
+            }
+            
             renderBelumBayarSPP();
 
             switchView(roleMenus[currentRole][0].id, roleMenus[currentRole][0].label);
@@ -953,6 +987,7 @@
 
         function renderDatalistSantri() {
             const dl = document.getElementById('list-santri');
+            if(!dl) return;
             dl.innerHTML = '';
             dataSantri.forEach(s => {
                 dl.innerHTML += `<option value="${s.nama}"></option>`;
@@ -1049,7 +1084,6 @@
             document.getElementById('set-jam-masuk').value = dataSettings.jamMasuk || '07:30';
             document.getElementById('set-potongan').value = dataSettings.potongan || '1000';
             document.getElementById('set-hari-kerja').value = dataSettings.hariKerja || '24';
-            document.getElementById('set-geo-auto').value = dataSettings.geoAuto || 'Aktif';
             document.getElementById('set-geo-radius').value = dataSettings.geoRadius || '10';
             document.getElementById('set-geo-lat').value = dataSettings.geoLat || '-3.595196';
             document.getElementById('set-geo-lng').value = dataSettings.geoLng || '98.672223';
@@ -1081,7 +1115,6 @@
                 jamMasuk: document.getElementById('set-jam-masuk').value,
                 potongan: document.getElementById('set-potongan').value,
                 hariKerja: document.getElementById('set-hari-kerja').value,
-                geoAuto: document.getElementById('set-geo-auto').value,
                 geoRadius: document.getElementById('set-geo-radius').value,
                 geoLat: document.getElementById('set-geo-lat').value,
                 geoLng: document.getElementById('set-geo-lng').value,
@@ -1096,12 +1129,18 @@
         // --- LOGIKA ABSENSI ---
         function simpanAbsenPekanan() {
             const pekan = document.getElementById('absen-pekan').value;
-            const row = document.querySelector('#table-input-absen tbody tr');
-            const nama = row.getAttribute('data-nama');
-            const sen = row.querySelector('.val-senin').value;
-            const sel = row.querySelector('.val-selasa').value;
-            const rab = row.querySelector('.val-rabu').value;
-            const kam = row.querySelector('.val-kamis').value;
+            // PERBAIKAN: mengambil nilai nama langsung dari input bar
+            const nama = document.getElementById('input-nama-absen').value;
+
+            if(!nama) { 
+                tampilkanNotif('Silakan cari & pilih nama santri terlebih dahulu!'); 
+                return; 
+            }
+
+            const sen = document.querySelector('.val-senin').value;
+            const sel = document.querySelector('.val-selasa').value;
+            const rab = document.querySelector('.val-rabu').value;
+            const kam = document.querySelector('.val-kamis').value;
 
             if(!riwayatAbsensi[nama]) riwayatAbsensi[nama] = [];
             
@@ -1113,6 +1152,9 @@
             
             renderTabelRiwayatAbsen(document.getElementById('cari-riwayat-absen').value);
             tampilkanNotif('Absensi Pekanan Berhasil Disimpan & Masuk Riwayat!');
+            
+            // Kosongkan nama setelah menyimpan agar mudah untuk mengisi santri selanjutnya
+            document.getElementById('input-nama-absen').value = '';
         }
 
         function renderTabelRiwayatAbsen(query = "") {
