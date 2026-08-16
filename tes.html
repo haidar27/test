@@ -48,6 +48,9 @@
 </head>
 <body class="text-gray-800">
 
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3"></div>
+
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gray-100">
         <div class="card w-full max-w-md">
@@ -60,6 +63,11 @@
             <input type="text" id="login-username" placeholder="Username" class="w-full p-3 border rounded-lg mb-3 focus:outline-none focus:border-primary">
             <input type="password" id="login-password" placeholder="Password" class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:border-primary">
             
+            <div class="flex items-center gap-2 mb-4 text-sm text-gray-600">
+                <input type="checkbox" id="login-remember" class="w-4 h-4 cursor-pointer"> 
+                <label for="login-remember" class="cursor-pointer select-none">Ingat Saya</label>
+            </div>
+
             <button onclick="login()" class="w-full bg-primary hover:bg-dark text-white font-bold py-3 rounded-lg transition">Masuk Sistem</button>
         </div>
     </div>
@@ -136,19 +144,21 @@
                             <button class="bg-primary text-white px-4 py-2 rounded text-sm btn-admin-only w-full md:w-auto" onclick="document.getElementById('modal-tambah-santri').classList.remove('hidden')"><i class="fa-solid fa-plus"></i> Tambah Santri</button>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-sm min-w-[1000px]" id="table-santri">
+                            <table class="w-full text-left border-collapse text-sm min-w-[1200px]" id="table-santri">
                                 <thead>
                                     <tr class="table-header">
                                         <th class="p-3 border-b">NIS</th><th class="p-3 border-b">Nama Lengkap</th><th class="p-3 border-b">L/P</th>
-                                        <th class="p-3 border-b">TTL</th><th class="p-3 border-b">Alamat</th><th class="p-3 border-b">Guru Pengajar</th>
-                                        <th class="p-3 border-b">Status</th><th class="p-3 border-b">Aksi</th>
+                                        <th class="p-3 border-b">TTL</th><th class="p-3 border-b">Alamat</th><th class="p-3 border-b">No. WA Ortu</th>
+                                        <th class="p-3 border-b">Guru Pengajar</th><th class="p-3 border-b">Status</th>
+                                        <th class="p-3 border-b">Username</th><th class="p-3 border-b">Password</th><th class="p-3 border-b">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr class="border-b">
                                         <td class="p-3">S-001</td><td class="p-3">Ahmad Zaki</td><td class="p-3">L</td>
-                                        <td class="p-3">Medan, 12-05-2015</td><td class="p-3">Jl. Mawar No.1</td><td class="p-3">Ustadz Hasan</td>
-                                        <td class="p-3"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">Aktif</span></td>
+                                        <td class="p-3">Medan, 12-05-2015</td><td class="p-3">Jl. Mawar No.1</td><td class="p-3">08123456789</td>
+                                        <td class="p-3">Ustadz Hasan</td><td class="p-3"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">Aktif</span></td>
+                                        <td class="p-3">ahmadzaki</td><td class="p-3">***</td>
                                         <td class="p-3"><button class="text-gray-500 hover:text-primary"><i class="fa-solid fa-edit"></i></button></td>
                                     </tr>
                                 </tbody>
@@ -162,17 +172,21 @@
                             <button class="bg-secondary text-white px-4 py-2 rounded text-sm btn-admin-only w-full md:w-auto" onclick="document.getElementById('modal-tambah-guru').classList.remove('hidden')"><i class="fa-solid fa-plus"></i> Tambah Guru</button>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-sm min-w-[1000px]" id="table-guru">
+                            <table class="w-full text-left border-collapse text-sm min-w-[1200px]" id="table-guru">
                                 <thead>
                                     <tr class="table-header">
                                         <th class="p-3 border-b">NIK</th><th class="p-3 border-b">Nama Lengkap</th><th class="p-3 border-b">L/P</th>
-                                        <th class="p-3 border-b">No. WA</th><th class="p-3 border-b">Gaji Harian</th><th class="p-3 border-b">Aksi</th>
+                                        <th class="p-3 border-b">TTL</th><th class="p-3 border-b">Alamat</th><th class="p-3 border-b">Bank & Norek</th>
+                                        <th class="p-3 border-b">No. WA</th><th class="p-3 border-b">Gaji Harian</th>
+                                        <th class="p-3 border-b">Username</th><th class="p-3 border-b">Password</th><th class="p-3 border-b">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr class="border-b">
                                         <td class="p-3">G-001</td><td class="p-3">Ustadz Hasan</td><td class="p-3">L</td>
+                                        <td class="p-3">Medan, 01-01-1990</td><td class="p-3">Jl. Melati</td><td class="p-3">BSI - 12345678</td>
                                         <td class="p-3">0856112233</td><td class="p-3">Rp 75.000</td>
+                                        <td class="p-3">usthasan</td><td class="p-3">***</td>
                                         <td class="p-3"><button class="text-gray-500 hover:text-primary"><i class="fa-solid fa-edit"></i></button></td>
                                     </tr>
                                 </tbody>
@@ -238,7 +252,7 @@
                     <div class="card mb-6 div-absen-pribadi">
                         <h3 class="font-bold mb-4">Absensi Kehadiran Harian (Khusus Anda)</h3>
                         <p class="text-sm text-gray-600 mb-4"><i class="fa-solid fa-location-dot text-red-500"></i> Jarak Anda dari koordinat: <span class="font-bold text-green-600">3 Meter</span></p>
-                        <button onclick="alert('Berhasil Absen Masuk!')" class="bg-primary text-white px-6 py-2 rounded shadow w-full md:w-auto"><i class="fa-solid fa-fingerprint"></i> Lakukan Absensi</button>
+                        <button onclick="tampilkanNotif('Berhasil Absen Masuk!')" class="bg-primary text-white px-6 py-2 rounded shadow w-full md:w-auto"><i class="fa-solid fa-fingerprint"></i> Lakukan Absensi</button>
                     </div>
 
                     <!-- Absen Santri (Input Pekanan) -->
@@ -247,7 +261,7 @@
                             <h3 class="font-bold w-full md:w-auto">Form Input Absensi Santri (Per Pekan)</h3>
                             <div class="flex gap-2 w-full md:w-auto">
                                 <select class="border p-2 rounded text-sm w-full md:w-auto" disabled><option>Agustus 2026</option></select>
-                                <select id="absen-pekan" class="border p-2 rounded text-sm w-full md:w-auto"><option>Pekan 1</option><option>Pekan 2</option><option>Pekan 3</option></select>
+                                <select id="absen-pekan" class="border p-2 rounded text-sm w-full md:w-auto"><option>Pekan 1</option><option>Pekan 2</option><option>Pekan 3</option><option>Pekan 4</option></select>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
@@ -276,18 +290,20 @@
 
                     <!-- Riwayat Absensi Pekanan Santri -->
                     <div class="card">
-                        <h3 class="font-bold mb-4">Riwayat Absensi Santri</h3>
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-3">
+                            <h3 class="font-bold">Riwayat Absensi Santri</h3>
+                            <input type="text" id="cari-riwayat-absen" placeholder="Cari Nama Santri..." class="border p-2 rounded text-sm w-full md:w-64" onkeyup="renderTabelRiwayatAbsen(this.value)">
+                        </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm min-w-[600px]" id="table-riwayat-absen">
+                            <table class="w-full text-left text-sm min-w-[300px]" id="table-riwayat-absen">
                                 <thead>
                                     <tr class="table-header">
-                                        <th class="p-3">Pekan</th><th class="p-3">Nama Santri</th>
-                                        <th class="p-3">Senin</th><th class="p-3">Selasa</th><th class="p-3">Rabu</th><th class="p-3">Kamis</th>
+                                        <th class="p-3">Nama Santri</th>
                                         <th class="p-3">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- Terisi otomatis -->
+                                    <!-- Terisi otomatis oleh JS agar terkelompok per nama -->
                                 </tbody>
                             </table>
                         </div>
@@ -306,7 +322,7 @@
                             <input type="text" list="list-surat" placeholder="Surat" class="border p-2 rounded">
                             <input type="number" placeholder="Ayat Terakhir" class="border p-2 rounded">
                             <input type="number" placeholder="Total Baris" class="border p-2 rounded">
-                            <button class="bg-primary text-white p-2 rounded" onclick="alert('Disimpan!')"><i class="fa-solid fa-save"></i> Simpan</button>
+                            <button class="bg-primary text-white p-2 rounded" onclick="tampilkanNotif('Capaian Hafalan Disimpan!')"><i class="fa-solid fa-save"></i> Simpan</button>
                         </div>
                     </div>
 
@@ -359,7 +375,6 @@
                         <div class="mb-4 flex flex-col md:flex-row gap-4 btn-admin-only">
                             <select id="haflah-tahun" class="border p-2 rounded w-full md:w-48">
                                 <option value="">Pilih Tahun Angkatan</option>
-                                <!-- Option digenerate dari 2022 sampai 2030 -->
                                 <script>
                                     for(let i=2022; i<=2030; i++) document.write(`<option value="${i}">Angkatan ${i}</option>`);
                                 </script>
@@ -378,12 +393,24 @@
 
                 <!-- VIEW: SETTING GLOBAL -->
                 <div id="view-setting" class="view-section hidden">
+                    <div class="card mb-6">
+                        <h3 class="font-bold mb-4">Pengaturan Identitas Lembaga</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="text-sm text-gray-600 block mb-1">Nama Rumah Tahfidz</label><input type="text" class="w-full border p-2 rounded" value="RUTASY Pusat"></div>
+                            <div><label class="text-sm text-gray-600 block mb-1">Tahun Ajaran Aktif</label><input type="text" class="w-full border p-2 rounded" value="2026/2027"></div>
+                            <div><label class="text-sm text-gray-600 block mb-1">Kontak & Telepon</label><input type="text" class="w-full border p-2 rounded" value="0812-3456-7890"></div>
+                            <div><label class="text-sm text-gray-600 block mb-1">Email Lembaga</label><input type="email" class="w-full border p-2 rounded" value="admin@rutasy.id"></div>
+                            <div class="md:col-span-2"><label class="text-sm text-gray-600 block mb-1">Alamat Lengkap</label><input type="text" class="w-full border p-2 rounded" value="Jl. Contoh Alamat No. 123, Kota Medan"></div>
+                            <div class="md:col-span-2"><button onclick="tampilkanNotif('Pengaturan Parameter Berhasil Disimpan!')" class="bg-primary text-white px-4 py-2 rounded"><i class="fa-solid fa-save"></i> Simpan Pengaturan</button></div>
+                        </div>
+                    </div>
+
                     <div class="card w-full md:w-1/2">
-                        <h3 class="font-bold mb-4">Pengaturan Global Sistem</h3>
-                        <p class="text-sm text-gray-500 mb-4">Hanya Admin Global yang dapat mengubah pengaturan inti ini.</p>
+                        <h3 class="font-bold mb-4">Pengaturan Basis Data</h3>
+                        <p class="text-sm text-gray-500 mb-4">Hanya Admin Global yang dapat mengakses area sistem inti ini.</p>
                         <hr class="mb-4">
                         <h3 class="font-bold mb-4 text-red-600">Zona Bahaya</h3>
-                        <button onclick="localStorage.clear(); location.reload();" class="bg-red-600 hover:bg-red-700 text-white font-bold w-full py-2 rounded">
+                        <button onclick="hapusSemuaData()" class="bg-red-600 hover:bg-red-700 text-white font-bold w-full py-2 rounded">
                             <i class="fa-solid fa-trash-can mr-2"></i> Reset Semua Data Sistem
                         </button>
                     </div>
@@ -394,7 +421,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div class="card flex items-center gap-4">
                             <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-2xl"><i class="fa-solid fa-child"></i></div>
-                            <div><h3 class="font-bold text-lg">Ahmad Zaki</h3><p class="text-sm text-gray-600">Kelompok: Abu Bakar</p></div>
+                            <div><h3 class="font-bold text-lg">Ahmad Zaki</h3><p class="text-sm text-gray-600">Kelompok: Ustadz Hasan</p></div>
                         </div>
                         <div class="card bg-green-50 border border-green-200">
                             <h3 class="font-bold text-green-800">Status SPP</h3>
@@ -410,17 +437,22 @@
 
     <!-- MODAL TAMBAH SANTRI -->
     <div id="modal-tambah-santri" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg w-11/12 md:w-1/2">
+        <div class="bg-white p-6 rounded-lg w-11/12 md:w-2/3 max-h-[90vh] overflow-y-auto">
             <h3 class="font-bold text-lg mb-4">Tambah Data Santri Baru</h3>
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <input type="text" id="ms-nis" placeholder="NIS" class="border p-2 rounded">
-                <input type="text" id="ms-nama" placeholder="Nama Lengkap" class="border p-2 rounded">
-                <select id="ms-lp" class="border p-2 rounded"><option>L</option><option>P</option></select>
-                <input type="text" id="ms-ttl" placeholder="Tempat, Tgl Lahir" class="border p-2 rounded">
-                <input type="text" id="ms-alamat" placeholder="Alamat" class="border p-2 rounded col-span-2">
-                <input type="text" id="ms-guru" placeholder="Guru Pengajar" class="border p-2 rounded col-span-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div><label class="text-xs text-gray-500">NIS</label><input type="text" id="ms-nis" placeholder="Nomor Induk Santri" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Nama Lengkap</label><input type="text" id="ms-nama" placeholder="Nama Lengkap" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Jenis Kelamin</label><select id="ms-lp" class="w-full border p-2 rounded"><option>L</option><option>P</option></select></div>
+                <div><label class="text-xs text-gray-500">Tempat, Tanggal Lahir</label><input type="text" id="ms-ttl" placeholder="Medan, 01-01-2015" class="w-full border p-2 rounded"></div>
+                <div class="md:col-span-2"><label class="text-xs text-gray-500">Alamat Lengkap</label><input type="text" id="ms-alamat" placeholder="Alamat" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">No. WA Orang Tua</label><input type="text" id="ms-wa-ortu" placeholder="08xxxx" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Guru Pengajar</label><select id="ms-guru" class="w-full border p-2 rounded"><option>Ustadz Hasan</option><option>Ustadz Zaid</option></select></div>
+                <div><label class="text-xs text-gray-500">Status</label><select id="ms-status" class="w-full border p-2 rounded"><option>Aktif</option><option>Nonaktif</option><option>Alumni</option></select></div>
+                <div></div>
+                <div><label class="text-xs text-gray-500">Username Login</label><input type="text" id="ms-username" placeholder="Username" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Password Login</label><input type="password" id="ms-password" placeholder="Password" class="w-full border p-2 rounded"></div>
             </div>
-            <div class="flex justify-end gap-2">
+            <div class="flex justify-end gap-2 mt-4">
                 <button onclick="document.getElementById('modal-tambah-santri').classList.add('hidden')" class="bg-gray-200 px-4 py-2 rounded">Batal</button>
                 <button onclick="prosesTambahSantri()" class="bg-primary text-white px-4 py-2 rounded">Simpan Santri</button>
             </div>
@@ -429,16 +461,22 @@
 
     <!-- MODAL TAMBAH GURU -->
     <div id="modal-tambah-guru" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg w-11/12 md:w-1/2">
+        <div class="bg-white p-6 rounded-lg w-11/12 md:w-2/3 max-h-[90vh] overflow-y-auto">
             <h3 class="font-bold text-lg mb-4">Tambah Data Guru Baru</h3>
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <input type="text" id="mg-nik" placeholder="NIK" class="border p-2 rounded">
-                <input type="text" id="mg-nama" placeholder="Nama Lengkap" class="border p-2 rounded">
-                <select id="mg-lp" class="border p-2 rounded"><option>L</option><option>P</option></select>
-                <input type="text" id="mg-wa" placeholder="No WhatsApp" class="border p-2 rounded">
-                <input type="text" id="mg-gaji" placeholder="Gaji Harian (Rp)" class="border p-2 rounded col-span-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div><label class="text-xs text-gray-500">NIK</label><input type="text" id="mg-nik" placeholder="Nomor Induk" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Nama Lengkap</label><input type="text" id="mg-nama" placeholder="Nama Lengkap" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Jenis Kelamin</label><select id="mg-lp" class="w-full border p-2 rounded"><option>L</option><option>P</option></select></div>
+                <div><label class="text-xs text-gray-500">Tempat, Tanggal Lahir</label><input type="text" id="mg-ttl" placeholder="Medan, 01-01-1990" class="w-full border p-2 rounded"></div>
+                <div class="md:col-span-2"><label class="text-xs text-gray-500">Alamat Lengkap</label><input type="text" id="mg-alamat" placeholder="Alamat" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Bank & No Rekening</label><input type="text" id="mg-bank" placeholder="BSI - 1234xxx" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">No. WhatsApp</label><input type="text" id="mg-wa" placeholder="08xxxx" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Gaji Harian (Rp)</label><input type="number" id="mg-gaji" placeholder="Gaji" class="w-full border p-2 rounded"></div>
+                <div></div>
+                <div><label class="text-xs text-gray-500">Username Login</label><input type="text" id="mg-username" placeholder="Username" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Password Login</label><input type="password" id="mg-password" placeholder="Password" class="w-full border p-2 rounded"></div>
             </div>
-            <div class="flex justify-end gap-2">
+            <div class="flex justify-end gap-2 mt-4">
                 <button onclick="document.getElementById('modal-tambah-guru').classList.add('hidden')" class="bg-gray-200 px-4 py-2 rounded">Batal</button>
                 <button onclick="prosesTambahGuru()" class="bg-primary text-white px-4 py-2 rounded">Simpan Guru</button>
             </div>
@@ -447,13 +485,13 @@
     
     <!-- MODAL DETAIL ABSEN -->
     <div id="modal-detail-absen" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg w-11/12 md:w-96">
-            <h3 class="font-bold text-lg mb-2">Detail Absensi Bulanan</h3>
-            <p id="modal-nama-santri" class="text-gray-600 mb-4"></p>
-            <ul class="divide-y text-sm">
-                <li class="py-2 flex justify-between"><span>Hadir</span><span class="font-bold text-green-600">Terangkum</span></li>
+        <div class="bg-white p-6 rounded-lg w-11/12 md:w-96 max-h-[80vh] overflow-y-auto">
+            <h3 class="font-bold text-lg mb-2">Detail Absensi Santri</h3>
+            <p id="modal-nama-santri" class="text-gray-600 mb-4 font-bold border-b pb-2"></p>
+            <ul id="modal-absen-list" class="divide-y text-sm">
+                <!-- Di generate dinamis berurutan berdasarkan pekan -->
             </ul>
-            <button onclick="document.getElementById('modal-detail-absen').classList.add('hidden')" class="mt-4 w-full bg-gray-200 py-2 rounded">Tutup</button>
+            <button onclick="document.getElementById('modal-detail-absen').classList.add('hidden')" class="mt-6 w-full bg-gray-200 py-2 rounded hover:bg-gray-300 transition">Tutup Detail</button>
         </div>
     </div>
 
@@ -462,8 +500,39 @@
         let currentRole = '';
         let chartsRendered = false;
         
-        // Data Global Dummy Setup
-        let eventsKalender = [
+        // --- CUSTOM TOAST NOTIFICATION ---
+        function tampilkanNotif(pesan) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-primary text-white px-5 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full opacity-0 flex items-center gap-3 font-medium';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-xl"></i> <span>${pesan}</span>`;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+            }, 10);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 300); // Tunggu animasi selesai baru di remove
+            }, 3000);
+        }
+
+        // --- DATA PERSISTENCE & INITIALIZATION ---
+        // Load Data Absensi
+        let riwayatAbsensi = JSON.parse(localStorage.getItem('rutasy_absen')) || {};
+        if(Object.keys(riwayatAbsensi).length === 0) {
+            riwayatAbsensi["Ahmad Zaki"] = [
+                {pekan: "Pekan 1", sen: "Hadir", sel: "Hadir", rab: "Izin", kam: "Hadir"}
+            ];
+            localStorage.setItem('rutasy_absen', JSON.stringify(riwayatAbsensi));
+        }
+
+        // Load Data Kalender
+        let eventsKalender = JSON.parse(localStorage.getItem('rutasy_kalender')) || [
             { id: 1, name: 'Ujian Kenaikan Hafalan', date: '2026-08-21' },
             { id: 2, name: 'Haflah Akhirussanah', date: '2026-08-30' }
         ];
@@ -500,11 +569,24 @@
         };
 
         // --- AUTH & NAVIGATION ---
+        // Cek Fitur Ingat Saya saat halaman dimuat
+        window.onload = () => {
+            const savedRole = localStorage.getItem('rutasy_role');
+            if(savedRole) {
+                currentRole = savedRole;
+                jalankanAplikasiLanjutan();
+            }
+        };
+
         function login() {
             const user = document.getElementById('login-username').value.toLowerCase().trim();
             const pass = document.getElementById('login-password').value;
+            const ingatSaya = document.getElementById('login-remember').checked;
             
-            if(!user || !pass) return alert('Silahkan masukkan Username dan Password!');
+            if(!user || !pass) {
+                tampilkanNotif('Silahkan masukkan Username dan Password!');
+                return;
+            }
 
             // Deteksi Role tanpa select box
             if(user.includes('guru')) currentRole = 'guru';
@@ -512,6 +594,14 @@
             else if(user.includes('keuangan')) currentRole = 'admin_keuangan';
             else currentRole = 'admin_global';
 
+            if(ingatSaya) {
+                localStorage.setItem('rutasy_role', currentRole);
+            }
+
+            jalankanAplikasiLanjutan();
+        }
+
+        function jalankanAplikasiLanjutan() {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             document.getElementById('user-role-display').innerText = currentRole.replace('_', ' ');
@@ -522,14 +612,18 @@
             
             renderKalenderInit();
             renderTabelHaflah();
+            renderTabelRiwayatAbsen();
         }
 
         function logout() {
+            localStorage.removeItem('rutasy_role');
             document.getElementById('main-app').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('login-username').value = '';
             document.getElementById('login-password').value = '';
+            document.getElementById('login-remember').checked = false;
             chartsRendered = false; 
+            tampilkanNotif('Berhasil Keluar dari Sistem');
         }
 
         function buildSidebar(role) {
@@ -585,7 +679,7 @@
             } else if (role === 'admin_keuangan') {
                 cssHide('.btn-admin-only, .ortu-only, .div-absen-pribadi, .form-absen-guru-only, .form-input-hafalan');
             } else if (role === 'admin_global') {
-                cssHide('.ortu-only, .div-absen-pribadi'); // Admin tidak absen & tidak ajukan bayar
+                cssHide('.ortu-only, .div-absen-pribadi'); 
             }
         }
 
@@ -596,46 +690,74 @@
             const lp = document.getElementById('ms-lp').value;
             const ttl = document.getElementById('ms-ttl').value;
             const alamat = document.getElementById('ms-alamat').value;
+            const waOrtu = document.getElementById('ms-wa-ortu').value;
             const guru = document.getElementById('ms-guru').value;
+            const status = document.getElementById('ms-status').value;
+            const user = document.getElementById('ms-username').value;
+            const pass = document.getElementById('ms-password').value;
             
-            if(!nis || !nama) return alert('NIS dan Nama wajib diisi!');
+            if(!nis || !nama || !user || !pass) {
+                tampilkanNotif('Harap isi minimal NIS, Nama, Username, dan Password!');
+                return;
+            }
             
+            let statusColor = status==='Aktif' ? 'bg-blue-100 text-blue-700' : (status==='Alumni' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700');
+
             const tbody = document.querySelector('#table-santri tbody');
             const tr = document.createElement('tr');
             tr.className = "border-b bg-green-50";
             tr.innerHTML = `
                 <td class="p-3">${nis}</td><td class="p-3">${nama}</td><td class="p-3">${lp}</td>
-                <td class="p-3">${ttl}</td><td class="p-3">${alamat}</td><td class="p-3">${guru}</td>
-                <td class="p-3"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">Aktif</span></td>
+                <td class="p-3">${ttl}</td><td class="p-3">${alamat}</td><td class="p-3">${waOrtu}</td>
+                <td class="p-3">${guru}</td><td class="p-3"><span class="${statusColor} px-2 py-1 rounded text-xs">${status}</span></td>
+                <td class="p-3">${user}</td><td class="p-3">***</td>
                 <td class="p-3"><button class="text-gray-500 hover:text-primary"><i class="fa-solid fa-edit"></i></button></td>
             `;
             tbody.appendChild(tr);
             document.getElementById('dash-santri').innerText = parseInt(document.getElementById('dash-santri').innerText) + 1;
             document.getElementById('modal-tambah-santri').classList.add('hidden');
-            alert('Data Santri Berhasil Ditambahkan!');
+            
+            // Clear inputs
+            document.querySelectorAll('#modal-tambah-santri input').forEach(inp => inp.value = '');
+            
+            tampilkanNotif('Data Santri Berhasil Ditambahkan!');
         }
 
         function prosesTambahGuru() {
             const nik = document.getElementById('mg-nik').value;
             const nama = document.getElementById('mg-nama').value;
             const lp = document.getElementById('mg-lp').value;
+            const ttl = document.getElementById('mg-ttl').value;
+            const alamat = document.getElementById('mg-alamat').value;
+            const bank = document.getElementById('mg-bank').value;
             const wa = document.getElementById('mg-wa').value;
             const gaji = document.getElementById('mg-gaji').value;
+            const user = document.getElementById('mg-username').value;
+            const pass = document.getElementById('mg-password').value;
             
-            if(!nik || !nama) return alert('NIK dan Nama wajib diisi!');
+            if(!nik || !nama || !user || !pass) {
+                tampilkanNotif('Harap isi minimal NIK, Nama, Username, dan Password!');
+                return;
+            }
             
             const tbody = document.querySelector('#table-guru tbody');
             const tr = document.createElement('tr');
             tr.className = "border-b bg-green-50";
             tr.innerHTML = `
                 <td class="p-3">${nik}</td><td class="p-3">${nama}</td><td class="p-3">${lp}</td>
+                <td class="p-3">${ttl}</td><td class="p-3">${alamat}</td><td class="p-3">${bank}</td>
                 <td class="p-3">${wa}</td><td class="p-3">Rp ${gaji}</td>
+                <td class="p-3">${user}</td><td class="p-3">***</td>
                 <td class="p-3"><button class="text-gray-500 hover:text-primary"><i class="fa-solid fa-edit"></i></button></td>
             `;
             tbody.appendChild(tr);
             document.getElementById('dash-guru').innerText = parseInt(document.getElementById('dash-guru').innerText) + 1;
             document.getElementById('modal-tambah-guru').classList.add('hidden');
-            alert('Data Guru Berhasil Ditambahkan!');
+            
+            // Clear inputs
+            document.querySelectorAll('#modal-tambah-guru input').forEach(inp => inp.value = '');
+            
+            tampilkanNotif('Data Guru Berhasil Ditambahkan!');
         }
 
         // --- LOGIKA KEUANGAN ---
@@ -643,7 +765,10 @@
             const nama = document.getElementById('ortu-nama').value;
             const jenis = document.getElementById('ortu-jenis').value;
             const nom = document.getElementById('ortu-nominal').value;
-            if(!nom) return alert('Masukkan nominal pembayaran!');
+            if(!nom) {
+                tampilkanNotif('Masukkan nominal pembayaran!');
+                return;
+            }
 
             const tbody = document.querySelector('#table-persetujuan tbody');
             const tr = document.createElement('tr');
@@ -651,15 +776,14 @@
             let tgl = new Date().toLocaleDateString('id-ID');
             tr.innerHTML = `
                 <td class="p-3">${tgl}</td><td class="p-3">${nama}</td><td class="p-3 font-bold">${jenis}</td><td class="p-3">Rp ${nom}</td>
-                <td class="p-3"><button class="bg-primary text-white px-2 py-1 rounded text-xs" onclick="approvePembayaran(this, '${tgl}', '${nama}', '${jenis}', '${nom}')">Approve</button></td>
+                <td class="p-3"><button class="bg-primary text-white px-3 py-1 rounded shadow text-xs font-bold" onclick="approvePembayaran(this, '${tgl}', '${nama}', '${jenis}', '${nom}')">Approve</button></td>
             `;
             tbody.appendChild(tr);
             document.getElementById('ortu-nominal').value = '';
-            alert('Pengajuan terkirim ke Admin Keuangan!');
+            tampilkanNotif('Pengajuan terkirim ke Admin Keuangan!');
         }
 
         function approvePembayaran(btn, tgl, nama, jenis, nom) {
-            // Pindahkan ke riwayat
             const tbodyR = document.querySelector('#table-riwayat-keuangan tbody');
             const tr = document.createElement('tr');
             tr.className = "border-b bg-green-50";
@@ -669,12 +793,11 @@
                 <td class="p-3 btn-print"><button class="text-blue-500" onclick="window.print()"><i class="fa-solid fa-print"></i></button></td>
             `;
             tbodyR.prepend(tr);
-            // Hapus dari persetujuan
             btn.parentElement.parentElement.remove();
-            alert('Pembayaran Disetujui & Masuk Riwayat!');
+            tampilkanNotif('Pembayaran Disetujui & Masuk Riwayat!');
         }
 
-        // --- LOGIKA ABSENSI ---
+        // --- LOGIKA ABSENSI TERKELOMPOK ---
         function simpanAbsenPekanan() {
             const pekan = document.getElementById('absen-pekan').value;
             const row = document.querySelector('#table-input-absen tbody tr');
@@ -684,43 +807,102 @@
             const rab = row.querySelector('.val-rabu').value;
             const kam = row.querySelector('.val-kamis').value;
 
-            const tbodyRiwayat = document.querySelector('#table-riwayat-absen tbody');
-            const tr = document.createElement('tr');
-            tr.className = "border-b";
-            tr.innerHTML = `
-                <td class="p-3 font-bold">${pekan}</td><td class="p-3">${nama}</td>
-                <td class="p-3">${sen}</td><td class="p-3">${sel}</td><td class="p-3">${rab}</td><td class="p-3">${kam}</td>
-                <td class="p-3"><button onclick="lihatDetailAbsen('${nama}')" class="text-primary text-xs font-bold">Detail</button></td>
-            `;
-            tbodyRiwayat.appendChild(tr);
-            alert('Absensi Pekanan Berhasil Disimpan & Masuk Riwayat!');
+            if(!riwayatAbsensi[nama]) riwayatAbsensi[nama] = [];
+            
+            // Cek jika pekan ini sudah ada sebelumnya, maka update. Jika belum, tambahkan.
+            let idx = riwayatAbsensi[nama].findIndex(item => item.pekan === pekan);
+            if(idx >= 0) {
+                riwayatAbsensi[nama][idx] = { pekan, sen, sel, rab, kam };
+            } else {
+                riwayatAbsensi[nama].push({ pekan, sen, sel, rab, kam });
+            }
+
+            localStorage.setItem('rutasy_absen', JSON.stringify(riwayatAbsensi));
+            
+            renderTabelRiwayatAbsen(document.getElementById('cari-riwayat-absen').value);
+            tampilkanNotif('Absensi Pekanan Berhasil Disimpan & Masuk Riwayat!');
+        }
+
+        function renderTabelRiwayatAbsen(query = "") {
+            const tbody = document.querySelector('#table-riwayat-absen tbody');
+            tbody.innerHTML = '';
+            
+            for(let namaAnak in riwayatAbsensi) {
+                if(namaAnak.toLowerCase().includes(query.toLowerCase())) {
+                    tbody.innerHTML += `
+                        <tr class="border-b hover:bg-gray-50 transition">
+                            <td class="p-3 font-medium">${namaAnak}</td>
+                            <td class="p-3">
+                                <button onclick="lihatDetailAbsen('${namaAnak}')" class="bg-primary text-white px-3 py-1.5 rounded shadow text-xs font-bold hover:bg-dark transition">
+                                    <i class="fa-solid fa-eye"></i> Lihat Detail
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
         }
 
         function lihatDetailAbsen(nama) {
-            document.getElementById('modal-nama-santri').innerText = "Catatan santri: " + nama;
+            document.getElementById('modal-nama-santri').innerText = nama;
+            const ul = document.getElementById('modal-absen-list');
+            ul.innerHTML = '';
+            
+            // Urutkan data berdasarkan pekannya
+            let dataAnak = riwayatAbsensi[nama].sort((a,b) => a.pekan.localeCompare(b.pekan));
+            
+            dataAnak.forEach(d => {
+                let colSen = getWarnaAbsen(d.sen);
+                let colSel = getWarnaAbsen(d.sel);
+                let colRab = getWarnaAbsen(d.rab);
+                let colKam = getWarnaAbsen(d.kam);
+
+                ul.innerHTML += `
+                    <li class="py-4">
+                        <div class="font-bold text-gray-700 mb-2">${d.pekan}</div>
+                        <div class="grid grid-cols-4 gap-2 text-center text-xs">
+                            <div class="bg-gray-100 p-2 rounded">Senin<br><b class="${colSen}">${d.sen}</b></div>
+                            <div class="bg-gray-100 p-2 rounded">Selasa<br><b class="${colSel}">${d.sel}</b></div>
+                            <div class="bg-gray-100 p-2 rounded">Rabu<br><b class="${colRab}">${d.rab}</b></div>
+                            <div class="bg-gray-100 p-2 rounded">Kamis<br><b class="${colKam}">${d.kam}</b></div>
+                        </div>
+                    </li>
+                `;
+            });
+
             document.getElementById('modal-detail-absen').classList.remove('hidden');
+        }
+
+        function getWarnaAbsen(status) {
+            return status === 'Hadir' ? 'text-green-600' : (status === 'Izin' ? 'text-blue-600' : 'text-red-600');
         }
 
         // --- LOGIKA KALENDER ---
         function tambahEventKalender() {
             const nama = document.getElementById('input-kal-nama').value;
             const tgl = document.getElementById('input-kal-tgl').value;
-            if(!nama || !tgl) return alert('Isi form dengan lengkap!');
+            if(!nama || !tgl) {
+                tampilkanNotif('Isi form nama dan tanggal agenda dengan lengkap!');
+                return;
+            }
             
             eventsKalender.push({ id: Date.now(), name: nama, date: tgl });
+            localStorage.setItem('rutasy_kalender', JSON.stringify(eventsKalender));
+            
             document.getElementById('input-kal-nama').value = '';
             document.getElementById('input-kal-tgl').value = '';
             renderKalenderInit();
-            alert('Acara Ditambahkan!');
+            tampilkanNotif('Agenda Akademik Ditambahkan!');
         }
 
         function hapusEventKalender(id) {
             eventsKalender = eventsKalender.filter(e => e.id !== id);
+            localStorage.setItem('rutasy_kalender', JSON.stringify(eventsKalender));
             renderKalenderInit();
+            tampilkanNotif('Agenda Dihapus dari Kalender!');
         }
 
         function renderKalenderInit() {
-            // Sorting closest date to today (past or future)
             const today = new Date();
             eventsKalender.sort((a, b) => Math.abs(new Date(a.date) - today) - Math.abs(new Date(b.date) - today));
 
@@ -747,7 +929,7 @@
                         <div><span class="font-bold block">${ev.name}</span><span class="text-sm text-gray-600">${ev.date}</span></div>
                         <div class="flex items-center gap-2">
                             ${badge}
-                            ${currentRole !== 'guru' && currentRole !== 'ortu' ? `<button onclick="hapusEventKalender(${ev.id})" class="text-red-500 hover:text-red-700 ml-2 btn-admin-only"><i class="fa-solid fa-trash"></i></button>` : ''}
+                            ${currentRole === 'admin_global' ? `<button onclick="hapusEventKalender(${ev.id})" class="text-red-500 hover:text-red-700 ml-2 btn-admin-only"><i class="fa-solid fa-trash"></i></button>` : ''}
                         </div>
                     </li>
                 `;
@@ -758,7 +940,7 @@
                 document.getElementById('notif-badge').style.display = 'block';
             } else {
                 document.getElementById('notif-badge').style.display = 'none';
-                notifEl.innerHTML = 'Tidak ada pemberitahuan baru.';
+                notifEl.innerHTML = 'Tidak ada pemberitahuan acara dekat.';
             }
 
             // Render Realtime Calendar Grid
@@ -770,7 +952,6 @@
             const firstDay = new Date(y, m, 1).getDay();
             const daysInMonth = new Date(y, m + 1, 0).getDate();
             
-            // Empty slots
             for(let i=0; i<firstDay; i++) gridEl.innerHTML += `<div></div>`;
             
             for(let d=1; d<=daysInMonth; d++) {
@@ -778,7 +959,8 @@
                 let isEvent = eventsKalender.find(e => e.date === currentStr);
                 
                 if(isEvent) {
-                    gridEl.innerHTML += `<div class="calendar-day event" onclick="alert('Acara: ${isEvent.name}\\nTanggal: ${isEvent.date}')" title="${isEvent.name}">${d}</div>`;
+                    // Gunakan single quotes di HTML onclick parameter agar tidak konflik
+                    gridEl.innerHTML += `<div class="calendar-day event shadow-md" onclick="tampilkanNotif('Acara: ${isEvent.name} (${isEvent.date})')" title="${isEvent.name}">${d}</div>`;
                 } else {
                     gridEl.innerHTML += `<div class="calendar-day">${d}</div>`;
                 }
@@ -789,7 +971,6 @@
         function renderTabelHaflah() {
             const container = document.getElementById('container-tabel-haflah');
             container.innerHTML = '';
-            // Render berdasarkan tahun terbesar ke terkecil
             let years = Object.keys(dataHaflah).sort((a,b) => b-a);
             
             years.forEach(year => {
@@ -815,7 +996,10 @@
             const total = document.getElementById('haflah-total').value;
             const nilai = parseInt(document.getElementById('haflah-nilai').value);
 
-            if(!tahun || !nama || !total || isNaN(nilai)) return alert('Harap lengkapi semua data Haflah!');
+            if(!tahun || !nama || !total || isNaN(nilai)) {
+                tampilkanNotif('Harap lengkapi semua data Haflah dengan benar!');
+                return;
+            }
 
             let kriteria = 'Rasib';
             if(nilai >= 90) kriteria = 'Mumtaz';
@@ -826,13 +1010,20 @@
             if(!dataHaflah[tahun]) dataHaflah[tahun] = [];
             dataHaflah[tahun].push({ nama, total, nilai, kriteria });
             
-            // Bersihkan form
             document.getElementById('haflah-nama').value = '';
             document.getElementById('haflah-total').value = '';
             document.getElementById('haflah-nilai').value = '';
 
             renderTabelHaflah();
-            alert(`Berhasil menambahkan data ke Angkatan ${tahun}`);
+            tampilkanNotif(`Berhasil menambahkan data ke Angkatan ${tahun}`);
+        }
+
+        function hapusSemuaData() {
+            let konfirmasi = confirm('PERINGATAN! Ini akan mereset seluruh data sistem. Lanjutkan?');
+            if(konfirmasi) {
+                localStorage.clear();
+                location.reload();
+            }
         }
 
         // Utilities
