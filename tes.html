@@ -191,19 +191,20 @@
                         <div class="card border-l-4 border-red-500"><p class="text-sm text-gray-500">Pengeluaran</p><h3 class="text-2xl font-bold">Rp 3.200.000</h3></div>
                     </div>
                     
-                    <!-- Form Pembayaran (Ortu Only) -->
+                    <!-- Form Pembayaran (Ortu Only) - SUDAH DIPERBARUI -->
                     <div class="card mb-6 ortu-only">
-                        <h3 class="font-bold mb-4">Form Pembayaran SPP / Infaq (Orang Tua)</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <input type="text" id="ortu-nama" placeholder="Nama Santri" class="border p-2 rounded" value="Ahmad Zaki" readonly>
-                            <select id="ortu-jenis" class="border p-2 rounded"><option>SPP</option><option>Infaq</option></select>
-                            <input type="number" id="ortu-nominal" placeholder="Nominal (Rp)" class="border p-2 rounded">
-                            <button class="bg-primary text-white p-2 rounded" onclick="ajukanPembayaranOrtu()"><i class="fa-solid fa-paper-plane"></i> Ajukan Pembayaran</button>
+                        <h3 class="font-bold mb-4">Form Pembayaran SPP & Infaq (Orang Tua)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            <input type="text" id="ortu-nama" placeholder="Nama Santri" class="border p-2 rounded bg-gray-100" value="Ahmad Zaki" readonly>
+                            <input type="text" id="ortu-bulan" placeholder="Bulan (Cth: Agustus-Oktober)" class="border p-2 rounded">
+                            <input type="number" id="ortu-spp" placeholder="Nominal SPP (Rp)" class="border p-2 rounded">
+                            <input type="number" id="ortu-infaq" placeholder="Nominal Infaq (Rp)" class="border p-2 rounded">
+                            <button class="bg-primary text-white p-2 rounded hover:bg-dark transition" onclick="ajukanPembayaranOrtu()"><i class="fa-solid fa-paper-plane"></i> Ajukan Pembayaran</button>
                         </div>
-                        <p class="text-xs text-gray-500 mt-2">* Setelah diajukan, menunggu persetujuan (Approve) dari Admin Keuangan.</p>
+                        <p class="text-xs text-gray-500 mt-2">* Kosongkan kolom infaq jika hanya membayar SPP, begitupun sebaliknya. Setelah diajukan, menunggu Approve Admin Keuangan.</p>
                     </div>
 
-                    <!-- Santri Belum Bayar SPP Bulan Ini (Admin Keuangan & Global Only) -->
+                    <!-- Santri Belum Bayar SPP Bulan Ini -->
                     <div class="card mb-6 admin-keuangan-only">
                         <h3 class="font-bold text-red-600 mb-4"><i class="fa-solid fa-circle-exclamation mr-1"></i> Daftar Santri Belum Bayar SPP Bulan Ini</h3>
                         <div class="overflow-x-auto">
@@ -224,12 +225,12 @@
                         </div>
                     </div>
 
-                    <!-- Persetujuan Pembayaran (Admin Keuangan & Global Only) -->
+                    <!-- Persetujuan Pembayaran -->
                     <div class="card mb-6 admin-keuangan-only">
                         <h3 class="font-bold text-yellow-600 mb-4">Persetujuan Pengajuan Pembayaran</h3>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm" id="table-persetujuan">
-                                <thead><tr class="table-header"><th class="p-3">Tanggal</th><th class="p-3">Nama Santri</th><th class="p-3">Jenis</th><th class="p-3">Nominal</th><th class="p-3">Aksi</th></tr></thead>
+                            <table class="w-full text-left text-sm min-w-[700px]" id="table-persetujuan">
+                                <thead><tr class="table-header"><th class="p-3">Tanggal</th><th class="p-3">Nama Santri</th><th class="p-3">Bulan</th><th class="p-3">SPP</th><th class="p-3">Infaq</th><th class="p-3">Aksi</th></tr></thead>
                                 <tbody>
                                     <!-- Dinamis dari JS -->
                                 </tbody>
@@ -244,8 +245,8 @@
                             <input type="text" placeholder="Filter Nama..." class="border p-2 rounded text-sm w-full md:w-64" onkeyup="filterTable('table-riwayat-keuangan', this.value)">
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm min-w-[700px]" id="table-riwayat-keuangan">
-                                <thead><tr class="table-header"><th class="p-3">Tanggal</th><th class="p-3">Nama</th><th class="p-3">Jenis</th><th class="p-3">Nominal</th><th class="p-3">Status</th><th class="p-3 btn-print">Resi</th></tr></thead>
+                            <table class="w-full text-left text-sm min-w-[800px]" id="table-riwayat-keuangan">
+                                <thead><tr class="table-header"><th class="p-3">Tanggal</th><th class="p-3">Nama</th><th class="p-3">Bulan Pembayaran</th><th class="p-3">Nominal SPP</th><th class="p-3">Nominal Infaq</th><th class="p-3">Status</th><th class="p-3 btn-print">Resi</th></tr></thead>
                                 <tbody>
                                     <!-- Dinamis dari JS -->
                                 </tbody>
@@ -257,11 +258,21 @@
                 <!-- VIEW: ABSENSI -->
                 <div id="view-absensi" class="view-section hidden">
                     
-                    <!-- Absen Diri (Khusus Guru) -->
+                    <!-- Absen Diri (Khusus Guru) - SUDAH DIPERBARUI -->
                     <div class="card mb-6 div-absen-pribadi">
                         <h3 class="font-bold mb-4">Absensi Kehadiran Harian (Khusus Anda)</h3>
                         <p class="text-sm text-gray-600 mb-4"><i class="fa-solid fa-location-dot text-red-500"></i> Jarak Anda dari koordinat: <span class="font-bold text-green-600">3 Meter</span></p>
-                        <button onclick="tampilkanNotif('Berhasil Absen Masuk!')" class="bg-primary text-white px-6 py-2 rounded shadow w-full md:w-auto"><i class="fa-solid fa-fingerprint"></i> Lakukan Absensi</button>
+                        <button onclick="absenGuruMasuk()" class="bg-primary hover:bg-dark transition text-white px-6 py-2 rounded shadow w-full md:w-auto mb-6"><i class="fa-solid fa-fingerprint"></i> Lakukan Absensi Masuk</button>
+                        
+                        <h4 class="font-bold text-gray-700 mb-3 border-b pb-2 text-sm"><i class="fa-solid fa-history"></i> Riwayat Absen Anda</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm border" id="table-absen-guru-pribadi">
+                                <thead><tr class="bg-gray-100 text-gray-600"><th class="p-2">Tanggal & Waktu Absen</th><th class="p-2">Status</th></tr></thead>
+                                <tbody>
+                                    <!-- Dinamis lewat JS -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <!-- Absen Santri (Input Pekanan) -->
@@ -283,7 +294,6 @@
                                 </thead>
                                 <tbody>
                                     <tr class="border-b">
-                                        <!-- Perbaikan: Kolom nama diubah menjadi dropdown datalist yang dilengkapi ikon search -->
                                         <td class="p-3 text-left">
                                             <div class="relative w-full min-w-[200px]">
                                                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
@@ -327,11 +337,10 @@
 
                 <!-- VIEW: PROGRES & UJIAN SANTRI -->
                 <div id="view-progres" class="view-section hidden">
-                    <!-- Datalist untuk pencarian nama santri dan daftar nama surah -->
                     <datalist id="list-santri"></datalist>
                     <datalist id="list-surat"></datalist>
 
-                    <!-- PERBAIKAN: Form Input Ujian Santri yang Hilang Sudah Dikembalikan -->
+                    <!-- Form Input Ujian Santri -->
                     <div class="card mb-6 form-input-hafalan">
                         <h3 class="font-bold mb-4 text-blue-700">Input Hasil Ujian Santri</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -349,15 +358,40 @@
                         </div>
                     </div>
 
-                    <!-- Form Input Capaian Hafalan -->
+                    <!-- Form Input Capaian Hafalan - SUDAH DIPERBARUI KATEGORI -->
                     <div class="card mb-6 form-input-hafalan">
-                        <h3 class="font-bold mb-4 text-green-700">Input Capaian Hafalan (Per Pekan)</h3>
+                        <h3 class="font-bold mb-4 text-green-700">Input Capaian Belajar / Hafalan</h3>
                         <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
-                            <input type="text" list="list-santri" placeholder="Cari Nama Santri..." class="border p-2 rounded md:col-span-2 bg-white">
-                            <input type="text" list="list-surat" placeholder="Surat (Ketik u/ Cari)" class="border p-2 rounded bg-white">
-                            <input type="number" placeholder="Ayat Terakhir" class="border p-2 rounded">
-                            <input type="number" placeholder="Total Baris" class="border p-2 rounded">
-                            <button class="bg-primary hover:bg-dark text-white p-2 rounded transition" onclick="tampilkanNotif('Capaian Hafalan Disimpan!')"><i class="fa-solid fa-save"></i> Simpan Hafalan</button>
+                            <input type="text" id="prog-nama" list="list-santri" placeholder="Cari Nama Santri..." class="border p-2 rounded md:col-span-2 bg-white">
+                            <select id="prog-kategori" class="border p-2 rounded bg-white">
+                                <option value="Tahfidz">Tahfidz</option>
+                                <option value="Tahsin">Tahsin</option>
+                                <option value="Iqro">Iqro</option>
+                            </select>
+                            <input type="text" id="prog-surat" list="list-surat" placeholder="Surat / Jilid (Ketik)" class="border p-2 rounded bg-white">
+                            <input type="text" id="prog-ayat" placeholder="Ayat Terakhir / Halaman" class="border p-2 rounded">
+                            <button class="bg-primary hover:bg-dark text-white p-2 rounded transition" onclick="simpanProgresSantri()"><i class="fa-solid fa-save"></i> Simpan Progres</button>
+                        </div>
+                    </div>
+
+                    <!-- Riwayat Progres Belajar Santri - BARU -->
+                    <div class="card mb-6">
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-3">
+                            <h3 class="font-bold">Tabel Riwayat Progres Belajar Santri</h3>
+                            <input type="text" id="cari-riwayat-progres" placeholder="Cari Nama Santri..." class="border p-2 rounded text-sm w-full md:w-64" onkeyup="renderTabelProgres(this.value)">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm min-w-[300px]" id="table-riwayat-progres">
+                                <thead>
+                                    <tr class="table-header">
+                                        <th class="p-3">Nama Santri</th>
+                                        <th class="p-3">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Terisi otomatis oleh JS -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -379,7 +413,6 @@
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- List Agenda Terurut -->
                         <div class="card">
                             <h3 class="font-bold mb-4">Daftar Agenda (Terdekat)</h3>
                             <ul id="list-kalender" class="border rounded divide-y text-sm">
@@ -387,7 +420,6 @@
                             </ul>
                         </div>
                         
-                        <!-- Kalender Real-Time Bulanan -->
                         <div class="card">
                             <h3 class="font-bold mb-4">Kalender Bulan Ini <span id="nama-bulan-ini" class="text-primary"></span></h3>
                             <div class="calendar-grid mb-2">
@@ -397,7 +429,7 @@
                                 <div class="calendar-header-day">Sab</div>
                             </div>
                             <div class="calendar-grid" id="kalender-grid-bulanan">
-                                <!-- Terisi otomatis lewat JS -->
+                                <!-- Terisi otomatis -->
                             </div>
                         </div>
                     </div>
@@ -419,17 +451,19 @@
                             </select>
                             <input type="text" id="haflah-total" placeholder="Total Hafalan (cth: 30 Juz)" class="border p-2 rounded w-full md:w-auto">
                             <input type="number" id="haflah-nilai" placeholder="Nilai" class="border p-2 rounded w-full md:w-24">
-                            <button class="bg-primary text-white px-4 py-2 rounded" onclick="simpanHaflah()">Simpan Data</button>
+                            <button class="bg-primary hover:bg-dark transition text-white px-4 py-2 rounded" onclick="simpanHaflah()">Simpan & Luluskan</button>
                         </div>
+                        <p class="text-xs text-gray-500">* Menyimpan santri ke database Haflah akan otomatis mengubah statusnya di Data Santri menjadi "Alumni".</p>
                     </div>
                     
                     <div id="container-tabel-haflah">
-                        <!-- Tabel Haflah akan dirender di sini berdasarkan tahun -->
+                        <!-- Tabel Haflah akan dirender di sini -->
                     </div>
                 </div>
 
                 <!-- VIEW: SETTING GLOBAL -->
                 <div id="view-setting" class="view-section hidden">
+                    <!-- ... KODE SETTING TETAP SAMA ... -->
                     <div class="card mb-6">
                         <h3 class="font-bold mb-4">Pengaturan Global Sistem</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -437,26 +471,13 @@
                             <div><label class="text-sm text-gray-600 block mb-1">Jam Masuk Guru</label><input type="time" id="set-jam-masuk" class="w-full border p-2 rounded"></div>
                             <div><label class="text-sm text-gray-600 block mb-1">Potongan Telat (Rp/Menit)</label><input type="number" id="set-potongan" class="w-full border p-2 rounded" placeholder="Contoh: 1000"></div>
                             <div><label class="text-sm text-gray-600 block mb-1">Jumlah Hari Dalam Bekerja (Sebulan)</label><input type="number" id="set-hari-kerja" class="w-full border p-2 rounded" placeholder="Contoh: 24"></div>
-                            <div></div> <!-- spacing -->
+                            <div></div>
 
                             <div class="md:col-span-2 border-b pb-2 mt-4 mb-2"><h4 class="font-semibold text-gray-700"><i class="fa-solid fa-location-dot"></i> Pengaturan Geofencing</h4></div>
-                            
-                            <!-- PERBAIKAN: Form select deteksi otomatis dihapus, langsung hanya radius & lat/long saja -->
-                            
                             <div><label class="text-sm text-gray-600 block mb-1">Radius Maksimal (Meter)</label><input type="number" id="set-geo-radius" class="w-full border p-2 rounded" placeholder="Contoh: 10"></div>
-                            <div>
-                                <label class="text-sm text-gray-600 block mb-1">Latitude Koordinat Pusat</label>
-                                <input type="text" id="set-geo-lat" class="w-full border p-2 rounded" placeholder="-3.595196">
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-600 block mb-1">Longitude Koordinat Pusat</label>
-                                <input type="text" id="set-geo-lng" class="w-full border p-2 rounded" placeholder="98.672223">
-                            </div>
-                            <div class="md:col-span-2">
-                                <button type="button" onclick="deteksiGeofencingOtomatis()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
-                                    <i class="fa-solid fa-crosshairs mr-1"></i> Deteksi Lokasi Saya Sekarang (Otomatis Isi Lat & Lng)
-                                </button>
-                            </div>
+                            <div><label class="text-sm text-gray-600 block mb-1">Latitude Koordinat Pusat</label><input type="text" id="set-geo-lat" class="w-full border p-2 rounded" placeholder="-3.595196"></div>
+                            <div><label class="text-sm text-gray-600 block mb-1">Longitude Koordinat Pusat</label><input type="text" id="set-geo-lng" class="w-full border p-2 rounded" placeholder="98.672223"></div>
+                            <div class="md:col-span-2"><button type="button" onclick="deteksiGeofencingOtomatis()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded"><i class="fa-solid fa-crosshairs mr-1"></i> Deteksi Lokasi Saya Sekarang (Otomatis Isi Lat & Lng)</button></div>
                             
                             <div class="md:col-span-2 border-b pb-2 mt-4 mb-2"><h4 class="font-semibold text-gray-700"><i class="fa-solid fa-money-bill-wave"></i> Pengaturan Keuangan (3 Metode Pembayaran)</h4></div>
                             <div><label class="text-sm text-gray-600 block mb-1">1. Transfer Bank</label><textarea id="set-pay-bank" rows="2" class="w-full border p-2 rounded" placeholder="Transfer Bank BSI 12345678 a.n RUTASY"></textarea></div>
@@ -497,23 +518,25 @@
         </div>
     </div>
 
-    <!-- MODAL TAMBAH / EDIT SANTRI -->
+    <!-- SEMUA MODAL POP UP -->
+    <!-- Modal Santri -->
     <div id="modal-tambah-santri" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-lg w-11/12 md:w-2/3 max-h-[90vh] overflow-y-auto">
             <h3 class="font-bold text-lg mb-4" id="modal-santri-title">Tambah Data Santri Baru</h3>
             <input type="hidden" id="ms-index" value="-1">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div><label class="text-xs text-gray-500">NIS</label><input type="text" id="ms-nis" placeholder="Nomor Induk Santri" class="w-full border p-2 rounded"></div>
-                <div><label class="text-xs text-gray-500">Nama Lengkap</label><input type="text" id="ms-nama" placeholder="Nama Lengkap" class="w-full border p-2 rounded"></div>
+                <!-- Data Santri Form Sama Seperti Sebelumnya -->
+                <div><label class="text-xs text-gray-500">NIS</label><input type="text" id="ms-nis" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Nama Lengkap</label><input type="text" id="ms-nama" class="w-full border p-2 rounded"></div>
                 <div><label class="text-xs text-gray-500">Jenis Kelamin</label><select id="ms-lp" class="w-full border p-2 rounded"><option>L</option><option>P</option></select></div>
-                <div><label class="text-xs text-gray-500">Tempat, Tanggal Lahir</label><input type="text" id="ms-ttl" placeholder="Medan, 01-01-2015" class="w-full border p-2 rounded"></div>
-                <div class="md:col-span-2"><label class="text-xs text-gray-500">Alamat Lengkap</label><input type="text" id="ms-alamat" placeholder="Alamat" class="w-full border p-2 rounded"></div>
-                <div><label class="text-xs text-gray-500">No. WA Orang Tua</label><input type="text" id="ms-wa-ortu" placeholder="08xxxx" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Tempat, Tanggal Lahir</label><input type="text" id="ms-ttl" class="w-full border p-2 rounded"></div>
+                <div class="md:col-span-2"><label class="text-xs text-gray-500">Alamat Lengkap</label><input type="text" id="ms-alamat" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">No. WA Orang Tua</label><input type="text" id="ms-wa-ortu" class="w-full border p-2 rounded"></div>
                 <div><label class="text-xs text-gray-500">Guru Pengajar</label><select id="ms-guru" class="w-full border p-2 rounded"><option>Ustadz Hasan</option><option>Ustadz Zaid</option></select></div>
                 <div><label class="text-xs text-gray-500">Status</label><select id="ms-status" class="w-full border p-2 rounded"><option>Aktif</option><option>Nonaktif</option><option>Alumni</option></select></div>
                 <div></div>
-                <div><label class="text-xs text-gray-500">Username Login</label><input type="text" id="ms-username" placeholder="Username" class="w-full border p-2 rounded"></div>
-                <div><label class="text-xs text-gray-500">Password Login</label><input type="password" id="ms-password" placeholder="Password" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Username Login</label><input type="text" id="ms-username" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Password Login</label><input type="password" id="ms-password" class="w-full border p-2 rounded"></div>
             </div>
             <div class="flex justify-end gap-2 mt-4">
                 <button onclick="document.getElementById('modal-tambah-santri').classList.add('hidden')" class="bg-gray-200 px-4 py-2 rounded">Batal</button>
@@ -522,23 +545,24 @@
         </div>
     </div>
 
-    <!-- MODAL TAMBAH / EDIT GURU -->
+    <!-- Modal Guru -->
     <div id="modal-tambah-guru" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-lg w-11/12 md:w-2/3 max-h-[90vh] overflow-y-auto">
             <h3 class="font-bold text-lg mb-4" id="modal-guru-title">Tambah Data Guru Baru</h3>
             <input type="hidden" id="mg-index" value="-1">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div><label class="text-xs text-gray-500">NIK</label><input type="text" id="mg-nik" placeholder="Nomor Induk" class="w-full border p-2 rounded"></div>
-                <div><label class="text-xs text-gray-500">Nama Lengkap</label><input type="text" id="mg-nama" placeholder="Nama Lengkap" class="w-full border p-2 rounded"></div>
+                <!-- Data Guru Form Sama -->
+                <div><label class="text-xs text-gray-500">NIK</label><input type="text" id="mg-nik" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Nama Lengkap</label><input type="text" id="mg-nama" class="w-full border p-2 rounded"></div>
                 <div><label class="text-xs text-gray-500">Jenis Kelamin</label><select id="mg-lp" class="w-full border p-2 rounded"><option>L</option><option>P</option></select></div>
-                <div><label class="text-xs text-gray-500">Tempat, Tanggal Lahir</label><input type="text" id="mg-ttl" placeholder="Medan, 01-01-1990" class="w-full border p-2 rounded"></div>
-                <div class="md:col-span-2"><label class="text-xs text-gray-500">Alamat Lengkap</label><input type="text" id="mg-alamat" placeholder="Alamat" class="w-full border p-2 rounded"></div>
-                <div><label class="text-xs text-gray-500">Bank & No Rekening</label><input type="text" id="mg-bank" placeholder="BSI - 1234xxx" class="w-full border p-2 rounded"></div>
-                <div><label class="text-xs text-gray-500">No. WhatsApp</label><input type="text" id="mg-wa" placeholder="08xxxx" class="w-full border p-2 rounded"></div>
-                <div><label class="text-xs text-gray-500">Gaji Harian (Rp)</label><input type="number" id="mg-gaji" placeholder="Gaji" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Tempat, Tanggal Lahir</label><input type="text" id="mg-ttl" class="w-full border p-2 rounded"></div>
+                <div class="md:col-span-2"><label class="text-xs text-gray-500">Alamat Lengkap</label><input type="text" id="mg-alamat" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Bank & No Rekening</label><input type="text" id="mg-bank" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">No. WhatsApp</label><input type="text" id="mg-wa" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Gaji Harian (Rp)</label><input type="number" id="mg-gaji" class="w-full border p-2 rounded"></div>
                 <div></div>
-                <div><label class="text-xs text-gray-500">Username Login</label><input type="text" id="mg-username" placeholder="Username" class="w-full border p-2 rounded"></div>
-                <div><label class="text-xs text-gray-500">Password Login</label><input type="password" id="mg-password" placeholder="Password" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Username Login</label><input type="text" id="mg-username" class="w-full border p-2 rounded"></div>
+                <div><label class="text-xs text-gray-500">Password Login</label><input type="password" id="mg-password" class="w-full border p-2 rounded"></div>
             </div>
             <div class="flex justify-end gap-2 mt-4">
                 <button onclick="document.getElementById('modal-tambah-guru').classList.add('hidden')" class="bg-gray-200 px-4 py-2 rounded">Batal</button>
@@ -547,15 +571,28 @@
         </div>
     </div>
     
-    <!-- MODAL DETAIL ABSEN -->
+    <!-- Modal Detail Absen -->
     <div id="modal-detail-absen" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-lg w-11/12 md:w-96 max-h-[80vh] overflow-y-auto">
             <h3 class="font-bold text-lg mb-2">Detail Absensi Santri</h3>
             <p id="modal-nama-santri" class="text-gray-600 mb-4 font-bold border-b pb-2"></p>
-            <ul id="modal-absen-list" class="divide-y text-sm">
-                <!-- Di generate dinamis berurutan berdasarkan pekan -->
-            </ul>
+            <ul id="modal-absen-list" class="divide-y text-sm"></ul>
             <button onclick="document.getElementById('modal-detail-absen').classList.add('hidden')" class="mt-6 w-full bg-gray-200 py-2 rounded hover:bg-gray-300 transition">Tutup Detail</button>
+        </div>
+    </div>
+
+    <!-- Modal Detail Progres -->
+    <div id="modal-detail-progres" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg w-11/12 md:w-1/2 max-h-[80vh] overflow-y-auto">
+            <h3 class="font-bold text-lg mb-2">Detail Progres Belajar Santri</h3>
+            <p id="modal-progres-nama" class="text-gray-600 mb-4 font-bold border-b pb-2"></p>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm border">
+                    <thead><tr class="bg-gray-100 text-gray-600"><th class="p-2">Tanggal</th><th class="p-2">Kategori</th><th class="p-2">Surat / Jilid</th><th class="p-2">Capaian Ayat / Hal</th></tr></thead>
+                    <tbody id="modal-progres-list"></tbody>
+                </table>
+            </div>
+            <button onclick="document.getElementById('modal-detail-progres').classList.add('hidden')" class="mt-6 w-full bg-gray-200 py-2 rounded hover:bg-gray-300 transition">Tutup Detail</button>
         </div>
     </div>
 
@@ -565,7 +602,6 @@
         let loggedInSantri = null;
         let chartsRendered = false;
         
-        // --- CUSTOM TOAST NOTIFICATION ---
         function tampilkanNotif(pesan) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -573,7 +609,6 @@
             toast.innerHTML = `<i class="fa-solid fa-circle-check text-xl"></i> <span>${pesan}</span>`;
             
             container.appendChild(toast);
-            
             setTimeout(() => { toast.classList.remove('translate-x-full', 'opacity-0'); }, 10);
             
             setTimeout(() => {
@@ -582,52 +617,44 @@
             }, 3000);
         }
 
-        // --- DATA PERSISTENCE (STATE MANAGEMENT) ---
-        // Santri
+        // --- DATA STATE MANAGEMENT ---
         let dataSantri = JSON.parse(localStorage.getItem('rutasy_santri')) || [
             {nis: 'S-001', nama: 'Ahmad Zaki', lp: 'L', ttl: 'Medan, 12-05-2015', alamat: 'Jl. Mawar No.1', wa: '08123456789', guru: 'Ustadz Hasan', status: 'Aktif', user: 'ahmadzaki', pass: '123456'}
         ];
         
-        // Guru
         let dataGuru = JSON.parse(localStorage.getItem('rutasy_guru')) || [
             {nik: 'G-001', nama: 'Ustadz Hasan', lp: 'L', ttl: 'Medan, 01-01-1990', alamat: 'Jl. Melati', bank: 'BSI - 12345678', wa: '0856112233', gaji: '75000', user: 'usthasan', pass: '123456'}
         ];
 
-        // Keuangan
         let dataKeuanganPengajuan = JSON.parse(localStorage.getItem('rutasy_keu_pengajuan')) || [];
         let dataKeuanganRiwayat = JSON.parse(localStorage.getItem('rutasy_keu_riwayat')) || [
-            {tgl: '01 Aug 2026', nama: 'Ahmad Zaki', jenis: 'SPP', nom: '150000'}
+            {tgl: '01 Aug 2026', nama: 'Ahmad Zaki', bulan: 'Agustus', spp: 100000, infaq: 50000}
         ];
 
-        // Pengaturan Global
         let dataSettings = JSON.parse(localStorage.getItem('rutasy_settings')) || {
-            jamMasuk: '07:30', potongan: '1000', hariKerja: '24', geoRadius: '10', 
-            geoLat: '-3.595196', geoLng: '98.672223',
-            payBank: 'Transfer Bank BSI 12345678 a.n RUTASY',
-            payEwallet: 'DANA / OVO / GoPay: 081234567890 a.n RUTASY',
-            payCash: 'Bayar Tunai melalui Loket Tata Usaha RUTASY'
+            jamMasuk: '07:30', potongan: '1000', hariKerja: '24', geoRadius: '10', geoLat: '-3.595196', geoLng: '98.672223',
+            payBank: 'Transfer Bank BSI 12345678 a.n RUTASY', payEwallet: 'DANA / OVO / GoPay: 081234567890 a.n RUTASY', payCash: 'Bayar Tunai melalui Loket Tata Usaha RUTASY'
         };
 
-        // Absensi Santri
         let riwayatAbsensi = JSON.parse(localStorage.getItem('rutasy_absen')) || {};
         if(Object.keys(riwayatAbsensi).length === 0) {
             riwayatAbsensi["Ahmad Zaki"] = [{pekan: "Pekan 1", sen: "Hadir", sel: "Hadir", rab: "Izin", kam: "Hadir"}];
             localStorage.setItem('rutasy_absen', JSON.stringify(riwayatAbsensi));
         }
 
-        // Kalender
+        let absenGuruRecord = JSON.parse(localStorage.getItem('rutasy_absen_guru')) || [];
+
+        let riwayatProgres = JSON.parse(localStorage.getItem('rutasy_progres_hafalan')) || {};
+
         let eventsKalender = JSON.parse(localStorage.getItem('rutasy_kalender')) || [
             { id: 1, name: 'Ujian Kenaikan Hafalan', date: '2026-08-21' },
             { id: 2, name: 'Haflah Akhirussanah', date: '2026-08-30' }
         ];
 
-        // Haflah
         let dataHaflah = JSON.parse(localStorage.getItem('rutasy_haflah')) || {
-            "2023": [{ nama: "Fatimah Zahra", total: "5 Juz", nilai: 92, kriteria: "Mumtaz" }],
-            "2022": [{ nama: "Umar bin Khattab", total: "30 Juz", nilai: 88, kriteria: "Jayyid Jiddan" }]
+            "2023": [{ nama: "Fatimah Zahra", total: "5 Juz", nilai: 92, kriteria: "Mumtaz" }]
         };
 
-        // PERBAIKAN: List 114 Surah
         const daftarSurat = [
             "Al-Fatihah", "Al-Baqarah", "Ali 'Imran", "An-Nisa'", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Taubah", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra'", "Al-Kahf", "Maryam", "Taha", "Al-Anbiya'", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan", "Asy-Syu'ara'", "An-Naml", "Al-Qasas", "Al-'Ankabut", "Ar-Rum", "Luqman", "As-Sajdah", "Al-Ahzab", "Saba'", "Fatir", "Yasin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Asy-Syura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jasiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Az-Zariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadilah", "Al-Hasyr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Tagabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddassir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba'", "An-Nazi'at", "'Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Insyiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Ghasyiyah", "Al-Fajr", "Al-Balad", "Asy-Syams", "Al-Lail", "Ad-Duha", "Asy-Syarh", "At-Tin", "Al-'Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-'Adiyat", "Al-Qari'ah", "At-Takasur", "Al-'Asr", "Al-Humazah", "Al-Fil", "Quraisy", "Al-Ma'un", "Al-Kausar", "Al-Kafirun", "An-Nasr", "Al-Lahab", "Al-Ikhlas", "Al-Falaq", "An-Nas"
         ];
@@ -643,9 +670,7 @@
                 { id: 'view-haflah', icon: 'fa-graduation-cap', label: 'Database Haflah' },
                 { id: 'view-setting', icon: 'fa-cog', label: 'Pengaturan Global' }
             ],
-            admin_keuangan: [
-                { id: 'view-keuangan', icon: 'fa-wallet', label: 'Manajemen Keuangan' }
-            ],
+            admin_keuangan: [ { id: 'view-keuangan', icon: 'fa-wallet', label: 'Manajemen Keuangan' } ],
             guru: [
                 { id: 'view-absensi', icon: 'fa-calendar-check', label: 'Absensi' },
                 { id: 'view-progres', icon: 'fa-book-open', label: 'Progres & Ujian' },
@@ -664,9 +689,7 @@
             const savedUser = localStorage.getItem('rutasy_username');
             if(savedRole) {
                 currentRole = savedRole;
-                if(currentRole === 'ortu' && savedUser) {
-                    loggedInSantri = dataSantri.find(s => s.user === savedUser) || null;
-                }
+                if(currentRole === 'ortu' && savedUser) loggedInSantri = dataSantri.find(s => s.user === savedUser) || null;
                 jalankanAplikasiLanjutan();
             }
         };
@@ -678,32 +701,16 @@
             
             if(!user || !pass) { tampilkanNotif('Silahkan masukkan Username dan Password!'); return; }
 
-            // Dynamic User Detection Bugfix
             let matchedSantri = dataSantri.find(s => s.user.toLowerCase() === user && (s.pass === pass || s.pass === '***'));
             let matchedGuru = dataGuru.find(g => g.user.toLowerCase() === user && (g.pass === pass || g.pass === '***'));
 
-            if (matchedSantri) {
-                currentRole = 'ortu';
-                loggedInSantri = matchedSantri;
-            } else if (matchedGuru) {
-                currentRole = 'guru';
-                loggedInSantri = null;
-            } else if (user === 'admin_keuangan' || user.includes('keuangan')) {
-                currentRole = 'admin_keuangan';
-                loggedInSantri = null;
-            } else if (user === 'admin' || user.includes('admin')) {
-                currentRole = 'admin_global';
-                loggedInSantri = null;
-            } else {
-                tampilkanNotif('Username atau Password tidak terdaftar!');
-                return;
-            }
+            if (matchedSantri) { currentRole = 'ortu'; loggedInSantri = matchedSantri; } 
+            else if (matchedGuru) { currentRole = 'guru'; loggedInSantri = null; } 
+            else if (user === 'admin_keuangan' || user.includes('keuangan')) { currentRole = 'admin_keuangan'; loggedInSantri = null; } 
+            else if (user === 'admin' || user.includes('admin')) { currentRole = 'admin_global'; loggedInSantri = null; } 
+            else { tampilkanNotif('Username atau Password tidak terdaftar!'); return; }
 
-            if(ingatSaya) {
-                localStorage.setItem('rutasy_role', currentRole);
-                localStorage.setItem('rutasy_username', user);
-            }
-
+            if(ingatSaya) { localStorage.setItem('rutasy_role', currentRole); localStorage.setItem('rutasy_username', user); }
             jalankanAplikasiLanjutan();
         }
 
@@ -723,37 +730,26 @@
             buildSidebar(currentRole);
             applyRoleRestrictions(currentRole);
             
-            // Render Seluruh Data
-            renderSantri();
-            renderGuru();
-            renderKeuangan();
-            renderSettings();
-            renderKalenderInit();
-            renderSelectHaflahSantri();
-            renderTabelHaflah();
-            renderTabelRiwayatAbsen();
-            renderDatalistSantri();
-            
-            // Populate Datalist Surah
-            const listSuratEl = document.getElementById('list-surat');
-            if(listSuratEl) {
-                listSuratEl.innerHTML = daftarSurat.map(s => `<option value="${s}"></option>`).join('');
-            }
-            
-            renderBelumBayarSPP();
-
+            renderSemuaData();
             switchView(roleMenus[currentRole][0].id, roleMenus[currentRole][0].label);
+        }
+        
+        function renderSemuaData() {
+            renderSantri(); renderGuru(); renderKeuangan(); renderSettings(); 
+            renderKalenderInit(); renderSelectHaflahSantri(); renderTabelHaflah(); 
+            renderTabelRiwayatAbsen(); renderDatalistSantri(); renderTabelProgres();
+            renderAbsenGuruPribadi(); renderBelumBayarSPP();
+            
+            const listSuratEl = document.getElementById('list-surat');
+            if(listSuratEl) listSuratEl.innerHTML = daftarSurat.map(s => `<option value="${s}"></option>`).join('');
         }
 
         function logout() {
-            localStorage.removeItem('rutasy_role');
-            localStorage.removeItem('rutasy_username');
+            localStorage.removeItem('rutasy_role'); localStorage.removeItem('rutasy_username');
             loggedInSantri = null;
             document.getElementById('main-app').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('login-username').value = '';
-            document.getElementById('login-password').value = '';
-            document.getElementById('login-remember').checked = false;
+            document.getElementById('login-username').value = ''; document.getElementById('login-password').value = '';
             chartsRendered = false; 
             tampilkanNotif('Berhasil Keluar dari Sistem');
         }
@@ -793,9 +789,7 @@
             document.getElementById('sidebar-overlay').classList.toggle('hidden');
         }
 
-        function toggleNotif() {
-            document.getElementById('notif-dropdown').classList.toggle('hidden');
-        }
+        function toggleNotif() { document.getElementById('notif-dropdown').classList.toggle('hidden'); }
 
         function applyRoleRestrictions(role) {
             const cssHide = (selector) => document.querySelectorAll(selector).forEach(el => el.style.display = 'none');
@@ -815,7 +809,7 @@
             }
         }
 
-        // --- LOGIKA RENDER & SIMPAN ENTITAS (SANTRI & GURU) ---
+        // --- ENTITAS ---
         function renderSantri() {
             const tbody = document.querySelector('#table-santri tbody');
             tbody.innerHTML = '';
@@ -825,7 +819,7 @@
                     <tr class="border-b">
                         <td class="p-3">${s.nis}</td><td class="p-3">${s.nama}</td><td class="p-3">${s.lp}</td>
                         <td class="p-3">${s.ttl}</td><td class="p-3">${s.alamat}</td><td class="p-3">${s.wa}</td>
-                        <td class="p-3">${s.guru}</td><td class="p-3"><span class="${statusColor} px-2 py-1 rounded text-xs">${s.status}</span></td>
+                        <td class="p-3">${s.guru}</td><td class="p-3"><span class="${statusColor} px-2 py-1 rounded text-xs font-bold">${s.status}</span></td>
                         <td class="p-3">${s.user}</td><td class="p-3">${s.pass}</td>
                         <td class="p-3">
                             <button onclick="editSantri(${index})" class="text-blue-600 hover:text-blue-800 mr-2" title="Edit"><i class="fa-solid fa-edit"></i></button>
@@ -835,8 +829,7 @@
                 `;
             });
             document.getElementById('dash-santri').innerText = dataSantri.length;
-            renderSelectHaflahSantri();
-            renderDatalistSantri();
+            renderSelectHaflahSantri(); renderDatalistSantri();
         }
 
         function renderGuru() {
@@ -859,150 +852,45 @@
             document.getElementById('dash-guru').innerText = dataGuru.length;
         }
 
-        function bukaModalTambahSantri() {
-            document.getElementById('modal-santri-title').innerText = 'Tambah Data Santri Baru';
-            document.getElementById('ms-index').value = '-1';
-            document.querySelectorAll('#modal-tambah-santri input').forEach(inp => inp.value = '');
-            document.getElementById('modal-tambah-santri').classList.remove('hidden');
-        }
-
-        function editSantri(index) {
-            const s = dataSantri[index];
-            document.getElementById('modal-santri-title').innerText = 'Edit Data Santri';
-            document.getElementById('ms-index').value = index;
-            document.getElementById('ms-nis').value = s.nis;
-            document.getElementById('ms-nama').value = s.nama;
-            document.getElementById('ms-lp').value = s.lp;
-            document.getElementById('ms-ttl').value = s.ttl;
-            document.getElementById('ms-alamat').value = s.alamat;
-            document.getElementById('ms-wa-ortu').value = s.wa;
-            document.getElementById('ms-guru').value = s.guru;
-            document.getElementById('ms-status').value = s.status;
-            document.getElementById('ms-username').value = s.user;
-            document.getElementById('ms-password').value = s.pass;
-            document.getElementById('modal-tambah-santri').classList.remove('hidden');
-        }
-
-        function deleteSantri(index) {
-            if (confirm(`Yakin ingin menghapus santri ${dataSantri[index].nama}?`)) {
-                dataSantri.splice(index, 1);
-                localStorage.setItem('rutasy_santri', JSON.stringify(dataSantri));
-                renderSantri();
-                renderBelumBayarSPP();
-                tampilkanNotif('Data Santri Berhasil Dihapus!');
-            }
-        }
-
+        function bukaModalTambahSantri() { document.getElementById('modal-santri-title').innerText = 'Tambah Data Santri Baru'; document.getElementById('ms-index').value = '-1'; document.querySelectorAll('#modal-tambah-santri input').forEach(inp => inp.value = ''); document.getElementById('modal-tambah-santri').classList.remove('hidden'); }
+        function editSantri(index) { const s = dataSantri[index]; document.getElementById('modal-santri-title').innerText = 'Edit Data Santri'; document.getElementById('ms-index').value = index; document.getElementById('ms-nis').value = s.nis; document.getElementById('ms-nama').value = s.nama; document.getElementById('ms-lp').value = s.lp; document.getElementById('ms-ttl').value = s.ttl; document.getElementById('ms-alamat').value = s.alamat; document.getElementById('ms-wa-ortu').value = s.wa; document.getElementById('ms-guru').value = s.guru; document.getElementById('ms-status').value = s.status; document.getElementById('ms-username').value = s.user; document.getElementById('ms-password').value = s.pass; document.getElementById('modal-tambah-santri').classList.remove('hidden'); }
+        function deleteSantri(index) { if (confirm(`Yakin ingin menghapus santri ${dataSantri[index].nama}?`)) { dataSantri.splice(index, 1); localStorage.setItem('rutasy_santri', JSON.stringify(dataSantri)); renderSantri(); renderBelumBayarSPP(); tampilkanNotif('Data Santri Berhasil Dihapus!'); } }
+        
         function prosesTambahSantri() {
             const idx = parseInt(document.getElementById('ms-index').value);
-            const nis = document.getElementById('ms-nis').value;
-            const nama = document.getElementById('ms-nama').value;
-            const lp = document.getElementById('ms-lp').value;
-            const ttl = document.getElementById('ms-ttl').value;
-            const alamat = document.getElementById('ms-alamat').value;
-            const waOrtu = document.getElementById('ms-wa-ortu').value;
-            const guru = document.getElementById('ms-guru').value;
-            const status = document.getElementById('ms-status').value;
-            const user = document.getElementById('ms-username').value;
-            const pass = document.getElementById('ms-password').value;
-            
-            if(!nis || !nama || !user || !pass) { tampilkanNotif('Harap isi minimal NIS, Nama, Username, dan Password!'); return; }
-            
-            const obj = {nis, nama, lp, ttl, alamat, wa: waOrtu, guru, status, user, pass};
-            if(idx === -1) {
-                dataSantri.push(obj);
-                tampilkanNotif('Data Santri Berhasil Ditambahkan!');
-            } else {
-                dataSantri[idx] = obj;
-                tampilkanNotif('Data Santri Berhasil Diperbarui!');
-            }
-            
-            localStorage.setItem('rutasy_santri', JSON.stringify(dataSantri));
-            renderSantri();
-            renderBelumBayarSPP();
-            document.getElementById('modal-tambah-santri').classList.add('hidden');
+            const obj = { nis: document.getElementById('ms-nis').value, nama: document.getElementById('ms-nama').value, lp: document.getElementById('ms-lp').value, ttl: document.getElementById('ms-ttl').value, alamat: document.getElementById('ms-alamat').value, wa: document.getElementById('ms-wa-ortu').value, guru: document.getElementById('ms-guru').value, status: document.getElementById('ms-status').value, user: document.getElementById('ms-username').value, pass: document.getElementById('ms-password').value };
+            if(!obj.nis || !obj.nama || !obj.user) { tampilkanNotif('Isi minimal NIS, Nama, Username!'); return; }
+            if(idx === -1) { dataSantri.push(obj); tampilkanNotif('Data Santri Berhasil Ditambahkan!'); } else { dataSantri[idx] = obj; tampilkanNotif('Data Santri Berhasil Diperbarui!'); }
+            localStorage.setItem('rutasy_santri', JSON.stringify(dataSantri)); renderSantri(); renderBelumBayarSPP(); document.getElementById('modal-tambah-santri').classList.add('hidden');
         }
 
-        function bukaModalTambahGuru() {
-            document.getElementById('modal-guru-title').innerText = 'Tambah Data Guru Baru';
-            document.getElementById('mg-index').value = '-1';
-            document.querySelectorAll('#modal-tambah-guru input').forEach(inp => inp.value = '');
-            document.getElementById('modal-tambah-guru').classList.remove('hidden');
-        }
-
-        function editGuru(index) {
-            const g = dataGuru[index];
-            document.getElementById('modal-guru-title').innerText = 'Edit Data Guru';
-            document.getElementById('mg-index').value = index;
-            document.getElementById('mg-nik').value = g.nik;
-            document.getElementById('mg-nama').value = g.nama;
-            document.getElementById('mg-lp').value = g.lp;
-            document.getElementById('mg-ttl').value = g.ttl;
-            document.getElementById('mg-alamat').value = g.alamat;
-            document.getElementById('mg-bank').value = g.bank;
-            document.getElementById('mg-wa').value = g.wa;
-            document.getElementById('mg-gaji').value = g.gaji;
-            document.getElementById('mg-username').value = g.user;
-            document.getElementById('mg-password').value = g.pass;
-            document.getElementById('modal-tambah-guru').classList.remove('hidden');
-        }
-
-        function deleteGuru(index) {
-            if (confirm(`Yakin ingin menghapus guru ${dataGuru[index].nama}?`)) {
-                dataGuru.splice(index, 1);
-                localStorage.setItem('rutasy_guru', JSON.stringify(dataGuru));
-                renderGuru();
-                tampilkanNotif('Data Guru Berhasil Dihapus!');
-            }
-        }
-
+        function bukaModalTambahGuru() { document.getElementById('modal-guru-title').innerText = 'Tambah Data Guru Baru'; document.getElementById('mg-index').value = '-1'; document.querySelectorAll('#modal-tambah-guru input').forEach(inp => inp.value = ''); document.getElementById('modal-tambah-guru').classList.remove('hidden'); }
+        function editGuru(index) { const g = dataGuru[index]; document.getElementById('modal-guru-title').innerText = 'Edit Data Guru'; document.getElementById('mg-index').value = index; document.getElementById('mg-nik').value = g.nik; document.getElementById('mg-nama').value = g.nama; document.getElementById('mg-lp').value = g.lp; document.getElementById('mg-ttl').value = g.ttl; document.getElementById('mg-alamat').value = g.alamat; document.getElementById('mg-bank').value = g.bank; document.getElementById('mg-wa').value = g.wa; document.getElementById('mg-gaji').value = g.gaji; document.getElementById('mg-username').value = g.user; document.getElementById('mg-password').value = g.pass; document.getElementById('modal-tambah-guru').classList.remove('hidden'); }
+        function deleteGuru(index) { if (confirm(`Yakin ingin menghapus guru ${dataGuru[index].nama}?`)) { dataGuru.splice(index, 1); localStorage.setItem('rutasy_guru', JSON.stringify(dataGuru)); renderGuru(); tampilkanNotif('Data Guru Berhasil Dihapus!'); } }
+        
         function prosesTambahGuru() {
             const idx = parseInt(document.getElementById('mg-index').value);
-            const nik = document.getElementById('mg-nik').value;
-            const nama = document.getElementById('mg-nama').value;
-            const lp = document.getElementById('mg-lp').value;
-            const ttl = document.getElementById('mg-ttl').value;
-            const alamat = document.getElementById('mg-alamat').value;
-            const bank = document.getElementById('mg-bank').value;
-            const wa = document.getElementById('mg-wa').value;
-            const gaji = document.getElementById('mg-gaji').value;
-            const user = document.getElementById('mg-username').value;
-            const pass = document.getElementById('mg-password').value;
-            
-            if(!nik || !nama || !user || !pass) { tampilkanNotif('Harap isi minimal NIK, Nama, Username, dan Password!'); return; }
-            
-            const obj = {nik, nama, lp, ttl, alamat, bank, wa, gaji, user, pass};
-            if(idx === -1) {
-                dataGuru.push(obj);
-                tampilkanNotif('Data Guru Berhasil Ditambahkan!');
-            } else {
-                dataGuru[idx] = obj;
-                tampilkanNotif('Data Guru Berhasil Diperbarui!');
-            }
-            
-            localStorage.setItem('rutasy_guru', JSON.stringify(dataGuru));
-            renderGuru();
-            document.getElementById('modal-tambah-guru').classList.add('hidden');
+            const obj = { nik: document.getElementById('mg-nik').value, nama: document.getElementById('mg-nama').value, lp: document.getElementById('mg-lp').value, ttl: document.getElementById('mg-ttl').value, alamat: document.getElementById('mg-alamat').value, bank: document.getElementById('mg-bank').value, wa: document.getElementById('mg-wa').value, gaji: document.getElementById('mg-gaji').value, user: document.getElementById('mg-username').value, pass: document.getElementById('mg-password').value };
+            if(!obj.nik || !obj.nama || !obj.user) { tampilkanNotif('Isi minimal NIK, Nama, Username!'); return; }
+            if(idx === -1) { dataGuru.push(obj); tampilkanNotif('Data Guru Berhasil Ditambahkan!'); } else { dataGuru[idx] = obj; tampilkanNotif('Data Guru Berhasil Diperbarui!'); }
+            localStorage.setItem('rutasy_guru', JSON.stringify(dataGuru)); renderGuru(); document.getElementById('modal-tambah-guru').classList.add('hidden');
         }
 
         function renderDatalistSantri() {
             const dl = document.getElementById('list-santri');
-            if(!dl) return;
-            dl.innerHTML = '';
-            dataSantri.forEach(s => {
-                dl.innerHTML += `<option value="${s.nama}"></option>`;
-            });
+            if(dl) { dl.innerHTML = ''; dataSantri.forEach(s => { dl.innerHTML += `<option value="${s.nama}"></option>`; }); }
         }
 
-        // --- LOGIKA KEUANGAN ---
+        // --- KEUANGAN (SPP & INFAQ) ---
         function renderKeuangan() {
             const tbodyPengajuan = document.querySelector('#table-persetujuan tbody');
             tbodyPengajuan.innerHTML = '';
             dataKeuanganPengajuan.forEach(p => {
                 tbodyPengajuan.innerHTML += `
                     <tr class="border-b">
-                        <td class="p-3">${p.tgl}</td><td class="p-3">${p.nama}</td><td class="p-3 font-bold">${p.jenis}</td><td class="p-3">Rp ${p.nom}</td>
-                        <td class="p-3"><button class="bg-primary text-white px-3 py-1 rounded shadow text-xs font-bold" onclick="approvePembayaran(${p.id})">Approve</button></td>
+                        <td class="p-3">${p.tgl}</td><td class="p-3">${p.nama}</td><td class="p-3 font-bold text-gray-700">${p.bulan}</td>
+                        <td class="p-3 text-blue-600 font-medium">Rp ${p.spp}</td><td class="p-3 text-green-600 font-medium">Rp ${p.infaq}</td>
+                        <td class="p-3"><button class="bg-primary hover:bg-dark transition text-white px-3 py-1 rounded shadow text-xs font-bold" onclick="approvePembayaran(${p.id})">Approve</button></td>
                     </tr>
                 `;
             });
@@ -1011,37 +899,11 @@
             tbodyRiwayat.innerHTML = '';
             dataKeuanganRiwayat.forEach(r => {
                 tbodyRiwayat.innerHTML += `
-                    <tr class="border-b hover:bg-green-50 transition">
-                        <td class="p-3">${r.tgl}</td><td class="p-3">${r.nama}</td><td class="p-3 font-bold text-primary">${r.jenis}</td><td class="p-3">Rp ${r.nom}</td>
-                        <td class="p-3"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Lunas</span></td>
-                        <td class="p-3 btn-print"><button class="text-blue-500" onclick="window.print()"><i class="fa-solid fa-print"></i></button></td>
-                    </tr>
-                `;
-            });
-        }
-
-        function renderBelumBayarSPP() {
-            const tbody = document.querySelector('#table-belum-bayar tbody');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-
-            // Filter santri aktif yang belum bayar SPP di dataKeuanganRiwayat
-            const santriSudahBayar = dataKeuanganRiwayat.filter(r => r.jenis === 'SPP').map(r => r.nama.toLowerCase());
-            const santriBelumBayar = dataSantri.filter(s => s.status === 'Aktif' && !santriSudahBayar.includes(s.nama.toLowerCase()));
-
-            if(santriBelumBayar.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-500 italic">Semua santri aktif sudah melunasi SPP bulan ini.</td></tr>`;
-                return;
-            }
-
-            santriBelumBayar.forEach(s => {
-                tbody.innerHTML += `
-                    <tr class="border-b hover:bg-red-50 transition">
-                        <td class="p-3 font-medium">${s.nis}</td>
-                        <td class="p-3 font-bold text-gray-800">${s.nama}</td>
-                        <td class="p-3">${s.guru}</td>
-                        <td class="p-3">${s.wa}</td>
-                        <td class="p-3"><span class="bg-red-100 text-red-700 px-2.5 py-1 rounded-full text-xs font-semibold">Belum Bayar</span></td>
+                    <tr class="border-b hover:bg-gray-50 transition">
+                        <td class="p-3">${r.tgl}</td><td class="p-3">${r.nama}</td><td class="p-3 font-bold text-gray-700">${r.bulan}</td>
+                        <td class="p-3 font-bold text-blue-600">Rp ${r.spp}</td><td class="p-3 font-bold text-green-600">Rp ${r.infaq}</td>
+                        <td class="p-3"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Lunas</span></td>
+                        <td class="p-3 btn-print"><button class="text-blue-500 hover:text-blue-700" onclick="window.print()"><i class="fa-solid fa-print"></i></button></td>
                     </tr>
                 `;
             });
@@ -1049,99 +911,98 @@
 
         function ajukanPembayaranOrtu() {
             const nama = document.getElementById('ortu-nama').value;
-            const jenis = document.getElementById('ortu-jenis').value;
-            const nom = document.getElementById('ortu-nominal').value;
-            if(!nom) { tampilkanNotif('Masukkan nominal pembayaran!'); return; }
+            const bulan = document.getElementById('ortu-bulan').value;
+            const spp = parseInt(document.getElementById('ortu-spp').value) || 0;
+            const infaq = parseInt(document.getElementById('ortu-infaq').value) || 0;
+            
+            if(!bulan) { tampilkanNotif('Tolong sebutkan keterangan bulan pembayaran!'); return; }
+            if(spp === 0 && infaq === 0) { tampilkanNotif('Tolong masukkan setidaknya satu nominal (SPP / Infaq)!'); return; }
 
             let tgl = new Date().toLocaleDateString('id-ID');
             let id = Date.now();
             
-            dataKeuanganPengajuan.push({id, tgl, nama, jenis, nom});
+            dataKeuanganPengajuan.push({id, tgl, nama, bulan, spp, infaq});
             localStorage.setItem('rutasy_keu_pengajuan', JSON.stringify(dataKeuanganPengajuan));
             
             renderKeuangan();
-            document.getElementById('ortu-nominal').value = '';
-            tampilkanNotif('Pengajuan terkirim ke Admin Keuangan!');
+            document.getElementById('ortu-bulan').value = '';
+            document.getElementById('ortu-spp').value = '';
+            document.getElementById('ortu-infaq').value = '';
+            tampilkanNotif('Pengajuan Terkirim ke Admin Keuangan!');
         }
 
         function approvePembayaran(id) {
             let index = dataKeuanganPengajuan.findIndex(p => p.id === id);
             if(index > -1) {
                 let item = dataKeuanganPengajuan.splice(index, 1)[0];
-                dataKeuanganRiwayat.unshift({tgl: item.tgl, nama: item.nama, jenis: item.jenis, nom: item.nom});
+                dataKeuanganRiwayat.unshift({tgl: item.tgl, nama: item.nama, bulan: item.bulan, spp: item.spp, infaq: item.infaq});
                 
                 localStorage.setItem('rutasy_keu_pengajuan', JSON.stringify(dataKeuanganPengajuan));
                 localStorage.setItem('rutasy_keu_riwayat', JSON.stringify(dataKeuanganRiwayat));
                 
-                renderKeuangan();
-                renderBelumBayarSPP();
+                renderKeuangan(); renderBelumBayarSPP();
                 tampilkanNotif('Pembayaran Disetujui & Masuk Riwayat!');
             }
         }
 
-        // --- PENGATURAN GLOBAL ---
-        function renderSettings() {
-            document.getElementById('set-jam-masuk').value = dataSettings.jamMasuk || '07:30';
-            document.getElementById('set-potongan').value = dataSettings.potongan || '1000';
-            document.getElementById('set-hari-kerja').value = dataSettings.hariKerja || '24';
-            document.getElementById('set-geo-radius').value = dataSettings.geoRadius || '10';
-            document.getElementById('set-geo-lat').value = dataSettings.geoLat || '-3.595196';
-            document.getElementById('set-geo-lng').value = dataSettings.geoLng || '98.672223';
-            document.getElementById('set-pay-bank').value = dataSettings.payBank || '';
-            document.getElementById('set-pay-ewallet').value = dataSettings.payEwallet || '';
-            document.getElementById('set-pay-cash').value = dataSettings.payCash || '';
+        function renderBelumBayarSPP() {
+            const tbody = document.querySelector('#table-belum-bayar tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            const santriSudahBayar = dataKeuanganRiwayat.filter(r => r.spp > 0).map(r => r.nama.toLowerCase());
+            const santriBelumBayar = dataSantri.filter(s => s.status === 'Aktif' && !santriSudahBayar.includes(s.nama.toLowerCase()));
+
+            if(santriBelumBayar.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-500 italic">Semua santri aktif sudah melunasi SPP bulan ini.</td></tr>`;
+                return;
+            }
+            santriBelumBayar.forEach(s => {
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-red-50 transition">
+                        <td class="p-3 font-medium">${s.nis}</td><td class="p-3 font-bold text-gray-800">${s.nama}</td>
+                        <td class="p-3">${s.guru}</td><td class="p-3">${s.wa}</td>
+                        <td class="p-3"><span class="bg-red-100 text-red-700 px-2.5 py-1 rounded-full text-xs font-semibold">Belum Bayar</span></td>
+                    </tr>
+                `;
+            });
         }
 
-        function deteksiGeofencingOtomatis() {
-            if (navigator.geolocation) {
-                tampilkanNotif('Mendeteksi lokasi GPS...');
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        document.getElementById('set-geo-lat').value = position.coords.latitude;
-                        document.getElementById('set-geo-lng').value = position.coords.longitude;
-                        tampilkanNotif('Lokasi GPS berhasil dideteksi & diisi!');
-                    },
-                    (error) => {
-                        tampilkanNotif('Gagal mengakses GPS: ' + error.message);
-                    }
-                );
-            } else {
-                tampilkanNotif('Browser Anda tidak mendukung fitur Geolocation.');
-            }
+        // --- PENGATURAN GLOBAL ---
+        function renderSettings() {
+            document.getElementById('set-jam-masuk').value = dataSettings.jamMasuk; document.getElementById('set-potongan').value = dataSettings.potongan; document.getElementById('set-hari-kerja').value = dataSettings.hariKerja; document.getElementById('set-geo-radius').value = dataSettings.geoRadius; document.getElementById('set-geo-lat').value = dataSettings.geoLat; document.getElementById('set-geo-lng').value = dataSettings.geoLng; document.getElementById('set-pay-bank').value = dataSettings.payBank; document.getElementById('set-pay-ewallet').value = dataSettings.payEwallet; document.getElementById('set-pay-cash').value = dataSettings.payCash;
         }
 
         function simpanPengaturanGlobal() {
-            dataSettings = {
-                jamMasuk: document.getElementById('set-jam-masuk').value,
-                potongan: document.getElementById('set-potongan').value,
-                hariKerja: document.getElementById('set-hari-kerja').value,
-                geoRadius: document.getElementById('set-geo-radius').value,
-                geoLat: document.getElementById('set-geo-lat').value,
-                geoLng: document.getElementById('set-geo-lng').value,
-                payBank: document.getElementById('set-pay-bank').value,
-                payEwallet: document.getElementById('set-pay-ewallet').value,
-                payCash: document.getElementById('set-pay-cash').value
-            };
-            localStorage.setItem('rutasy_settings', JSON.stringify(dataSettings));
-            tampilkanNotif('Pengaturan Parameter Berhasil Disimpan!');
+            dataSettings = { jamMasuk: document.getElementById('set-jam-masuk').value, potongan: document.getElementById('set-potongan').value, hariKerja: document.getElementById('set-hari-kerja').value, geoRadius: document.getElementById('set-geo-radius').value, geoLat: document.getElementById('set-geo-lat').value, geoLng: document.getElementById('set-geo-lng').value, payBank: document.getElementById('set-pay-bank').value, payEwallet: document.getElementById('set-pay-ewallet').value, payCash: document.getElementById('set-pay-cash').value };
+            localStorage.setItem('rutasy_settings', JSON.stringify(dataSettings)); tampilkanNotif('Pengaturan Parameter Berhasil Disimpan!');
         }
 
-        // --- LOGIKA ABSENSI ---
+        // --- ABSENSI ---
+        function absenGuruMasuk() {
+            let tgl = new Date().toLocaleString('id-ID');
+            absenGuruRecord.unshift({ tgl: tgl, status: 'Hadir' });
+            localStorage.setItem('rutasy_absen_guru', JSON.stringify(absenGuruRecord));
+            tampilkanNotif('Berhasil Absen Masuk Hari Ini!');
+            renderAbsenGuruPribadi();
+        }
+
+        function renderAbsenGuruPribadi() {
+            const tbody = document.querySelector('#table-absen-guru-pribadi tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            if(absenGuruRecord.length === 0) { tbody.innerHTML = `<tr><td colspan="2" class="p-3 text-center text-gray-500 italic">Belum ada riwayat absensi.</td></tr>`; return; }
+            absenGuruRecord.forEach(a => {
+                tbody.innerHTML += `<tr class="border-b"><td class="p-2">${a.tgl}</td><td class="p-2 text-green-600 font-bold"><i class="fa-solid fa-check-circle mr-1"></i> ${a.status}</td></tr>`;
+            });
+        }
+
         function simpanAbsenPekanan() {
             const pekan = document.getElementById('absen-pekan').value;
-            // PERBAIKAN: mengambil nilai nama langsung dari input bar
             const nama = document.getElementById('input-nama-absen').value;
+            if(!nama) { tampilkanNotif('Silakan cari & pilih nama santri terlebih dahulu!'); return; }
 
-            if(!nama) { 
-                tampilkanNotif('Silakan cari & pilih nama santri terlebih dahulu!'); 
-                return; 
-            }
-
-            const sen = document.querySelector('.val-senin').value;
-            const sel = document.querySelector('.val-selasa').value;
-            const rab = document.querySelector('.val-rabu').value;
-            const kam = document.querySelector('.val-kamis').value;
-
+            const sen = document.querySelector('.val-senin').value; const sel = document.querySelector('.val-selasa').value; const rab = document.querySelector('.val-rabu').value; const kam = document.querySelector('.val-kamis').value;
             if(!riwayatAbsensi[nama]) riwayatAbsensi[nama] = [];
             
             let idx = riwayatAbsensi[nama].findIndex(item => item.pekan === pekan);
@@ -1149,26 +1010,68 @@
             else riwayatAbsensi[nama].push({ pekan, sen, sel, rab, kam });
 
             localStorage.setItem('rutasy_absen', JSON.stringify(riwayatAbsensi));
-            
             renderTabelRiwayatAbsen(document.getElementById('cari-riwayat-absen').value);
             tampilkanNotif('Absensi Pekanan Berhasil Disimpan & Masuk Riwayat!');
-            
-            // Kosongkan nama setelah menyimpan agar mudah untuk mengisi santri selanjutnya
             document.getElementById('input-nama-absen').value = '';
         }
 
         function renderTabelRiwayatAbsen(query = "") {
             const tbody = document.querySelector('#table-riwayat-absen tbody');
-            tbody.innerHTML = '';
-            
+            if(!tbody) return; tbody.innerHTML = '';
             for(let namaAnak in riwayatAbsensi) {
                 if(namaAnak.toLowerCase().includes(query.toLowerCase())) {
+                    tbody.innerHTML += `<tr class="border-b hover:bg-gray-50 transition"><td class="p-3 font-medium">${namaAnak}</td><td class="p-3"><button onclick="lihatDetailAbsen('${namaAnak}')" class="bg-primary text-white px-3 py-1.5 rounded shadow text-xs font-bold hover:bg-dark transition"><i class="fa-solid fa-eye"></i> Lihat Detail</button></td></tr>`;
+                }
+            }
+        }
+
+        function lihatDetailAbsen(nama) {
+            document.getElementById('modal-nama-santri').innerText = nama;
+            const ul = document.getElementById('modal-absen-list'); ul.innerHTML = '';
+            let dataAnak = riwayatAbsensi[nama].sort((a,b) => a.pekan.localeCompare(b.pekan));
+            dataAnak.forEach(d => {
+                let colSen = getWarnaAbsen(d.sen); let colSel = getWarnaAbsen(d.sel); let colRab = getWarnaAbsen(d.rab); let colKam = getWarnaAbsen(d.kam);
+                ul.innerHTML += `<li class="py-4"><div class="font-bold text-gray-700 mb-2">${d.pekan}</div><div class="grid grid-cols-4 gap-2 text-center text-xs"><div class="bg-gray-100 p-2 rounded">Senin<br><b class="${colSen}">${d.sen}</b></div><div class="bg-gray-100 p-2 rounded">Selasa<br><b class="${colSel}">${d.sel}</b></div><div class="bg-gray-100 p-2 rounded">Rabu<br><b class="${colRab}">${d.rab}</b></div><div class="bg-gray-100 p-2 rounded">Kamis<br><b class="${colKam}">${d.kam}</b></div></div></li>`;
+            });
+            document.getElementById('modal-detail-absen').classList.remove('hidden');
+        }
+        function getWarnaAbsen(status) { return status === 'Hadir' ? 'text-green-600' : (status === 'Izin' ? 'text-blue-600' : 'text-red-600'); }
+
+        // --- PROGRES HAFALAN ---
+        function simpanProgresSantri() {
+            const nama = document.getElementById('prog-nama').value;
+            const kategori = document.getElementById('prog-kategori').value;
+            const surat = document.getElementById('prog-surat').value;
+            const ayat = document.getElementById('prog-ayat').value;
+
+            if(!nama || !surat || !ayat) { tampilkanNotif('Tolong lengkapi form capaian sebelum menyimpan!'); return; }
+
+            if(!riwayatProgres[nama]) riwayatProgres[nama] = [];
+            let tgl = new Date().toLocaleDateString('id-ID');
+            
+            riwayatProgres[nama].push({ tgl, kategori, surat, ayat });
+            localStorage.setItem('rutasy_progres_hafalan', JSON.stringify(riwayatProgres));
+            
+            renderTabelProgres();
+            tampilkanNotif('Capaian Progres Berhasil Disimpan!');
+
+            document.getElementById('prog-nama').value = '';
+            document.getElementById('prog-surat').value = '';
+            document.getElementById('prog-ayat').value = '';
+        }
+
+        function renderTabelProgres(query = '') {
+            const tbody = document.querySelector('#table-riwayat-progres tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            for(let nama in riwayatProgres) {
+                if(nama.toLowerCase().includes(query.toLowerCase())) {
                     tbody.innerHTML += `
                         <tr class="border-b hover:bg-gray-50 transition">
-                            <td class="p-3 font-medium">${namaAnak}</td>
+                            <td class="p-3 font-medium">${nama}</td>
                             <td class="p-3">
-                                <button onclick="lihatDetailAbsen('${namaAnak}')" class="bg-primary text-white px-3 py-1.5 rounded shadow text-xs font-bold hover:bg-dark transition">
-                                    <i class="fa-solid fa-eye"></i> Lihat Detail
+                                <button onclick="lihatDetailProgres('${nama}')" class="bg-secondary text-white px-3 py-1.5 rounded shadow text-xs font-bold hover:bg-primary transition">
+                                    <i class="fa-solid fa-list"></i> Lihat Detail
                                 </button>
                             </td>
                         </tr>
@@ -1177,153 +1080,67 @@
             }
         }
 
-        function lihatDetailAbsen(nama) {
-            document.getElementById('modal-nama-santri').innerText = nama;
-            const ul = document.getElementById('modal-absen-list');
-            ul.innerHTML = '';
+        function lihatDetailProgres(nama) {
+            document.getElementById('modal-progres-nama').innerText = nama;
+            const tbody = document.getElementById('modal-progres-list');
+            tbody.innerHTML = '';
             
-            let dataAnak = riwayatAbsensi[nama].sort((a,b) => a.pekan.localeCompare(b.pekan));
-            
-            dataAnak.forEach(d => {
-                let colSen = getWarnaAbsen(d.sen);
-                let colSel = getWarnaAbsen(d.sel);
-                let colRab = getWarnaAbsen(d.rab);
-                let colKam = getWarnaAbsen(d.kam);
-
-                ul.innerHTML += `
-                    <li class="py-4">
-                        <div class="font-bold text-gray-700 mb-2">${d.pekan}</div>
-                        <div class="grid grid-cols-4 gap-2 text-center text-xs">
-                            <div class="bg-gray-100 p-2 rounded">Senin<br><b class="${colSen}">${d.sen}</b></div>
-                            <div class="bg-gray-100 p-2 rounded">Selasa<br><b class="${colSel}">${d.sel}</b></div>
-                            <div class="bg-gray-100 p-2 rounded">Rabu<br><b class="${colRab}">${d.rab}</b></div>
-                            <div class="bg-gray-100 p-2 rounded">Kamis<br><b class="${colKam}">${d.kam}</b></div>
-                        </div>
-                    </li>
-                `;
+            riwayatProgres[nama].forEach(p => {
+                let katColor = p.kategori === 'Tahfidz' ? 'text-green-600' : (p.kategori === 'Tahsin' ? 'text-blue-600' : 'text-orange-600');
+                tbody.innerHTML += `<tr class="border-b"><td class="p-2">${p.tgl}</td><td class="p-2 font-bold ${katColor}">${p.kategori}</td><td class="p-2">${p.surat}</td><td class="p-2">${p.ayat}</td></tr>`;
             });
-
-            document.getElementById('modal-detail-absen').classList.remove('hidden');
+            document.getElementById('modal-detail-progres').classList.remove('hidden');
         }
 
-        function getWarnaAbsen(status) {
-            return status === 'Hadir' ? 'text-green-600' : (status === 'Izin' ? 'text-blue-600' : 'text-red-600');
-        }
-
-        // --- LOGIKA KALENDER ---
-        function tambahEventKalender() {
-            const nama = document.getElementById('input-kal-nama').value;
-            const tgl = document.getElementById('input-kal-tgl').value;
-            if(!nama || !tgl) { tampilkanNotif('Isi form nama dan tanggal agenda dengan lengkap!'); return; }
-            
-            eventsKalender.push({ id: Date.now(), name: nama, date: tgl });
-            localStorage.setItem('rutasy_kalender', JSON.stringify(eventsKalender));
-            
-            document.getElementById('input-kal-nama').value = '';
-            document.getElementById('input-kal-tgl').value = '';
-            renderKalenderInit();
-            tampilkanNotif('Agenda Akademik Ditambahkan!');
-        }
-
-        function hapusEventKalender(id) {
-            eventsKalender = eventsKalender.filter(e => e.id !== id);
-            localStorage.setItem('rutasy_kalender', JSON.stringify(eventsKalender));
-            renderKalenderInit();
-            tampilkanNotif('Agenda Dihapus dari Kalender!');
-        }
-
+        // --- KALENDER ---
         function renderKalenderInit() {
             const today = new Date();
             eventsKalender.sort((a, b) => Math.abs(new Date(a.date) - today) - Math.abs(new Date(b.date) - today));
 
-            const listEl = document.getElementById('list-kalender');
-            const notifEl = document.getElementById('notif-content');
-            listEl.innerHTML = '';
-            notifEl.innerHTML = '';
-            let notifCount = 0;
+            const listEl = document.getElementById('list-kalender'); const notifEl = document.getElementById('notif-content');
+            listEl.innerHTML = ''; notifEl.innerHTML = ''; let notifCount = 0;
 
             eventsKalender.forEach(ev => {
-                let evDate = new Date(ev.date);
-                let diffTime = evDate - today;
-                let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
+                let evDate = new Date(ev.date); let diffTime = evDate - today; let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 let badge = '';
                 if(diffDays > 0 && diffDays <= 7) {
                     badge = `<span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded">H-${diffDays}</span>`;
                     notifEl.innerHTML += `<div class="py-1"><i class="fa-solid fa-circle-exclamation text-yellow-500"></i> ${ev.name} (H-${diffDays})</div>`;
                     notifCount++;
                 }
-
-                listEl.innerHTML += `
-                    <li class="p-3 flex justify-between items-center hover:bg-gray-50">
-                        <div><span class="font-bold block">${ev.name}</span><span class="text-sm text-gray-600">${ev.date}</span></div>
-                        <div class="flex items-center gap-2">
-                            ${badge}
-                            ${currentRole === 'admin_global' ? `<button onclick="hapusEventKalender(${ev.id})" class="text-red-500 hover:text-red-700 ml-2 btn-admin-only"><i class="fa-solid fa-trash"></i></button>` : ''}
-                        </div>
-                    </li>
-                `;
+                listEl.innerHTML += `<li class="p-3 flex justify-between items-center hover:bg-gray-50"><div><span class="font-bold block">${ev.name}</span><span class="text-sm text-gray-600">${ev.date}</span></div><div class="flex items-center gap-2">${badge}${currentRole === 'admin_global' ? `<button onclick="hapusEventKalender(${ev.id})" class="text-red-500 hover:text-red-700 ml-2 btn-admin-only"><i class="fa-solid fa-trash"></i></button>` : ''}</div></li>`;
             });
             
-            if(notifCount > 0) {
-                document.getElementById('notif-badge').innerText = notifCount;
-                document.getElementById('notif-badge').style.display = 'block';
-            } else {
-                document.getElementById('notif-badge').style.display = 'none';
-                notifEl.innerHTML = 'Tidak ada pemberitahuan acara dekat.';
-            }
+            if(notifCount > 0) { document.getElementById('notif-badge').innerText = notifCount; document.getElementById('notif-badge').style.display = 'block'; } else { document.getElementById('notif-badge').style.display = 'none'; notifEl.innerHTML = 'Tidak ada pemberitahuan acara dekat.'; }
 
-            const gridEl = document.getElementById('kalender-grid-bulanan');
-            gridEl.innerHTML = '';
-            const y = today.getFullYear(), m = today.getMonth();
-            document.getElementById('nama-bulan-ini').innerText = new Intl.DateTimeFormat('id-ID', {month: 'long', year: 'numeric'}).format(today);
-            
-            const firstDay = new Date(y, m, 1).getDay();
-            const daysInMonth = new Date(y, m + 1, 0).getDate();
-            
+            const gridEl = document.getElementById('kalender-grid-bulanan'); gridEl.innerHTML = '';
+            const y = today.getFullYear(), m = today.getMonth(); document.getElementById('nama-bulan-ini').innerText = new Intl.DateTimeFormat('id-ID', {month: 'long', year: 'numeric'}).format(today);
+            const firstDay = new Date(y, m, 1).getDay(); const daysInMonth = new Date(y, m + 1, 0).getDate();
             for(let i=0; i<firstDay; i++) gridEl.innerHTML += `<div></div>`;
-            
             for(let d=1; d<=daysInMonth; d++) {
                 let currentStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                 let isEvent = eventsKalender.find(e => e.date === currentStr);
-                
-                if(isEvent) {
-                    gridEl.innerHTML += `<div class="calendar-day event shadow-md" onclick="tampilkanNotif('Acara: ${isEvent.name} (${isEvent.date})')" title="${isEvent.name}">${d}</div>`;
-                } else {
-                    gridEl.innerHTML += `<div class="calendar-day">${d}</div>`;
-                }
+                if(isEvent) { gridEl.innerHTML += `<div class="calendar-day event shadow-md" onclick="tampilkanNotif('Acara: ${isEvent.name} (${isEvent.date})')" title="${isEvent.name}">${d}</div>`; } else { gridEl.innerHTML += `<div class="calendar-day">${d}</div>`; }
             }
         }
+        function tambahEventKalender() { const nama = document.getElementById('input-kal-nama').value; const tgl = document.getElementById('input-kal-tgl').value; if(!nama || !tgl) return; eventsKalender.push({ id: Date.now(), name: nama, date: tgl }); localStorage.setItem('rutasy_kalender', JSON.stringify(eventsKalender)); document.getElementById('input-kal-nama').value = ''; document.getElementById('input-kal-tgl').value = ''; renderKalenderInit(); tampilkanNotif('Agenda Akademik Ditambahkan!'); }
+        function hapusEventKalender(id) { eventsKalender = eventsKalender.filter(e => e.id !== id); localStorage.setItem('rutasy_kalender', JSON.stringify(eventsKalender)); renderKalenderInit(); tampilkanNotif('Agenda Dihapus!'); }
 
-        // --- LOGIKA HAFLAH ---
+        // --- HAFLAH & ALUMNI ---
         function renderSelectHaflahSantri() {
             const select = document.getElementById('haflah-nama-select');
             if(!select) return;
             select.innerHTML = '<option value="">Pilih Santri (Dari Database Entitas)</option>';
-            dataSantri.forEach(s => {
-                select.innerHTML += `<option value="${s.nama}">${s.nama} (${s.nis})</option>`;
-            });
+            dataSantri.forEach(s => { if(s.status !== 'Alumni') select.innerHTML += `<option value="${s.nama}">${s.nama} (${s.nis})</option>`; });
         }
 
         function renderTabelHaflah() {
-            const container = document.getElementById('container-tabel-haflah');
-            container.innerHTML = '';
+            const container = document.getElementById('container-tabel-haflah'); container.innerHTML = '';
             let years = Object.keys(dataHaflah).sort((a,b) => b-a);
-            
             years.forEach(year => {
-                let html = `
-                <div class="mb-6 border p-4 rounded-lg bg-gray-50">
-                    <h4 class="font-bold text-gray-800 border-b pb-2 mb-3">Angkatan ${year}</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm min-w-[500px]">
-                            <thead><tr class="table-header"><th class="p-2">Nama</th><th class="p-2">Total Hafalan</th><th class="p-2">Nilai Ujian</th><th class="p-2">Kriteria</th></tr></thead>
-                            <tbody>`;
-                dataHaflah[year].forEach(h => {
-                    let kriteriaColor = h.kriteria === 'Mumtaz' ? 'text-primary' : 'text-blue-600';
-                    html += `<tr class="border-b bg-white"><td class="p-2">${h.nama}</td><td class="p-2">${h.total}</td><td class="p-2">${h.nilai}</td><td class="p-2 font-bold ${kriteriaColor}">${h.kriteria}</td></tr>`;
-                });
-                html += `</tbody></table></div></div>`;
-                container.innerHTML += html;
+                let html = `<div class="mb-6 border p-4 rounded-lg bg-gray-50"><h4 class="font-bold text-gray-800 border-b pb-2 mb-3"><i class="fa-solid fa-graduation-cap text-primary mr-2"></i> Angkatan ${year}</h4><div class="overflow-x-auto"><table class="w-full text-left text-sm min-w-[500px]"><thead><tr class="table-header"><th class="p-2">Nama</th><th class="p-2">Total Hafalan</th><th class="p-2">Nilai Ujian</th><th class="p-2">Kriteria</th></tr></thead><tbody>`;
+                dataHaflah[year].forEach(h => { let kriteriaColor = h.kriteria === 'Mumtaz' ? 'text-primary' : 'text-blue-600'; html += `<tr class="border-b bg-white"><td class="p-2 font-bold">${h.nama}</td><td class="p-2">${h.total}</td><td class="p-2">${h.nilai}</td><td class="p-2 font-bold ${kriteriaColor}">${h.kriteria}</td></tr>`; });
+                html += `</tbody></table></div></div>`; container.innerHTML += html;
             });
         }
 
@@ -1333,71 +1150,43 @@
             const total = document.getElementById('haflah-total').value;
             const nilai = parseInt(document.getElementById('haflah-nilai').value);
 
-            if(!tahun || !nama || !total || isNaN(nilai)) { tampilkanNotif('Harap lengkapi semua data Haflah dengan memilih Santri dari Database Entitas!'); return; }
+            if(!tahun || !nama || !total || isNaN(nilai)) { tampilkanNotif('Lengkapi semua data Haflah dengan memilih Santri!'); return; }
 
             let kriteria = 'Rasib';
-            if(nilai >= 90) kriteria = 'Mumtaz';
-            else if(nilai >= 85) kriteria = 'Jayyid Jiddan';
-            else if(nilai >= 80) kriteria = 'Jayyid';
-            else if(nilai >= 78) kriteria = 'Maqbul';
+            if(nilai >= 90) kriteria = 'Mumtaz'; else if(nilai >= 85) kriteria = 'Jayyid Jiddan'; else if(nilai >= 80) kriteria = 'Jayyid'; else if(nilai >= 78) kriteria = 'Maqbul';
 
             if(!dataHaflah[tahun]) dataHaflah[tahun] = [];
             dataHaflah[tahun].push({ nama, total, nilai, kriteria });
-            
             localStorage.setItem('rutasy_haflah', JSON.stringify(dataHaflah));
             
-            document.getElementById('haflah-nama-select').value = '';
-            document.getElementById('haflah-total').value = '';
-            document.getElementById('haflah-nilai').value = '';
-
-            renderTabelHaflah();
-            tampilkanNotif(`Berhasil menambahkan data ${nama} ke Angkatan ${tahun}`);
-        }
-
-        function hapusSemuaData() {
-            let konfirmasi = confirm('PERINGATAN! Ini akan mereset seluruh data sistem. Lanjutkan?');
-            if(konfirmasi) {
-                localStorage.clear();
-                location.reload();
+            // Otomatis ubah status di Data Santri jadi Alumni
+            let santriIndex = dataSantri.findIndex(s => s.nama === nama);
+            if(santriIndex !== -1) {
+                dataSantri[santriIndex].status = 'Alumni';
+                localStorage.setItem('rutasy_santri', JSON.stringify(dataSantri));
+                renderSantri();
             }
+
+            document.getElementById('haflah-nama-select').value = ''; document.getElementById('haflah-total').value = ''; document.getElementById('haflah-nilai').value = '';
+            renderTabelHaflah(); renderSelectHaflahSantri();
+            tampilkanNotif(`Berhasil menambahkan ${nama} ke Angkatan ${tahun} & Mengubah statusnya jadi Alumni!`);
         }
 
-        function filterTable(tableId, query) {
-            const table = document.getElementById(tableId);
-            const rows = table.getElementsByTagName('tr');
-            for (let i = 1; i < rows.length; i++) {
-                let cell = rows[i].getElementsByTagName('td')[1];
-                if (cell) {
-                    let txtValue = cell.textContent || cell.innerText;
-                    rows[i].style.display = txtValue.toLowerCase().indexOf(query.toLowerCase()) > -1 ? "" : "none";
-                }
-            }
-        }
+        function filterTable(tableId, query) { const table = document.getElementById(tableId); const rows = table.getElementsByTagName('tr'); for (let i = 1; i < rows.length; i++) { let cell = rows[i].getElementsByTagName('td')[1]; if (cell) { let txtValue = cell.textContent || cell.innerText; rows[i].style.display = txtValue.toLowerCase().indexOf(query.toLowerCase()) > -1 ? "" : "none"; } } }
+        function hapusSemuaData() { let konfirmasi = confirm('PERINGATAN! Ini akan mereset seluruh data sistem. Lanjutkan?'); if(konfirmasi) { localStorage.clear(); location.reload(); } }
 
         // --- CHARTS LOGIC ---
         function renderGlobalCharts() {
             if(chartsRendered) return;
-            new Chart(document.getElementById('chart-prestasi-rutasy'), {
-                type: 'line',
-                data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'], datasets: [{ label: 'Rata-rata Nilai', data: [82, 85, 84, 88, 91, 93], borderColor: '#047857', tension: 0.3 }] }
-            });
-            new Chart(document.getElementById('chart-prestasi-guru'), {
-                type: 'bar',
-                data: { labels: ['(guru) haidar', '(guru) satria', '(guru) hasan', '(guru) ahmad'], datasets: [{ label: 'Rata-rata Nilai Murid', data: [87, 98.5, 91.2, 85], backgroundColor: '#10b981' }] }
-            });
+            new Chart(document.getElementById('chart-prestasi-rutasy'), { type: 'line', data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'], datasets: [{ label: 'Rata-rata Nilai', data: [82, 85, 84, 88, 91, 93], borderColor: '#047857', tension: 0.3 }] } });
+            new Chart(document.getElementById('chart-prestasi-guru'), { type: 'bar', data: { labels: ['(guru) haidar', '(guru) satria', '(guru) hasan', '(guru) ahmad'], datasets: [{ label: 'Rata-rata Nilai Murid', data: [87, 98.5, 91.2, 85], backgroundColor: '#10b981' }] } });
             chartsRendered = true;
         }
 
         let progresChartInstance = null;
         function renderProgresChart() {
             if(progresChartInstance) progresChartInstance.destroy();
-            progresChartInstance = new Chart(document.getElementById('chart-hafalan-santri'), {
-                type: 'bar',
-                data: {
-                    labels: ['Pekan 1', 'Pekan 2', 'Pekan 3', 'Pekan 4'],
-                    datasets: [{ label: 'Jumlah Baris Hafalan', data: [15, 20, 18, 25], backgroundColor: '#3b82f6', borderRadius: 4 }]
-                }
-            });
+            progresChartInstance = new Chart(document.getElementById('chart-hafalan-santri'), { type: 'bar', data: { labels: ['Pekan 1', 'Pekan 2', 'Pekan 3', 'Pekan 4'], datasets: [{ label: 'Jumlah Baris Hafalan', data: [15, 20, 18, 25], backgroundColor: '#3b82f6', borderRadius: 4 }] } });
         }
     </script>
 </body>
