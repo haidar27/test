@@ -38,15 +38,21 @@
         .calendar-day.event { background: #10b981; color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .calendar-day.event:hover { background: #047857; }
         
+        #print-area { display: none; }
         @media print {
+            @page { size: A4; margin: 20mm; }
+            body { background-color: white; }
+            #print-area { display: block; position: absolute; top: 0; left: 0; width: 100%; }
+            #main-app, #login-screen, #toast-container, .modal { display: none !important; }
             body * { visibility: hidden; }
-            #view-keuangan, #view-keuangan * { visibility: visible; }
-            #view-keuangan { position: absolute; left: 0; top: 0; width: 100%; }
-            aside, header, .btn-print, button { display: none !important; }
+            #print-area, #print-area * { visibility: visible; }
         }
     </style>
 </head>
 <body class="text-gray-800">
+
+    <!-- AREA CETAK RESI A4 -->
+    <div id="print-area"></div>
 
     <!-- TOAST NOTIFICATION CONTAINER -->
     <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3"></div>
@@ -191,15 +197,43 @@
                         <div class="card border-l-4 border-red-500"><p class="text-sm text-gray-500">Pengeluaran</p><h3 class="text-2xl font-bold">Rp 3.200.000</h3></div>
                     </div>
                     
-                    <!-- Form Pembayaran (Ortu Only) - SUDAH DIPERBARUI -->
+                    <!-- Form Pembayaran (Ortu Only) -->
                     <div class="card mb-6 ortu-only">
                         <h3 class="font-bold mb-4">Form Pembayaran SPP & Infaq (Orang Tua)</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                            <input type="text" id="ortu-nama" placeholder="Nama Santri" class="border p-2 rounded bg-gray-100" value="Ahmad Zaki" readonly>
-                            <input type="text" id="ortu-bulan" placeholder="Bulan (Cth: Agustus-Oktober)" class="border p-2 rounded">
+                        
+                        <!-- Info Rekening untuk Ortu -->
+                        <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
+                            <p class="font-bold text-blue-800 mb-2"><i class="fa-solid fa-info-circle"></i> Info Rekening & Metode Pembayaran</p>
+                            <ul class="text-gray-700 list-disc ml-4" id="ortu-info-payment">
+                                <!-- Dinamis dari JS Settings -->
+                            </ul>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                            <input type="text" id="ortu-nama" placeholder="Nama Santri" class="border p-2 rounded bg-gray-100" readonly>
+                            <select id="ortu-bulan" class="border p-2 rounded bg-white">
+                                <option value="">-- Pilih Bulan --</option>
+                                <option value="Januari">Januari</option>
+                                <option value="Februari">Februari</option>
+                                <option value="Maret">Maret</option>
+                                <option value="April">April</option>
+                                <option value="Mei">Mei</option>
+                                <option value="Juni">Juni</option>
+                                <option value="Juli">Juli</option>
+                                <option value="Agustus">Agustus</option>
+                                <option value="September">September</option>
+                                <option value="Oktober">Oktober</option>
+                                <option value="November">November</option>
+                                <option value="Desember">Desember</option>
+                            </select>
+                            <select id="ortu-metode" class="border p-2 rounded bg-white">
+                                <option value="Transfer Bank">Transfer Bank</option>
+                                <option value="E-Wallet">E-Wallet</option>
+                                <option value="Tunai">Tunai</option>
+                            </select>
                             <input type="number" id="ortu-spp" placeholder="Nominal SPP (Rp)" class="border p-2 rounded">
                             <input type="number" id="ortu-infaq" placeholder="Nominal Infaq (Rp)" class="border p-2 rounded">
-                            <button class="bg-primary text-white p-2 rounded hover:bg-dark transition" onclick="ajukanPembayaranOrtu()"><i class="fa-solid fa-paper-plane"></i> Ajukan Pembayaran</button>
+                            <button class="bg-primary text-white p-2 rounded hover:bg-dark transition" onclick="ajukanPembayaranOrtu()"><i class="fa-solid fa-paper-plane"></i> Ajukan</button>
                         </div>
                         <p class="text-xs text-gray-500 mt-2">* Kosongkan kolom infaq jika hanya membayar SPP, begitupun sebaliknya. Setelah diajukan, menunggu Approve Admin Keuangan.</p>
                     </div>
@@ -230,7 +264,7 @@
                         <h3 class="font-bold text-yellow-600 mb-4">Persetujuan Pengajuan Pembayaran</h3>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm min-w-[700px]" id="table-persetujuan">
-                                <thead><tr class="table-header"><th class="p-3">Tanggal</th><th class="p-3">Nama Santri</th><th class="p-3">Bulan</th><th class="p-3">SPP</th><th class="p-3">Infaq</th><th class="p-3">Aksi</th></tr></thead>
+                                <thead><tr class="table-header"><th class="p-3">Tanggal</th><th class="p-3">Nama Santri</th><th class="p-3">Bulan</th><th class="p-3">Metode</th><th class="p-3">SPP</th><th class="p-3">Infaq</th><th class="p-3">Aksi</th></tr></thead>
                                 <tbody>
                                     <!-- Dinamis dari JS -->
                                 </tbody>
@@ -246,7 +280,7 @@
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm min-w-[800px]" id="table-riwayat-keuangan">
-                                <thead><tr class="table-header"><th class="p-3">Tanggal</th><th class="p-3">Nama</th><th class="p-3">Bulan Pembayaran</th><th class="p-3">Nominal SPP</th><th class="p-3">Nominal Infaq</th><th class="p-3">Status</th><th class="p-3 btn-print">Resi</th></tr></thead>
+                                <thead><tr class="table-header"><th class="p-3">Tanggal</th><th class="p-3">Nama</th><th class="p-3">Bulan</th><th class="p-3">Metode</th><th class="p-3">SPP</th><th class="p-3">Infaq</th><th class="p-3">Status</th><th class="p-3 btn-print">Resi</th></tr></thead>
                                 <tbody>
                                     <!-- Dinamis dari JS -->
                                 </tbody>
@@ -258,7 +292,7 @@
                 <!-- VIEW: ABSENSI -->
                 <div id="view-absensi" class="view-section hidden">
                     
-                    <!-- Absen Diri (Khusus Guru) - SUDAH DIPERBARUI -->
+                    <!-- Absen Diri (Khusus Guru) -->
                     <div class="card mb-6 div-absen-pribadi">
                         <h3 class="font-bold mb-4">Absensi Kehadiran Harian (Khusus Anda)</h3>
                         <p class="text-sm text-gray-600 mb-4"><i class="fa-solid fa-location-dot text-red-500"></i> Jarak Anda dari koordinat: <span class="font-bold text-green-600">3 Meter</span></p>
@@ -268,6 +302,19 @@
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm border" id="table-absen-guru-pribadi">
                                 <thead><tr class="bg-gray-100 text-gray-600"><th class="p-2">Tanggal & Waktu Absen</th><th class="p-2">Status</th></tr></thead>
+                                <tbody>
+                                    <!-- Dinamis lewat JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Riwayat Absensi Guru Global (Admin Only) -->
+                    <div class="card mb-6 btn-admin-only">
+                        <h3 class="font-bold mb-4 text-blue-700">Riwayat Kehadiran Guru</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm border" id="table-absen-guru-global">
+                                <thead><tr class="bg-gray-100 text-gray-600"><th class="p-2">Nama Guru</th><th class="p-2">Tanggal & Waktu Absen</th><th class="p-2">Status</th></tr></thead>
                                 <tbody>
                                     <!-- Dinamis lewat JS -->
                                 </tbody>
@@ -328,7 +375,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- Terisi otomatis oleh JS agar terkelompok per nama -->
+                                    <!-- Terisi otomatis oleh JS -->
                                 </tbody>
                             </table>
                         </div>
@@ -358,7 +405,7 @@
                         </div>
                     </div>
 
-                    <!-- Form Input Capaian Hafalan - SUDAH DIPERBARUI KATEGORI -->
+                    <!-- Form Input Capaian Hafalan -->
                     <div class="card mb-6 form-input-hafalan">
                         <h3 class="font-bold mb-4 text-green-700">Input Capaian Belajar / Hafalan</h3>
                         <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
@@ -374,7 +421,7 @@
                         </div>
                     </div>
 
-                    <!-- Riwayat Progres Belajar Santri - BARU -->
+                    <!-- Riwayat Progres Belajar Santri -->
                     <div class="card mb-6">
                         <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-3">
                             <h3 class="font-bold">Tabel Riwayat Progres Belajar Santri</h3>
@@ -393,11 +440,6 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-
-                    <div class="card">
-                        <h3 class="font-bold mb-4">Grafik Hafalan (Baris per Pekan)</h3>
-                        <canvas id="chart-hafalan-santri" style="max-height: 300px;"></canvas>
                     </div>
                 </div>
 
@@ -463,7 +505,6 @@
 
                 <!-- VIEW: SETTING GLOBAL -->
                 <div id="view-setting" class="view-section hidden">
-                    <!-- ... KODE SETTING TETAP SAMA ... -->
                     <div class="card mb-6">
                         <h3 class="font-bold mb-4">Pengaturan Global Sistem</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -525,7 +566,6 @@
             <h3 class="font-bold text-lg mb-4" id="modal-santri-title">Tambah Data Santri Baru</h3>
             <input type="hidden" id="ms-index" value="-1">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <!-- Data Santri Form Sama Seperti Sebelumnya -->
                 <div><label class="text-xs text-gray-500">NIS</label><input type="text" id="ms-nis" class="w-full border p-2 rounded"></div>
                 <div><label class="text-xs text-gray-500">Nama Lengkap</label><input type="text" id="ms-nama" class="w-full border p-2 rounded"></div>
                 <div><label class="text-xs text-gray-500">Jenis Kelamin</label><select id="ms-lp" class="w-full border p-2 rounded"><option>L</option><option>P</option></select></div>
@@ -551,7 +591,6 @@
             <h3 class="font-bold text-lg mb-4" id="modal-guru-title">Tambah Data Guru Baru</h3>
             <input type="hidden" id="mg-index" value="-1">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <!-- Data Guru Form Sama -->
                 <div><label class="text-xs text-gray-500">NIK</label><input type="text" id="mg-nik" class="w-full border p-2 rounded"></div>
                 <div><label class="text-xs text-gray-500">Nama Lengkap</label><input type="text" id="mg-nama" class="w-full border p-2 rounded"></div>
                 <div><label class="text-xs text-gray-500">Jenis Kelamin</label><select id="mg-lp" class="w-full border p-2 rounded"><option>L</option><option>P</option></select></div>
@@ -596,6 +635,16 @@
         </div>
     </div>
 
+    <!-- Modal Grafik Anak -->
+    <div id="modal-grafik-progres" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg w-11/12 md:w-1/2 max-h-[80vh] overflow-y-auto">
+            <h3 class="font-bold text-lg mb-2">Grafik Perkembangan Santri</h3>
+            <p id="modal-grafik-nama" class="text-gray-600 mb-4 font-bold border-b pb-2"></p>
+            <canvas id="canvas-grafik-anak" style="max-height: 300px;"></canvas>
+            <button onclick="document.getElementById('modal-grafik-progres').classList.add('hidden')" class="mt-6 w-full bg-gray-200 py-2 rounded hover:bg-gray-300 transition">Tutup Grafik</button>
+        </div>
+    </div>
+
     <!-- JAVASCRIPT LOGIC -->
     <script>
         let currentRole = '';
@@ -628,7 +677,7 @@
 
         let dataKeuanganPengajuan = JSON.parse(localStorage.getItem('rutasy_keu_pengajuan')) || [];
         let dataKeuanganRiwayat = JSON.parse(localStorage.getItem('rutasy_keu_riwayat')) || [
-            {tgl: '01 Aug 2026', nama: 'Ahmad Zaki', bulan: 'Agustus', spp: 100000, infaq: 50000}
+            {tgl: '01 Aug 2026', nama: 'Ahmad Zaki', bulan: 'Agustus', metode: 'Transfer Bank', spp: 100000, infaq: 50000}
         ];
 
         let dataSettings = JSON.parse(localStorage.getItem('rutasy_settings')) || {
@@ -690,6 +739,7 @@
             if(savedRole) {
                 currentRole = savedRole;
                 if(currentRole === 'ortu' && savedUser) loggedInSantri = dataSantri.find(s => s.user === savedUser) || null;
+                else if (currentRole === 'guru' && savedUser) loggedInSantri = dataGuru.find(g => g.user === savedUser) || null;
                 jalankanAplikasiLanjutan();
             }
         };
@@ -705,7 +755,7 @@
             let matchedGuru = dataGuru.find(g => g.user.toLowerCase() === user && (g.pass === pass || g.pass === '***'));
 
             if (matchedSantri) { currentRole = 'ortu'; loggedInSantri = matchedSantri; } 
-            else if (matchedGuru) { currentRole = 'guru'; loggedInSantri = null; } 
+            else if (matchedGuru) { currentRole = 'guru'; loggedInSantri = matchedGuru; } 
             else if (user === 'admin_keuangan' || user.includes('keuangan')) { currentRole = 'admin_keuangan'; loggedInSantri = null; } 
             else if (user === 'admin' || user.includes('admin')) { currentRole = 'admin_global'; loggedInSantri = null; } 
             else { tampilkanNotif('Username atau Password tidak terdaftar!'); return; }
@@ -724,6 +774,8 @@
                 document.getElementById('ortu-nama').value = loggedInSantri.nama;
                 document.getElementById('ortu-dash-nama').innerText = loggedInSantri.nama;
                 document.getElementById('ortu-dash-guru').innerText = loggedInSantri.guru;
+            } else if (currentRole === 'guru' && loggedInSantri) {
+                labelRole = `Guru (${loggedInSantri.nama})`;
             }
             document.getElementById('user-role-display').innerText = labelRole;
 
@@ -738,7 +790,7 @@
             renderSantri(); renderGuru(); renderKeuangan(); renderSettings(); 
             renderKalenderInit(); renderSelectHaflahSantri(); renderTabelHaflah(); 
             renderTabelRiwayatAbsen(); renderDatalistSantri(); renderTabelProgres();
-            renderAbsenGuruPribadi(); renderBelumBayarSPP();
+            renderAbsenGuruPribadi(); renderAbsenGuruGlobal(); renderBelumBayarSPP();
             
             const listSuratEl = document.getElementById('list-surat');
             if(listSuratEl) listSuratEl.innerHTML = daftarSurat.map(s => `<option value="${s}"></option>`).join('');
@@ -779,7 +831,6 @@
             document.getElementById(viewId).classList.remove('hidden');
 
             if(viewId === 'view-dashboard' && !chartsRendered) renderGlobalCharts();
-            if(viewId === 'view-progres') renderProgresChart();
             if(viewId === 'view-kalender') renderKalenderInit();
             if(viewId === 'view-keuangan') renderBelumBayarSPP();
         }
@@ -795,15 +846,15 @@
             const cssHide = (selector) => document.querySelectorAll(selector).forEach(el => el.style.display = 'none');
             const cssShow = (selector) => document.querySelectorAll(selector).forEach(el => el.style.display = '');
 
-            cssShow('.btn-admin-only, .btn-print, .stats-keuangan, .ortu-only, .admin-keuangan-only, .div-absen-pribadi, .form-absen-guru-only, .form-input-hafalan');
+            cssShow('.btn-admin-only, .btn-print, .stats-keuangan, .ortu-only, .admin-keuangan-only, .div-absen-pribadi, .form-absen-guru-only, .form-input-hafalan, .admin-global-only');
 
             if(role === 'guru') {
-                cssHide('.btn-admin-only, .stats-keuangan, .ortu-only, .admin-keuangan-only');
+                cssHide('.btn-admin-only, .stats-keuangan, .ortu-only, .admin-keuangan-only, .admin-global-only');
             } else if (role === 'ortu') {
-                cssHide('.btn-admin-only, .stats-keuangan, .admin-keuangan-only, .div-absen-pribadi, .form-absen-guru-only, .form-input-hafalan');
+                cssHide('.btn-admin-only, .stats-keuangan, .admin-keuangan-only, .div-absen-pribadi, .form-absen-guru-only, .form-input-hafalan, .admin-global-only');
                 document.getElementById('notif-badge').style.display = 'none';
             } else if (role === 'admin_keuangan') {
-                cssHide('.btn-admin-only, .ortu-only, .div-absen-pribadi, .form-absen-guru-only, .form-input-hafalan');
+                cssHide('.btn-admin-only, .ortu-only, .div-absen-pribadi, .form-absen-guru-only, .form-input-hafalan, .admin-global-only');
             } else if (role === 'admin_global') {
                 cssHide('.ortu-only, .div-absen-pribadi'); 
             }
@@ -889,6 +940,7 @@
                 tbodyPengajuan.innerHTML += `
                     <tr class="border-b">
                         <td class="p-3">${p.tgl}</td><td class="p-3">${p.nama}</td><td class="p-3 font-bold text-gray-700">${p.bulan}</td>
+                        <td class="p-3 text-gray-600">${p.metode}</td>
                         <td class="p-3 text-blue-600 font-medium">Rp ${p.spp}</td><td class="p-3 text-green-600 font-medium">Rp ${p.infaq}</td>
                         <td class="p-3"><button class="bg-primary hover:bg-dark transition text-white px-3 py-1 rounded shadow text-xs font-bold" onclick="approvePembayaran(${p.id})">Approve</button></td>
                     </tr>
@@ -897,13 +949,14 @@
 
             const tbodyRiwayat = document.querySelector('#table-riwayat-keuangan tbody');
             tbodyRiwayat.innerHTML = '';
-            dataKeuanganRiwayat.forEach(r => {
+            dataKeuanganRiwayat.forEach((r, index) => {
                 tbodyRiwayat.innerHTML += `
                     <tr class="border-b hover:bg-gray-50 transition">
                         <td class="p-3">${r.tgl}</td><td class="p-3">${r.nama}</td><td class="p-3 font-bold text-gray-700">${r.bulan}</td>
+                        <td class="p-3 text-gray-600">${r.metode || '-'}</td>
                         <td class="p-3 font-bold text-blue-600">Rp ${r.spp}</td><td class="p-3 font-bold text-green-600">Rp ${r.infaq}</td>
                         <td class="p-3"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Lunas</span></td>
-                        <td class="p-3 btn-print"><button class="text-blue-500 hover:text-blue-700" onclick="window.print()"><i class="fa-solid fa-print"></i></button></td>
+                        <td class="p-3 btn-print"><button class="text-blue-500 hover:text-blue-700" onclick="cetakResi(${index})"><i class="fa-solid fa-print"></i></button></td>
                     </tr>
                 `;
             });
@@ -912,6 +965,7 @@
         function ajukanPembayaranOrtu() {
             const nama = document.getElementById('ortu-nama').value;
             const bulan = document.getElementById('ortu-bulan').value;
+            const metode = document.getElementById('ortu-metode').value;
             const spp = parseInt(document.getElementById('ortu-spp').value) || 0;
             const infaq = parseInt(document.getElementById('ortu-infaq').value) || 0;
             
@@ -921,7 +975,7 @@
             let tgl = new Date().toLocaleDateString('id-ID');
             let id = Date.now();
             
-            dataKeuanganPengajuan.push({id, tgl, nama, bulan, spp, infaq});
+            dataKeuanganPengajuan.push({id, tgl, nama, bulan, metode, spp, infaq});
             localStorage.setItem('rutasy_keu_pengajuan', JSON.stringify(dataKeuanganPengajuan));
             
             renderKeuangan();
@@ -935,7 +989,7 @@
             let index = dataKeuanganPengajuan.findIndex(p => p.id === id);
             if(index > -1) {
                 let item = dataKeuanganPengajuan.splice(index, 1)[0];
-                dataKeuanganRiwayat.unshift({tgl: item.tgl, nama: item.nama, bulan: item.bulan, spp: item.spp, infaq: item.infaq});
+                dataKeuanganRiwayat.unshift({tgl: item.tgl, nama: item.nama, bulan: item.bulan, metode: item.metode || 'Transfer Bank', spp: item.spp, infaq: item.infaq});
                 
                 localStorage.setItem('rutasy_keu_pengajuan', JSON.stringify(dataKeuanganPengajuan));
                 localStorage.setItem('rutasy_keu_riwayat', JSON.stringify(dataKeuanganRiwayat));
@@ -943,6 +997,61 @@
                 renderKeuangan(); renderBelumBayarSPP();
                 tampilkanNotif('Pembayaran Disetujui & Masuk Riwayat!');
             }
+        }
+
+        function cetakResi(index) {
+            const data = dataKeuanganRiwayat[index];
+            const total = parseInt(data.spp) + parseInt(data.infaq);
+            
+            const printHTML = `
+                <div style="font-family: Arial, sans-serif; color: #333; max-width: 800px; margin: 0 auto; padding: 20px;">
+                    <div style="text-align: center; border-bottom: 2px solid #047857; padding-bottom: 10px; margin-bottom: 20px;">
+                        <h2 style="color: #047857; margin: 0; font-size: 24px; font-weight: bold;">RUTASY</h2>
+                        <p style="margin: 5px 0 0; font-size: 14px;">Sistem Manajemen Rumah Tahfidz</p>
+                        <h3 style="margin: 15px 0 0; font-size: 18px; font-weight: bold; text-decoration: underline;">BUKTI PEMBAYARAN RESMI</h3>
+                    </div>
+                    
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                        <tr><td style="padding: 8px 0; width: 30%; font-weight: bold;">Tanggal Bayar</td><td style="padding: 8px 0;">: ${data.tgl}</td></tr>
+                        <tr><td style="padding: 8px 0; font-weight: bold;">Nama Santri</td><td style="padding: 8px 0;">: ${data.nama}</td></tr>
+                        <tr><td style="padding: 8px 0; font-weight: bold;">Bulan Pembayaran</td><td style="padding: 8px 0;">: ${data.bulan}</td></tr>
+                        <tr><td style="padding: 8px 0; font-weight: bold;">Metode Pembayaran</td><td style="padding: 8px 0;">: ${data.metode || '-'}</td></tr>
+                        <tr><td style="padding: 8px 0; font-weight: bold;">Status</td><td style="padding: 8px 0;">: <span style="color: #047857; font-weight: bold;">LUNAS</span></td></tr>
+                    </table>
+                    
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; text-align: left;">
+                        <thead>
+                            <tr style="background-color: #f3f4f6; border-bottom: 2px solid #ddd;">
+                                <th style="padding: 12px 8px;">Deskripsi Pembayaran</th>
+                                <th style="padding: 12px 8px; text-align: right;">Nominal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <td style="padding: 12px 8px;">Pembayaran SPP (Bulanan)</td>
+                                <td style="padding: 12px 8px; text-align: right;">Rp ${data.spp.toLocaleString('id-ID')}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <td style="padding: 12px 8px;">Infaq</td>
+                                <td style="padding: 12px 8px; text-align: right;">Rp ${data.infaq.toLocaleString('id-ID')}</td>
+                            </tr>
+                            <tr style="font-weight: bold; background-color: #f9fafb;">
+                                <td style="padding: 12px 8px; text-align: right;">TOTAL KESELURUHAN</td>
+                                <td style="padding: 12px 8px; text-align: right; color: #047857; font-size: 16px;">Rp ${total.toLocaleString('id-ID')}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div style="text-align: center; margin-top: 50px; font-size: 12px; color: #666; border-top: 1px solid #ddd; padding-top: 10px;">
+                        <p>Terima kasih atas pembayaran Anda. Jazakumullah Khairan.</p>
+                        <p>Dokumen ini sah dicetak otomatis oleh Sistem RUTASY pada ${new Date().toLocaleString('id-ID')}</p>
+                    </div>
+                </div>
+            `;
+            
+            const printArea = document.getElementById('print-area');
+            printArea.innerHTML = printHTML;
+            window.print();
         }
 
         function renderBelumBayarSPP() {
@@ -971,29 +1080,54 @@
         // --- PENGATURAN GLOBAL ---
         function renderSettings() {
             document.getElementById('set-jam-masuk').value = dataSettings.jamMasuk; document.getElementById('set-potongan').value = dataSettings.potongan; document.getElementById('set-hari-kerja').value = dataSettings.hariKerja; document.getElementById('set-geo-radius').value = dataSettings.geoRadius; document.getElementById('set-geo-lat').value = dataSettings.geoLat; document.getElementById('set-geo-lng').value = dataSettings.geoLng; document.getElementById('set-pay-bank').value = dataSettings.payBank; document.getElementById('set-pay-ewallet').value = dataSettings.payEwallet; document.getElementById('set-pay-cash').value = dataSettings.payCash;
+            
+            const ortuPayInfo = document.getElementById('ortu-info-payment');
+            if(ortuPayInfo) {
+                ortuPayInfo.innerHTML = `
+                    <li class="mb-1"><b>Transfer Bank:</b> ${dataSettings.payBank}</li>
+                    <li class="mb-1"><b>E-Wallet:</b> ${dataSettings.payEwallet}</li>
+                    <li class="mb-1"><b>Tunai:</b> ${dataSettings.payCash}</li>
+                `;
+            }
         }
 
         function simpanPengaturanGlobal() {
             dataSettings = { jamMasuk: document.getElementById('set-jam-masuk').value, potongan: document.getElementById('set-potongan').value, hariKerja: document.getElementById('set-hari-kerja').value, geoRadius: document.getElementById('set-geo-radius').value, geoLat: document.getElementById('set-geo-lat').value, geoLng: document.getElementById('set-geo-lng').value, payBank: document.getElementById('set-pay-bank').value, payEwallet: document.getElementById('set-pay-ewallet').value, payCash: document.getElementById('set-pay-cash').value };
-            localStorage.setItem('rutasy_settings', JSON.stringify(dataSettings)); tampilkanNotif('Pengaturan Parameter Berhasil Disimpan!');
+            localStorage.setItem('rutasy_settings', JSON.stringify(dataSettings)); 
+            renderSettings();
+            tampilkanNotif('Pengaturan Parameter Berhasil Disimpan!');
         }
 
         // --- ABSENSI ---
         function absenGuruMasuk() {
             let tgl = new Date().toLocaleString('id-ID');
-            absenGuruRecord.unshift({ tgl: tgl, status: 'Hadir' });
+            let nama = loggedInSantri ? loggedInSantri.nama : 'Guru Unknown';
+            absenGuruRecord.unshift({ tgl: tgl, nama: nama, status: 'Hadir' });
             localStorage.setItem('rutasy_absen_guru', JSON.stringify(absenGuruRecord));
             tampilkanNotif('Berhasil Absen Masuk Hari Ini!');
             renderAbsenGuruPribadi();
+            renderAbsenGuruGlobal();
         }
 
         function renderAbsenGuruPribadi() {
             const tbody = document.querySelector('#table-absen-guru-pribadi tbody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            if(absenGuruRecord.length === 0) { tbody.innerHTML = `<tr><td colspan="2" class="p-3 text-center text-gray-500 italic">Belum ada riwayat absensi.</td></tr>`; return; }
-            absenGuruRecord.forEach(a => {
+            // Filter hanya yang namanya sama untuk view pribadi
+            let myAbsen = absenGuruRecord.filter(a => loggedInSantri && a.nama === loggedInSantri.nama);
+            if(myAbsen.length === 0) { tbody.innerHTML = `<tr><td colspan="2" class="p-3 text-center text-gray-500 italic">Belum ada riwayat absensi.</td></tr>`; return; }
+            myAbsen.forEach(a => {
                 tbody.innerHTML += `<tr class="border-b"><td class="p-2">${a.tgl}</td><td class="p-2 text-green-600 font-bold"><i class="fa-solid fa-check-circle mr-1"></i> ${a.status}</td></tr>`;
+            });
+        }
+
+        function renderAbsenGuruGlobal() {
+            const tbody = document.querySelector('#table-absen-guru-global tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            if(absenGuruRecord.length === 0) { tbody.innerHTML = `<tr><td colspan="3" class="p-3 text-center text-gray-500 italic">Belum ada riwayat absensi.</td></tr>`; return; }
+            absenGuruRecord.forEach(a => {
+                tbody.innerHTML += `<tr class="border-b hover:bg-gray-50 transition"><td class="p-2 font-bold">${a.nama}</td><td class="p-2">${a.tgl}</td><td class="p-2 text-green-600 font-bold"><i class="fa-solid fa-check-circle mr-1"></i> ${a.status}</td></tr>`;
             });
         }
 
@@ -1053,6 +1187,7 @@
             localStorage.setItem('rutasy_progres_hafalan', JSON.stringify(riwayatProgres));
             
             renderTabelProgres();
+            renderGlobalCharts(); // Update dynamic chart in dashboard
             tampilkanNotif('Capaian Progres Berhasil Disimpan!');
 
             document.getElementById('prog-nama').value = '';
@@ -1069,9 +1204,12 @@
                     tbody.innerHTML += `
                         <tr class="border-b hover:bg-gray-50 transition">
                             <td class="p-3 font-medium">${nama}</td>
-                            <td class="p-3">
+                            <td class="p-3 flex gap-2 flex-wrap">
                                 <button onclick="lihatDetailProgres('${nama}')" class="bg-secondary text-white px-3 py-1.5 rounded shadow text-xs font-bold hover:bg-primary transition">
                                     <i class="fa-solid fa-list"></i> Lihat Detail
+                                </button>
+                                <button onclick="lihatGrafikProgres('${nama}')" class="bg-blue-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold hover:bg-blue-700 transition">
+                                    <i class="fa-solid fa-chart-bar"></i> Grafik
                                 </button>
                             </td>
                         </tr>
@@ -1090,6 +1228,35 @@
                 tbody.innerHTML += `<tr class="border-b"><td class="p-2">${p.tgl}</td><td class="p-2 font-bold ${katColor}">${p.kategori}</td><td class="p-2">${p.surat}</td><td class="p-2">${p.ayat}</td></tr>`;
             });
             document.getElementById('modal-detail-progres').classList.remove('hidden');
+        }
+
+        let childChartInstance = null;
+        function lihatGrafikProgres(nama) {
+            document.getElementById('modal-grafik-nama').innerText = nama;
+            document.getElementById('modal-grafik-progres').classList.remove('hidden');
+            
+            let progres = riwayatProgres[nama] || [];
+            let tahfidz = 0, tahsin = 0, iqro = 0;
+            progres.forEach(p => {
+                if(p.kategori === 'Tahfidz') tahfidz++;
+                if(p.kategori === 'Tahsin') tahsin++;
+                if(p.kategori === 'Iqro') iqro++;
+            });
+
+            if(childChartInstance) childChartInstance.destroy();
+            childChartInstance = new Chart(document.getElementById('canvas-grafik-anak'), {
+                type: 'bar',
+                data: {
+                    labels: ['Tahfidz', 'Tahsin', 'Iqro'],
+                    datasets: [{
+                        label: 'Jumlah Capaian (Frekuensi Setor Hafalan)',
+                        data: [tahfidz, tahsin, iqro],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b'],
+                        borderRadius: 4
+                    }]
+                },
+                options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            });
         }
 
         // --- KALENDER ---
@@ -1176,17 +1343,34 @@
         function hapusSemuaData() { let konfirmasi = confirm('PERINGATAN! Ini akan mereset seluruh data sistem. Lanjutkan?'); if(konfirmasi) { localStorage.clear(); location.reload(); } }
 
         // --- CHARTS LOGIC ---
+        let dashboardChartGuru = null;
         function renderGlobalCharts() {
-            if(chartsRendered) return;
-            new Chart(document.getElementById('chart-prestasi-rutasy'), { type: 'line', data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'], datasets: [{ label: 'Rata-rata Nilai', data: [82, 85, 84, 88, 91, 93], borderColor: '#047857', tension: 0.3 }] } });
-            new Chart(document.getElementById('chart-prestasi-guru'), { type: 'bar', data: { labels: ['(guru) haidar', '(guru) satria', '(guru) hasan', '(guru) ahmad'], datasets: [{ label: 'Rata-rata Nilai Murid', data: [87, 98.5, 91.2, 85], backgroundColor: '#10b981' }] } });
-            chartsRendered = true;
-        }
+            if(!chartsRendered) {
+                new Chart(document.getElementById('chart-prestasi-rutasy'), { type: 'line', data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'], datasets: [{ label: 'Rata-rata Nilai', data: [82, 85, 84, 88, 91, 93], borderColor: '#047857', tension: 0.3 }] } });
+                chartsRendered = true;
+            }
+            
+            // Menghitung dinamika progress berdasarkan santri dari masing-masing guru
+            let guruLabels = dataGuru.map(g => g.nama);
+            let guruScores = dataGuru.map(g => {
+                let santriGuru = dataSantri.filter(s => s.guru === g.nama);
+                if(santriGuru.length === 0) return 0;
+                let totalProgres = 0;
+                santriGuru.forEach(s => {
+                    if(riwayatProgres[s.nama]) totalProgres += riwayatProgres[s.nama].length;
+                });
+                return parseFloat((totalProgres / santriGuru.length).toFixed(1));
+            });
 
-        let progresChartInstance = null;
-        function renderProgresChart() {
-            if(progresChartInstance) progresChartInstance.destroy();
-            progresChartInstance = new Chart(document.getElementById('chart-hafalan-santri'), { type: 'bar', data: { labels: ['Pekan 1', 'Pekan 2', 'Pekan 3', 'Pekan 4'], datasets: [{ label: 'Jumlah Baris Hafalan', data: [15, 20, 18, 25], backgroundColor: '#3b82f6', borderRadius: 4 }] } });
+            if(dashboardChartGuru) dashboardChartGuru.destroy();
+            dashboardChartGuru = new Chart(document.getElementById('chart-prestasi-guru'), { 
+                type: 'bar', 
+                data: { 
+                    labels: guruLabels, 
+                    datasets: [{ label: 'Rata-rata Frekuensi Hafalan / Santri', data: guruScores, backgroundColor: '#10b981' }] 
+                },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
         }
     </script>
 </body>
