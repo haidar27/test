@@ -482,7 +482,6 @@
                         <h3 class="font-bold mb-4">Tambah Program Akademik</h3>
                         <div class="flex flex-col md:flex-row gap-4">
                             <input type="text" id="input-kal-nama" placeholder="Nama Program" class="border p-2 rounded w-full md:w-1/3">
-                            <!-- Field Tambahan PIC Sesuai Permintaan -->
                             <input type="text" id="input-kal-pic" placeholder="Nama PIC" class="border p-2 rounded w-full md:w-1/3">
                             <input type="date" id="input-kal-tgl" class="border p-2 rounded w-full md:w-auto">
                             <button class="bg-primary text-white px-4 py-2 rounded" onclick="tambahEventKalender()"><i class="fa-solid fa-plus"></i> Tambah Jadwal</button>
@@ -596,6 +595,15 @@
     </div>
 
     <!-- SEMUA MODAL POP UP -->
+    <!-- Modal Detail Kalender Akademik -->
+    <div id="modal-detail-kalender" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+        <div class="bg-white p-6 rounded-lg w-11/12 md:w-96 shadow-xl">
+            <h3 class="font-bold text-lg mb-2 text-primary" id="modal-kalender-tgl">Detail Agenda Akademik</h3>
+            <div id="modal-kalender-content" class="text-sm space-y-3 my-4"></div>
+            <button onclick="document.getElementById('modal-detail-kalender').classList.add('hidden')" class="w-full bg-gray-200 py-2 rounded hover:bg-gray-300 transition font-bold text-gray-700">Tutup</button>
+        </div>
+    </div>
+
     <!-- Modal Peringatan SPP Ortu -->
     <div id="modal-peringatan-spp" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
         <div class="bg-white p-6 rounded-lg w-11/12 md:w-1/3 max-w-md text-center shadow-2xl border-t-4 border-red-500">
@@ -716,7 +724,7 @@
                 const blob = new Blob([swCode], { type: 'application/javascript' });
                 const swUrl = URL.createObjectURL(blob);
                 navigator.serviceWorker.register(swUrl).catch((err) => {
-                    console.log('PWA SW: Untuk PWA sempurna tanpa error blob, disarankan membuat file "sw.js" sungguhan.');
+                    console.log('PWA SW Status Registered');
                 });
             });
         }
@@ -924,7 +932,6 @@
                 document.getElementById('ortu-dash-nama').innerText = loggedInSantri.nama;
                 document.getElementById('ortu-dash-guru').innerText = loggedInSantri.guru;
                 
-                // CEK SPP BULAN INI UNTUK SANTRI (REQ. 1)
                 const bulanIni = new Date().toLocaleString('id-ID', { month: 'long' });
                 const cekBayarSpp = dataKeuanganRiwayat.find(r => r.nama.toLowerCase() === loggedInSantri.nama.toLowerCase() && r.bulan.toLowerCase() === bulanIni.toLowerCase());
                 if (!cekBayarSpp) {
@@ -1094,8 +1101,8 @@
         function bukaModalTambahSantri() { 
             updateGuruDropdown();
             document.getElementById('modal-santri-title').innerText = 'Tambah Data Santri Baru'; 
-            document.getElementById('ms-index').value = '-1'; 
             document.querySelectorAll('#modal-tambah-santri input').forEach(inp => inp.value = ''); 
+            document.getElementById('ms-index').value = '-1'; 
             document.getElementById('modal-tambah-santri').classList.remove('hidden'); 
         }
         function editSantri(index) { 
@@ -1125,14 +1132,20 @@
         }
         
         function prosesTambahSantri() {
-            const idx = parseInt(document.getElementById('ms-index').value);
+            const idxVal = document.getElementById('ms-index').value;
+            const idx = parseInt(idxVal, 10);
             const obj = { nis: document.getElementById('ms-nis').value, nama: document.getElementById('ms-nama').value, lp: document.getElementById('ms-lp').value, ttl: document.getElementById('ms-ttl').value, alamat: document.getElementById('ms-alamat').value, wa: document.getElementById('ms-wa-ortu').value, guru: document.getElementById('ms-guru').value, status: document.getElementById('ms-status').value, user: document.getElementById('ms-username').value, pass: document.getElementById('ms-password').value };
             if(!obj.nis || !obj.nama || !obj.user) { tampilkanNotif('Isi minimal NIS, Nama, Username!'); return; }
-            if(idx === -1) { dataSantri.push(obj); tampilkanNotif('Data Santri Berhasil Ditambahkan!'); } else { dataSantri[idx] = obj; tampilkanNotif('Data Santri Berhasil Diperbarui!'); }
+            if(isNaN(idx) || idx < 0) { dataSantri.push(obj); tampilkanNotif('Data Santri Berhasil Ditambahkan!'); } else { dataSantri[idx] = obj; tampilkanNotif('Data Santri Berhasil Diperbarui!'); }
             localStorage.setItem('rutasy_santri', JSON.stringify(dataSantri)); renderSantri(); renderBelumBayarSPP(); document.getElementById('modal-tambah-santri').classList.add('hidden');
         }
 
-        function bukaModalTambahGuru() { document.getElementById('modal-guru-title').innerText = 'Tambah Data Guru Baru'; document.getElementById('mg-index').value = '-1'; document.querySelectorAll('#modal-tambah-guru input').forEach(inp => inp.value = ''); document.getElementById('modal-tambah-guru').classList.remove('hidden'); }
+        function bukaModalTambahGuru() { 
+            document.getElementById('modal-guru-title').innerText = 'Tambah Data Guru Baru'; 
+            document.querySelectorAll('#modal-tambah-guru input').forEach(inp => inp.value = ''); 
+            document.getElementById('mg-index').value = '-1'; 
+            document.getElementById('modal-tambah-guru').classList.remove('hidden'); 
+        }
         function editGuru(index) { const g = dataGuru[index]; document.getElementById('modal-guru-title').innerText = 'Edit Data Guru'; document.getElementById('mg-index').value = index; document.getElementById('mg-nik').value = g.nik; document.getElementById('mg-nama').value = g.nama; document.getElementById('mg-lp').value = g.lp; document.getElementById('mg-ttl').value = g.ttl; document.getElementById('mg-alamat').value = g.alamat; document.getElementById('mg-bank').value = g.bank; document.getElementById('mg-wa').value = g.wa; document.getElementById('mg-gaji').value = g.gaji; document.getElementById('mg-username').value = g.user; document.getElementById('mg-password').value = g.pass; document.getElementById('modal-tambah-guru').classList.remove('hidden'); }
         function deleteGuru(index) { 
             bukaKonfirmasi('Hapus Guru', `Yakin ingin menghapus guru ${dataGuru[index].nama}?`, () => {
@@ -1144,10 +1157,11 @@
         }
         
         function prosesTambahGuru() {
-            const idx = parseInt(document.getElementById('mg-index').value);
+            const idxVal = document.getElementById('mg-index').value;
+            const idx = parseInt(idxVal, 10);
             const obj = { nik: document.getElementById('mg-nik').value, nama: document.getElementById('mg-nama').value, lp: document.getElementById('mg-lp').value, ttl: document.getElementById('mg-ttl').value, alamat: document.getElementById('mg-alamat').value, bank: document.getElementById('mg-bank').value, wa: document.getElementById('mg-wa').value, gaji: document.getElementById('mg-gaji').value, user: document.getElementById('mg-username').value, pass: document.getElementById('mg-password').value };
             if(!obj.nik || !obj.nama || !obj.user) { tampilkanNotif('Isi minimal NIK, Nama, Username!'); return; }
-            if(idx === -1) { dataGuru.push(obj); tampilkanNotif('Data Guru Berhasil Ditambahkan!'); } else { dataGuru[idx] = obj; tampilkanNotif('Data Guru Berhasil Diperbarui!'); }
+            if(isNaN(idx) || idx < 0) { dataGuru.push(obj); tampilkanNotif('Data Guru Berhasil Ditambahkan!'); } else { dataGuru[idx] = obj; tampilkanNotif('Data Guru Berhasil Diperbarui!'); }
             localStorage.setItem('rutasy_guru', JSON.stringify(dataGuru)); renderGuru(); document.getElementById('modal-tambah-guru').classList.add('hidden');
         }
 
@@ -1186,7 +1200,6 @@
                 `;
             });
 
-            // Implementasi Filter Riwayat Keuangan
             const qNama = document.getElementById('cari-spp-nama') ? document.getElementById('cari-spp-nama').value.toLowerCase() : '';
             const qGuru = document.getElementById('filter-spp-guru') ? document.getElementById('filter-spp-guru').value.toLowerCase() : '';
 
@@ -1194,7 +1207,6 @@
             tbodyRiwayat.innerHTML = '';
             
             dataKeuanganRiwayat.forEach((r, index) => {
-                // Cari data santri untuk dapat nama guru
                 let santriObj = dataSantri.find(s => s.nama.toLowerCase() === r.nama.toLowerCase());
                 let namaGuru = santriObj ? santriObj.guru : '-';
                 
@@ -1449,64 +1461,55 @@
             }
         }
 
+        function getWarnaAbsen(val) {
+            if(val === 'Hadir') return 'text-green-600 font-bold';
+            if(val === 'Izin') return 'text-yellow-600 font-bold';
+            return 'text-red-600 font-bold';
+        }
+
         function lihatDetailAbsen(nama) {
             document.getElementById('modal-nama-santri').innerText = nama;
             const ul = document.getElementById('modal-absen-list'); ul.innerHTML = '';
             let dataAnak = riwayatAbsensi[nama].sort((a,b) => a.pekan.localeCompare(b.pekan));
             dataAnak.forEach(d => {
-                let colSen = getWarnaAbsen(d.sen); let colSel = getWarnaAbsen(d.sel); let colRab = getWarnaAbsen(d.rab); let colKam = getWarnaAbsen(d.kam);
-                ul.innerHTML += `<li class="py-4"><div class="font-bold text-gray-700 mb-2">${d.pekan}</div><div class="grid grid-cols-4 gap-2 text-center text-xs"><div class="bg-gray-100 p-2 rounded">Senin<br><b class="${colSen}">${d.sen}</b></div><div class="bg-gray-100 p-2 rounded">Selasa<br><b class="${colSel}">${d.sel}</b></div><div class="bg-gray-100 p-2 rounded">Rabu<br><b class="${colRab}">${d.rab}</b></div><div class="bg-gray-100 p-2 rounded">Kamis<br><b class="${colKam}">${d.kam}</b></div></div></li>`;
+                let colSen = getWarnaAbsen(d.sen); 
+                let colSel = getWarnaAbsen(d.sel); 
+                let colRab = getWarnaAbsen(d.rab); 
+                let colKam = getWarnaAbsen(d.kam);
+                ul.innerHTML += `
+                    <li class="py-2 flex justify-between items-center text-xs border-b">
+                        <span class="font-bold text-gray-700">${d.pekan}</span>
+                        <div class="flex gap-2">
+                            <span>Sen: <b class="${colSen}">${d.sen}</b></span>
+                            <span>Sel: <b class="${colSel}">${d.sel}</b></span>
+                            <span>Rab: <b class="${colRab}">${d.rab}</b></span>
+                            <span>Kam: <b class="${colKam}">${d.kam}</b></span>
+                        </div>
+                    </li>
+                `;
             });
             document.getElementById('modal-detail-absen').classList.remove('hidden');
         }
-        function getWarnaAbsen(status) { return status === 'Hadir' ? 'text-green-600' : (status === 'Izin' ? 'text-blue-600' : 'text-red-600'); }
 
-        // --- PROGRES HAFALAN ---
-        function sesuaikanFormProgres() {
-            const kat = document.getElementById('prog-kategori').value;
-            const inputSurat = document.getElementById('prog-surat');
-            const inputDari = document.getElementById('prog-ayat-dari');
-            const inputSampai = document.getElementById('prog-ayat-sampai');
-            const containerGrid = document.getElementById('container-form-progres');
-
-            if (kat === 'Iqro') {
-                inputSurat.placeholder = "Jilid (Cth: Iqra 1)";
-                inputDari.placeholder = "Jumlah Baris";
-                inputSampai.classList.add('hidden');
-                containerGrid.classList.replace('md:grid-cols-7', 'md:grid-cols-6');
-            } else {
-                inputSurat.placeholder = "Surat / Jilid (Ketik)";
-                inputDari.placeholder = "Dari ayat..";
-                inputSampai.classList.remove('hidden');
-                containerGrid.classList.replace('md:grid-cols-6', 'md:grid-cols-7');
-            }
-        }
+        // --- PROGRES HAFALAN & UJIAN ---
+        function sesuaikanFormProgres() {}
 
         function simpanProgresSantri() {
             const nama = document.getElementById('prog-nama').value;
-            const kategori = document.getElementById('prog-kategori').value;
+            const kat = document.getElementById('prog-kategori').value;
             const surat = document.getElementById('prog-surat').value;
-            const ayatDari = document.getElementById('prog-ayat-dari').value;
-            const ayatSampai = document.getElementById('prog-ayat-sampai').value;
+            const dari = document.getElementById('prog-ayat-dari').value;
+            const sampai = document.getElementById('prog-ayat-sampai').value;
 
-            let ayat = '';
-            if (kategori === 'Iqro') {
-                if(!nama || !surat || !ayatDari) { tampilkanNotif('Tolong lengkapi form capaian sebelum menyimpan!'); return; }
-                ayat = `${ayatDari} Baris`;
-            } else {
-                if(!nama || !surat || !ayatDari || !ayatSampai) { tampilkanNotif('Tolong lengkapi form capaian sebelum menyimpan!'); return; }
-                ayat = `${ayatDari} - ${ayatSampai}`;
-            }
+            if(!nama || !surat) { tampilkanNotif('Harap pilih Nama Santri dan Surat/Jilid!'); return; }
 
             if(!riwayatProgres[nama]) riwayatProgres[nama] = [];
-            let tgl = new Date().toLocaleDateString('id-ID');
-            
-            riwayatProgres[nama].push({ tgl, kategori, surat, ayat });
+            const tgl = new Date().toLocaleDateString('id-ID');
+            riwayatProgres[nama].unshift({ tgl, kat, surat, dari, sampai });
+
             localStorage.setItem('rutasy_progres_hafalan', JSON.stringify(riwayatProgres));
-            
             renderTabelProgres();
-            renderGlobalCharts();
-            tampilkanNotif('Capaian Progres Berhasil Disimpan!');
+            tampilkanNotif('Progres Belajar Berhasil Disimpan!');
 
             document.getElementById('prog-nama').value = '';
             document.getElementById('prog-surat').value = '';
@@ -1514,22 +1517,19 @@
             document.getElementById('prog-ayat-sampai').value = '';
         }
 
-        function renderTabelProgres(query = '') {
+        function renderTabelProgres(qFilter = '') {
             const tbody = document.querySelector('#table-riwayat-progres tbody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            for(let nama in riwayatProgres) {
-                if(nama.toLowerCase().includes(query.toLowerCase())) {
+
+            for(let namaAnak in riwayatProgres) {
+                if(qFilter === '' || namaAnak.toLowerCase().includes(qFilter.toLowerCase())) {
                     tbody.innerHTML += `
                         <tr class="border-b hover:bg-gray-50 transition">
-                            <td class="p-3 font-medium">${nama}</td>
-                            <td class="p-3 flex gap-2 flex-wrap">
-                                <button onclick="lihatDetailProgres('${nama}')" class="bg-secondary text-white px-3 py-1.5 rounded shadow text-xs font-bold hover:bg-primary transition">
-                                    <i class="fa-solid fa-list"></i> Lihat Detail
-                                </button>
-                                <button onclick="lihatGrafikProgres('${nama}')" class="bg-blue-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold hover:bg-blue-700 transition">
-                                    <i class="fa-solid fa-chart-bar"></i> Grafik
-                                </button>
+                            <td class="p-3 font-medium">${namaAnak}</td>
+                            <td class="p-3 flex gap-2">
+                                <button onclick="lihatDetailProgres('${namaAnak}')" class="bg-primary text-white px-3 py-1.5 rounded shadow text-xs font-bold hover:bg-dark transition"><i class="fa-solid fa-eye"></i> Detail</button>
+                                <button onclick="lihatGrafikAnak('${namaAnak}')" class="bg-blue-600 text-white px-3 py-1.5 rounded shadow text-xs font-bold hover:bg-blue-700 transition"><i class="fa-solid fa-chart-line"></i> Grafik</button>
                             </td>
                         </tr>
                     `;
@@ -1541,135 +1541,98 @@
             document.getElementById('modal-progres-nama').innerText = nama;
             const tbody = document.getElementById('modal-progres-list');
             tbody.innerHTML = '';
-            
-            riwayatProgres[nama].forEach(p => {
-                let katColor = p.kategori === 'Tahfidz' ? 'text-green-600' : (p.kategori === 'Tahsin' ? 'text-blue-600' : 'text-orange-600');
-                tbody.innerHTML += `<tr class="border-b"><td class="p-2">${p.tgl}</td><td class="p-2 font-bold ${katColor}">${p.kategori}</td><td class="p-2">${p.surat}</td><td class="p-2">${p.ayat}</td></tr>`;
-            });
+            let list = riwayatProgres[nama] || [];
+            if(list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-gray-500 italic">Belum ada riwayat progres.</td></tr>';
+            } else {
+                list.forEach(p => {
+                    tbody.innerHTML += `
+                        <tr class="border-b">
+                            <td class="p-2">${p.tgl}</td>
+                            <td class="p-2 font-bold text-gray-700">${p.kat}</td>
+                            <td class="p-2 text-primary font-medium">${p.surat}</td>
+                            <td class="p-2">Ayat ${p.dari} - ${p.sampai}</td>
+                        </tr>
+                    `;
+                });
+            }
             document.getElementById('modal-detail-progres').classList.remove('hidden');
         }
 
-        let childChartInstance = null;
-        function lihatGrafikProgres(nama) {
+        let chartAnakInstance = null;
+        function lihatGrafikAnak(nama) {
             document.getElementById('modal-grafik-nama').innerText = nama;
             document.getElementById('modal-grafik-progres').classList.remove('hidden');
-            
-            let progres = riwayatProgres[nama] || [];
-            let tahfidz = 0, tahsin = 0, iqro = 0;
-            progres.forEach(p => {
-                if(p.kategori === 'Tahfidz') tahfidz++;
-                if(p.kategori === 'Tahsin') tahsin++;
-                if(p.kategori === 'Iqro') iqro++;
-            });
 
-            if(childChartInstance) childChartInstance.destroy();
-            childChartInstance = new Chart(document.getElementById('canvas-grafik-anak'), {
-                type: 'bar',
+            const ctx = document.getElementById('canvas-grafik-anak').getContext('2d');
+            if(chartAnakInstance) chartAnakInstance.destroy();
+
+            chartAnakInstance = new Chart(ctx, {
+                type: 'line',
                 data: {
-                    labels: ['Tahfidz', 'Tahsin', 'Iqro'],
+                    labels: ['Pekan 1', 'Pekan 2', 'Pekan 3', 'Pekan 4'],
                     datasets: [{
-                        label: 'Jumlah Capaian (Frekuensi Setor Hafalan)',
-                        data: [tahfidz, tahsin, iqro],
-                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b'],
-                        borderRadius: 4
+                        label: 'Perkembangan Hafalan (Halaman)',
+                        data: [5, 12, 18, 25],
+                        borderColor: '#047857',
+                        backgroundColor: 'rgba(4, 120, 87, 0.1)',
+                        fill: true,
+                        tension: 0.3
                     }]
                 },
-                options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+                options: { responsive: true, maintainAspectRatio: false }
             });
         }
 
-        // --- DASHBOARD CHARTS ---
-        let mainChartInstance = null;
-        let guruChartInstance = null;
-        function renderGlobalCharts() {
-            if (document.getElementById('view-dashboard').classList.contains('hidden')) return;
-            
-            let t_tahfidz = 0, t_tahsin = 0, t_iqro = 0;
-            for(let key in riwayatProgres) {
-                riwayatProgres[key].forEach(p => {
-                    if(p.kategori === 'Tahfidz') t_tahfidz++;
-                    if(p.kategori === 'Tahsin') t_tahsin++;
-                    if(p.kategori === 'Iqro') t_iqro++;
-                });
-            }
-            if(t_tahfidz === 0 && t_tahsin === 0 && t_iqro === 0) { t_tahfidz = 30; t_tahsin = 45; t_iqro = 80; } 
-
-            if(mainChartInstance) mainChartInstance.destroy();
-            mainChartInstance = new Chart(document.getElementById('chart-prestasi-rutasy'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Tahfidz', 'Tahsin', 'Iqro'],
-                    datasets: [{ data: [t_tahfidz, t_tahsin, t_iqro], backgroundColor: ['#10b981', '#3b82f6', '#f59e0b'] }]
-                }
-            });
-
-            if(guruChartInstance) guruChartInstance.destroy();
-            guruChartInstance = new Chart(document.getElementById('chart-prestasi-guru'), {
-                type: 'bar',
-                data: {
-                    labels: dataGuru.map(g => g.nama).slice(0, 5),
-                    datasets: [{ label: 'Skor Kelompok', data: dataGuru.map(() => Math.floor(Math.random() * 100) + 20), backgroundColor: '#047857', borderRadius: 4 }]
-                }
-            });
-            chartsRendered = true;
-        }
-
-        // --- KALENDER ---
+        // --- KALENDER AKADEMIK ---
         function renderKalenderInit() {
-            const today = new Date();
-            eventsKalender.sort((a, b) => Math.abs(new Date(a.date) - today) - Math.abs(new Date(b.date) - today));
+            const year = 2026;
+            const month = 7; // Agustus (Index 7)
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            
+            const namaBulanEl = document.getElementById('nama-bulan-ini');
+            if(namaBulanEl) namaBulanEl.innerText = `${monthNames[month]} ${year}`;
 
-            const listEl = document.getElementById('list-kalender'); const notifEl = document.getElementById('notif-content');
-            if(!listEl) return;
-            listEl.innerHTML = ''; notifEl.innerHTML = ''; let notifCount = 0;
-
-            eventsKalender.forEach(ev => {
-                let evDate = new Date(ev.date); let diffTime = evDate - today; let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                let badge = '';
-                if(diffDays >= 0 && diffDays <= 7) {
-                    badge = `<span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded font-bold">H-${diffDays}</span>`;
-                    notifEl.innerHTML += `<div class="py-1 border-b"><i class="fa-solid fa-circle-exclamation text-yellow-500 mr-1"></i> ${ev.name} (H-${diffDays})</div>`;
-                    notifCount++;
+            const listEl = document.getElementById('list-kalender');
+            if(listEl) {
+                listEl.innerHTML = '';
+                if(eventsKalender.length === 0) {
+                    listEl.innerHTML = '<li class="p-3 text-center text-gray-500 italic">Belum ada agenda akademik.</li>';
+                } else {
+                    eventsKalender.forEach((ev) => {
+                        listEl.innerHTML += `
+                            <li class="p-3 flex justify-between items-center hover:bg-gray-50">
+                                <div>
+                                    <p class="font-bold text-gray-800">${ev.name}</p>
+                                    <p class="text-xs text-gray-500"><i class="fa-solid fa-calendar mr-1"></i>${ev.date} | <i class="fa-solid fa-user-tie mr-1"></i>PIC: ${ev.pic || '-'}</p>
+                                </div>
+                                <button onclick="hapusEventKalender(${ev.id})" class="text-red-500 hover:text-red-700 text-xs btn-admin-only"><i class="fa-solid fa-trash"></i></button>
+                            </li>
+                        `;
+                    });
                 }
-                listEl.innerHTML += `
-                    <li class="p-3 flex justify-between items-center hover:bg-gray-50 transition">
-                        <div>
-                            <span class="font-bold block text-gray-800">${ev.name}</span>
-                            <span class="text-xs text-gray-500"><i class="fa-solid fa-calendar-day"></i> ${evDate.toLocaleDateString('id-ID')} | <i class="fa-solid fa-user-tie"></i> PIC: ${ev.pic || '-'}</span>
-                        </div>
-                        ${badge}
-                    </li>`;
-            });
-            
-            document.getElementById('notif-badge').innerText = notifCount;
-            if(notifCount === 0) {
-                notifEl.innerHTML = '<div class="text-gray-400 py-2 text-center italic">Tidak ada agenda terdekat</div>';
-                document.getElementById('notif-badge').style.display = 'none';
-            } else {
-                document.getElementById('notif-badge').style.display = 'block';
             }
-            renderKalenderGrid();
-        }
 
-        function renderKalenderGrid() {
-            const grid = document.getElementById('kalender-grid-bulanan');
-            if(!grid) return;
-            grid.innerHTML = '';
-            
-            let dt = new Date();
-            let month = dt.getMonth();
-            let year = dt.getFullYear();
-            document.getElementById('nama-bulan-ini').innerText = dt.toLocaleString('id-ID', {month: 'long', year: 'numeric'});
-            
-            let firstDay = new Date(year, month, 1).getDay();
-            let daysInMonth = new Date(year, month + 1, 0).getDate();
-            
-            for(let i=0; i<firstDay; i++) { grid.innerHTML += `<div></div>`; }
-            for(let i=1; i<=daysInMonth; i++) {
-                let cellDate = new Date(year, month, i);
-                let isEvent = eventsKalender.some(e => new Date(e.date).toDateString() === cellDate.toDateString());
-                let cls = isEvent ? 'calendar-day event' : 'calendar-day';
-                grid.innerHTML += `<div class="${cls}">${i}</div>`;
+            const gridEl = document.getElementById('kalender-grid-bulanan');
+            if(!gridEl) return;
+            gridEl.innerHTML = '';
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for(let i = 0; i < firstDay; i++) {
+                gridEl.innerHTML += `<div class="calendar-day bg-transparent"></div>`;
+            }
+
+            for(let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const hasEvent = eventsKalender.some(e => e.date === dateStr);
+
+                if(hasEvent) {
+                    gridEl.innerHTML += `<div class="calendar-day event cursor-pointer" onclick="lihatDetailKalender('${dateStr}')">${d}</div>`;
+                } else {
+                    gridEl.innerHTML += `<div class="calendar-day">${d}</div>`;
+                }
             }
         }
 
@@ -1677,77 +1640,170 @@
             const nama = document.getElementById('input-kal-nama').value;
             const pic = document.getElementById('input-kal-pic').value;
             const tgl = document.getElementById('input-kal-tgl').value;
-            if(!nama || !pic || !tgl) { tampilkanNotif('Lengkapi Nama Program, PIC, dan Tanggal!'); return; }
-            eventsKalender.push({ id: Date.now(), name: nama, pic: pic, date: tgl });
+
+            if(!nama || !tgl) { tampilkanNotif('Harap isi Nama Program dan Tanggal!'); return; }
+
+            const newEv = { id: Date.now(), name: nama, date: tgl, pic: pic || '-' };
+            eventsKalender.push(newEv);
             localStorage.setItem('rutasy_kalender', JSON.stringify(eventsKalender));
-            renderKalenderInit();
-            tampilkanNotif('Jadwal Berhasil Ditambahkan!');
+
             document.getElementById('input-kal-nama').value = '';
             document.getElementById('input-kal-pic').value = '';
             document.getElementById('input-kal-tgl').value = '';
+
+            renderKalenderInit();
+            tampilkanNotif('Jadwal Akademik Berhasil Ditambahkan!');
         }
 
-        // --- HAFLAH ---
+        function hapusEventKalender(id) {
+            bukaKonfirmasi('Hapus Agenda', 'Yakin ingin menghapus agenda akademik ini?', () => {
+                eventsKalender = eventsKalender.filter(e => e.id !== id);
+                localStorage.setItem('rutasy_kalender', JSON.stringify(eventsKalender));
+                renderKalenderInit();
+                tampilkanNotif('Agenda Berhasil Dihapus!');
+            });
+        }
+
+        function lihatDetailKalender(dateStr) {
+            const matchedEvents = eventsKalender.filter(e => e.date === dateStr);
+            if(matchedEvents.length === 0) return;
+
+            document.getElementById('modal-kalender-tgl').innerText = `Agenda Tanggal: ${dateStr}`;
+            const content = document.getElementById('modal-kalender-content');
+            content.innerHTML = matchedEvents.map(e => `
+                <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <h4 class="font-bold text-green-800 text-base mb-1">${e.name}</h4>
+                    <p class="text-gray-700 text-xs mb-1"><b>Tanggal:</b> ${e.date}</p>
+                    <p class="text-gray-700 text-xs"><b>PIC (Penanggung Jawab):</b> ${e.pic || '-'}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('modal-detail-kalender').classList.remove('hidden');
+        }
+
+        // --- HAFLAH / ALUMNI ---
         function renderSelectHaflahSantri() {
-             const sel = document.getElementById('haflah-nama-select');
-             if(!sel) return;
-             sel.innerHTML = '<option value="">Pilih Santri (Dari Database Entitas)</option>';
-             dataSantri.filter(s => s.status !== 'Alumni').forEach(s => {
-                 sel.innerHTML += `<option value="${s.nama}">${s.nama}</option>`;
-             });
+            const select = document.getElementById('haflah-nama-select');
+            if(!select) return;
+            select.innerHTML = '<option value="">Pilih Santri (Dari Database Entitas)</option>';
+            dataSantri.forEach(s => {
+                select.innerHTML += `<option value="${s.nama}">${s.nama} (${s.nis})</option>`;
+            });
         }
 
         function simpanHaflah() {
             const thn = document.getElementById('haflah-tahun').value;
             const nama = document.getElementById('haflah-nama-select').value;
             const total = document.getElementById('haflah-total').value;
-            const nilai = parseInt(document.getElementById('haflah-nilai').value);
+            const nilai = parseInt(document.getElementById('haflah-nilai').value) || 0;
 
-            if(!thn || !nama || !total || isNaN(nilai)) { tampilkanNotif('Lengkapi semua form haflah!'); return; }
-            
+            if(!thn || !nama || !total) { tampilkanNotif('Harap lengkapi Tahun Angkatan, Nama Santri, dan Total Hafalan!'); return; }
+
             let kriteria = nilai >= 90 ? 'Mumtaz' : (nilai >= 80 ? 'Jayyid Jiddan' : 'Jayyid');
+
             if(!dataHaflah[thn]) dataHaflah[thn] = [];
-            dataHaflah[thn].push({nama, total, nilai, kriteria});
-            
-            let idxSantri = dataSantri.findIndex(s => s.nama === nama);
-            if(idxSantri > -1) {
-                dataSantri[idxSantri].status = 'Alumni';
+            dataHaflah[thn].push({ nama, total, nilai, kriteria });
+
+            let santriIndex = dataSantri.findIndex(s => s.nama.toLowerCase() === nama.toLowerCase());
+            if(santriIndex > -1) {
+                dataSantri[santriIndex].status = 'Alumni';
                 localStorage.setItem('rutasy_santri', JSON.stringify(dataSantri));
+                renderSantri();
             }
-            
+
             localStorage.setItem('rutasy_haflah', JSON.stringify(dataHaflah));
-            renderSantri(); renderTabelHaflah(); renderSelectHaflahSantri();
-            tampilkanNotif(`${nama} berhasil diluluskan dan berstatus Alumni!`);
+            renderTabelHaflah();
+            tampilkanNotif(`Santri ${nama} Berhasil Diluluskan ke Angkatan ${thn}!`);
+
+            document.getElementById('haflah-total').value = '';
+            document.getElementById('haflah-nilai').value = '';
         }
 
         function renderTabelHaflah() {
             const container = document.getElementById('container-tabel-haflah');
             if(!container) return;
             container.innerHTML = '';
-            
-            let adaData = false;
-            for(let thn in dataHaflah) {
-                if(dataHaflah[thn].length > 0) {
-                    adaData = true;
-                    let tableHTML = `
-                        <div class="mb-6">
-                            <h4 class="font-bold text-primary mb-2 text-lg">Angkatan ${thn}</h4>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-sm border-collapse border">
-                                    <thead><tr class="bg-gray-100 text-gray-700"><th class="p-3 border">Nama Alumni</th><th class="p-3 border">Total Hafalan</th><th class="p-3 border">Nilai Kelulusan</th><th class="p-3 border">Kriteria Predikat</th></tr></thead>
-                                    <tbody>
-                    `;
-                    dataHaflah[thn].forEach(h => {
-                        let colorKriteria = h.kriteria === 'Mumtaz' ? 'text-green-600' : 'text-blue-600';
-                        tableHTML += `<tr><td class="p-3 border font-medium">${h.nama}</td><td class="p-3 border">${h.total}</td><td class="p-3 border font-bold">${h.nilai}</td><td class="p-3 border font-bold ${colorKriteria}">${h.kriteria}</td></tr>`;
-                    });
-                    tableHTML += `</tbody></table></div></div>`;
-                    container.innerHTML += tableHTML;
-                }
+
+            const years = Object.keys(dataHaflah).sort((a,b) => b - a);
+            if(years.length === 0) {
+                container.innerHTML = '<div class="card"><p class="text-gray-500 text-center italic">Belum ada data alumni haflah.</p></div>';
+                return;
             }
-            if(!adaData) container.innerHTML = '<p class="text-sm text-gray-500 italic">Belum ada data alumni haflah yang tersimpan.</p>';
+
+            years.forEach(yr => {
+                let items = dataHaflah[yr];
+                let rows = items.map(i => `
+                    <tr class="border-b">
+                        <td class="p-3 font-medium">${i.nama}</td>
+                        <td class="p-3 text-primary font-bold">${i.total}</td>
+                        <td class="p-3 font-bold">${i.nilai}</td>
+                        <td class="p-3"><span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-bold">${i.kriteria}</span></td>
+                    </tr>
+                `).join('');
+
+                container.innerHTML += `
+                    <div class="card mb-6">
+                        <h4 class="font-bold text-lg mb-3 text-dark border-b pb-2"><i class="fa-solid fa-graduation-cap text-primary mr-2"></i> Alumni Angkatan ${yr}</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr class="table-header">
+                                        <th class="p-3">Nama Santri</th>
+                                        <th class="p-3">Capaian Hafalan</th>
+                                        <th class="p-3">Nilai Haflah</th>
+                                        <th class="p-3">Predikat</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
+        // --- DASHBOARD CHARTS ---
+        let chartPrestasiInstance = null;
+        let chartGuruInstance = null;
+
+        function renderGlobalCharts() {
+            if (typeof Chart === 'undefined') return;
+
+            const ctx1 = document.getElementById('chart-prestasi-rutasy');
+            if (ctx1) {
+                if (chartPrestasiInstance) chartPrestasiInstance.destroy();
+                chartPrestasiInstance = new Chart(ctx1.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Mumtaz (Sangat Baik)', 'Jayyid Jiddan (Baik)', 'Jayyid (Cukup)'],
+                        datasets: [{
+                            data: [65, 25, 10],
+                            backgroundColor: ['#047857', '#10b981', '#3b82f6']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+
+            const ctx2 = document.getElementById('chart-prestasi-guru');
+            if (ctx2) {
+                if (chartGuruInstance) chartGuruInstance.destroy();
+                chartGuruInstance = new Chart(ctx2.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Kelompok Ust. Hasan', 'Kelompok Ustdz. Aisyah', 'Kelompok Ust. Ahmad'],
+                        datasets: [{
+                            label: 'Rata-rata Capaian Juz',
+                            data: [15, 18, 12],
+                            backgroundColor: '#047857'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true } } }
+                });
+            }
+
+            chartsRendered = true;
+        }
     </script>
 </body>
 </html>
