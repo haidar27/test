@@ -4,12 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RUTASY - Sistem Manajemen Rumah Tahfidz</title>
+    
+    <!-- PWA & Favicon Config -->
+    <link rel="icon" href="logo.jpg" type="image/jpeg">
+    <link rel="apple-touch-icon" href="logo.jpg">
+    <meta name="theme-color" content="#047857">
+    <!-- Inline Manifest PWA untuk memicu Prompt Install Chrome -->
+    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22RUTASY%20Sistem%20Manajemen%22%2C%22short_name%22%3A%22RUTASY%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f3f4f6%22%2C%22theme_color%22%3A%22%23047857%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22logo.jpg%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fjpeg%22%7D%2C%7B%22src%22%3A%22logo.jpg%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fjpeg%22%7D%5D%7D'>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script>
         tailwind.config = {
             theme: {
@@ -61,13 +70,21 @@
     <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gray-100">
         <div class="card w-full max-w-md">
             <div class="text-center mb-6">
-                <i class="fa-solid fa-quran text-primary text-5xl mb-3"></i>
+                <!-- Diganti menggunakan logo.jpg -->
+                <img src="logo.jpg" alt="Logo RUTASY" class="w-24 h-24 mx-auto mb-3 rounded-full object-cover shadow-md border-2 border-primary">
                 <h1 class="text-2xl font-bold text-gray-800">RUTASY SYSTEM</h1>
                 <p class="text-gray-500 mb-4 text-sm">Masukkan Username & Password akun Anda</p>
             </div>
             
             <input type="text" id="login-username" placeholder="Username" class="w-full p-3 border rounded-lg mb-3 focus:outline-none focus:border-primary">
-            <input type="password" id="login-password" placeholder="Password" class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:border-primary">
+            
+            <!-- Fitur Toggle Password Baru -->
+            <div class="relative mb-4">
+                <input type="password" id="login-password" placeholder="Password" class="w-full p-3 border rounded-lg focus:outline-none focus:border-primary pr-10">
+                <button type="button" onclick="toggleLoginPassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-primary transition">
+                    <i id="login-eye-icon" class="fa-solid fa-eye"></i>
+                </button>
+            </div>
             
             <div class="flex items-center gap-2 mb-4 text-sm text-gray-600">
                 <input type="checkbox" id="login-remember" class="w-4 h-4 cursor-pointer"> 
@@ -85,7 +102,8 @@
         <!-- SIDEBAR -->
         <aside id="sidebar" class="w-64 flex-shrink-0 bg-dark text-white flex flex-col absolute md:relative z-30 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out">
             <div class="p-4 flex items-center gap-3 font-bold text-xl border-b border-gray-700">
-                <i class="fa-solid fa-quran text-secondary"></i> RUTASY
+                <!-- Diganti menggunakan logo.jpg -->
+                <img src="logo.jpg" alt="Logo" class="w-8 h-8 rounded-full object-cover border border-secondary bg-white"> RUTASY
                 <button onclick="toggleSidebar()" class="md:hidden ml-auto text-gray-300 hover:text-white"><i class="fa-solid fa-times"></i></button>
             </div>
             <div class="p-4 text-sm text-gray-300 border-b border-gray-700">
@@ -110,6 +128,11 @@
                     <h2 id="page-title" class="text-xl font-bold text-gray-800">Dashboard</h2>
                 </div>
                 <div class="flex items-center gap-4">
+                    <!-- Tombol PWA Install (Akan muncul jika disupport browser) -->
+                    <button id="btn-install-pwa" onclick="installPWA()" class="hidden bg-green-100 text-green-700 border border-green-300 hover:bg-green-200 font-bold px-3 py-1.5 rounded-full text-xs transition shadow-sm">
+                        <i class="fa-solid fa-download"></i> Install App ke Perangkat
+                    </button>
+
                     <div class="relative cursor-pointer" onclick="toggleNotif()">
                         <i class="fa-solid fa-bell text-gray-500 text-xl"></i>
                         <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 rounded-full">1</span>
@@ -534,8 +557,9 @@
                         <p class="text-sm text-gray-500 mb-4">Hanya Admin Global yang dapat mengakses area sistem inti ini.</p>
                         <hr class="mb-4">
                         <h3 class="font-bold mb-4 text-red-600">Zona Bahaya</h3>
-                        <button onclick="hapusSemuaData()" class="bg-red-600 hover:bg-red-700 text-white font-bold w-full py-2 rounded">
-                            <i class="fa-solid fa-trash-can mr-2"></i> Reset Semua Data Sistem
+                        <!-- Tombol Reset Semua Data (Sekarang 100% Membersihkan Memory) -->
+                        <button onclick="hapusSemuaData()" class="bg-red-600 hover:bg-red-700 text-white font-bold w-full py-2 rounded shadow transition">
+                            <i class="fa-solid fa-trash-can mr-2"></i> Reset Semua Data Sistem Permanen
                         </button>
                     </div>
                 </div>
@@ -647,6 +671,57 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
+        // --- PWA SETUP & INSTALL PROMPT LOGIC ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Register script Service Worker dummy via Blob untuk memenuhi syarat PWA
+                const swCode = `
+                    self.addEventListener('install', (e) => { self.skipWaiting(); });
+                    self.addEventListener('fetch', (e) => { });
+                `;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl).catch((err) => {
+                    console.log('PWA SW: Untuk PWA sempurna tanpa error blob, disarankan membuat file "sw.js" sungguhan.');
+                });
+            });
+        }
+
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = document.getElementById('btn-install-pwa');
+            if(installBtn) installBtn.classList.remove('hidden');
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') { console.log('Aplikasi diinstall'); }
+                    deferredPrompt = null;
+                    document.getElementById('btn-install-pwa').classList.add('hidden');
+                });
+            }
+        }
+
+        // --- PASSWORD TOGGLE LOGIC ---
+        function toggleLoginPassword() {
+            const passField = document.getElementById('login-password');
+            const eyeIcon = document.getElementById('login-eye-icon');
+            if (passField.type === "password") {
+                passField.type = "text";
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passField.type = "password";
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        // --- SISTEM GLOBAL ---
         let currentRole = '';
         let loggedInSantri = null;
         let chartsRendered = false;
@@ -672,19 +747,21 @@
             }, 3000);
         }
 
-        // --- DATA STATE MANAGEMENT ---
-        let dataSantri = JSON.parse(localStorage.getItem('rutasy_santri')) || [
+        // --- DATA STATE MANAGEMENT (Dengan perbaikan pengecekan Reset) ---
+        let isCleared = localStorage.getItem('rutasy_cleared') === 'true';
+
+        let dataSantri = JSON.parse(localStorage.getItem('rutasy_santri')) || (isCleared ? [] : [
             {nis: 'S-001', nama: 'Ahmad Zaki', lp: 'L', ttl: 'Medan, 12-05-2015', alamat: 'Jl. Mawar No.1', wa: '08123456789', guru: 'Ustadz Hasan', status: 'Aktif', user: 'murid', pass: '123'}
-        ];
+        ]);
         
-        let dataGuru = JSON.parse(localStorage.getItem('rutasy_guru')) || [
+        let dataGuru = JSON.parse(localStorage.getItem('rutasy_guru')) || (isCleared ? [] : [
             {nik: 'G-001', nama: 'Ustadz Hasan', lp: 'L', ttl: 'Medan, 01-01-1990', alamat: 'Jl. Melati', bank: 'BSI - 12345678', wa: '0856112233', gaji: '75000', user: 'guru', pass: '123'}
-        ];
+        ]);
 
         let dataKeuanganPengajuan = JSON.parse(localStorage.getItem('rutasy_keu_pengajuan')) || [];
-        let dataKeuanganRiwayat = JSON.parse(localStorage.getItem('rutasy_keu_riwayat')) || [
+        let dataKeuanganRiwayat = JSON.parse(localStorage.getItem('rutasy_keu_riwayat')) || (isCleared ? [] : [
             {tgl: '01 Aug 2026', nama: 'Ahmad Zaki', bulan: 'Agustus', metode: 'Transfer Bank', spp: 100000, infaq: 50000}
-        ];
+        ]);
 
         let dataSettings = JSON.parse(localStorage.getItem('rutasy_settings')) || {
             jamMasuk: '07:30', potongan: '1000', hariKerja: '24', geoRadius: '10', geoLat: '-3.595196', geoLng: '98.672223',
@@ -692,7 +769,7 @@
         };
 
         let riwayatAbsensi = JSON.parse(localStorage.getItem('rutasy_absen')) || {};
-        if(Object.keys(riwayatAbsensi).length === 0) {
+        if(!isCleared && Object.keys(riwayatAbsensi).length === 0) {
             riwayatAbsensi["Ahmad Zaki"] = [{pekan: "Pekan 1", sen: "Hadir", sel: "Hadir", rab: "Izin", kam: "Hadir"}];
             localStorage.setItem('rutasy_absen', JSON.stringify(riwayatAbsensi));
         }
@@ -701,14 +778,14 @@
 
         let riwayatProgres = JSON.parse(localStorage.getItem('rutasy_progres_hafalan')) || {};
 
-        let eventsKalender = JSON.parse(localStorage.getItem('rutasy_kalender')) || [
+        let eventsKalender = JSON.parse(localStorage.getItem('rutasy_kalender')) || (isCleared ? [] : [
             { id: 1, name: 'Ujian Kenaikan Hafalan', date: '2026-08-21' },
             { id: 2, name: 'Haflah Akhirussanah', date: '2026-08-30' }
-        ];
+        ]);
 
-        let dataHaflah = JSON.parse(localStorage.getItem('rutasy_haflah')) || {
+        let dataHaflah = JSON.parse(localStorage.getItem('rutasy_haflah')) || (isCleared ? {} : {
             "2023": [{ nama: "Fatimah Zahra", total: "5 Juz", nilai: 92, kriteria: "Mumtaz" }]
-        };
+        });
 
         const daftarSurat = [
             "Al-Fatihah", "Al-Baqarah", "Ali 'Imran", "An-Nisa'", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Taubah", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra'", "Al-Kahf", "Maryam", "Taha", "Al-Anbiya'", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan", "Asy-Syu'ara'", "An-Naml", "Al-Qasas", "Al-'Ankabut", "Ar-Rum", "Luqman", "As-Sajdah", "Al-Ahzab", "Saba'", "Fatir", "Yasin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Asy-Syura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jasiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Az-Zariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadilah", "Al-Hasyr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Tagabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddassir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba'", "An-Nazi'at", "'Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Insyiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Ghasyiyah", "Al-Fajr", "Al-Balad", "Asy-Syams", "Al-Lail", "Ad-Duha", "Asy-Syarh", "At-Tin", "Al-'Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-'Adiyat", "Al-Qari'ah", "At-Takasur", "Al-'Asr", "Al-Humazah", "Al-Fil", "Quraisy", "Al-Ma'un", "Al-Kausar", "Al-Kafirun", "An-Nasr", "Al-Lahab", "Al-Ikhlas", "Al-Falaq", "An-Nas"
@@ -1399,7 +1476,17 @@
         }
 
         function filterTable(tableId, query) { const table = document.getElementById(tableId); const rows = table.getElementsByTagName('tr'); for (let i = 1; i < rows.length; i++) { let cell = rows[i].getElementsByTagName('td')[1]; if (cell) { let txtValue = cell.textContent || cell.innerText; rows[i].style.display = txtValue.toLowerCase().indexOf(query.toLowerCase()) > -1 ? "" : "none"; } } }
-        function hapusSemuaData() { let konfirmasi = confirm('PERINGATAN! Ini akan mereset seluruh data sistem. Lanjutkan?'); if(konfirmasi) { localStorage.clear(); location.reload(); } }
+        
+        // Logika Reset Data Yang Ditingkatkan (100% Menghapus Data)
+        function hapusSemuaData() { 
+            let konfirmasi = confirm('PERINGATAN! Ini akan mereset seluruh data sistem secara permanen dan tidak dapat dikembalikan. Anda yakin ingin melanjutkan?'); 
+            if(konfirmasi) { 
+                localStorage.clear(); 
+                // Menanamkan flag agar sistem tahu data telah dihapus dan tidak boleh memuat dummy data lagi
+                localStorage.setItem('rutasy_cleared', 'true'); 
+                location.reload(); 
+            } 
+        }
 
         // --- CHARTS LOGIC ---
         let dashboardChartGuru = null;
