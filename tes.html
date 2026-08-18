@@ -70,7 +70,6 @@
     <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gray-100">
         <div class="card w-full max-w-md">
             <div class="text-center mb-6">
-                <!-- Diganti menggunakan logo.jpg -->
                 <img src="logo.jpg" alt="Logo RUTASY" class="w-24 h-24 mx-auto mb-3 rounded-full object-cover shadow-md border-2 border-primary">
                 <h1 class="text-2xl font-bold text-gray-800">RUTASY SYSTEM</h1>
                 <p class="text-gray-500 mb-4 text-sm">Masukkan Username & Password akun Anda</p>
@@ -102,7 +101,6 @@
         <!-- SIDEBAR -->
         <aside id="sidebar" class="w-64 flex-shrink-0 bg-dark text-white flex flex-col absolute md:relative z-30 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out">
             <div class="p-4 flex items-center gap-3 font-bold text-xl border-b border-gray-700">
-                <!-- Diganti menggunakan logo.jpg -->
                 <img src="logo.jpg" alt="Logo" class="w-8 h-8 rounded-full object-cover border border-secondary bg-white"> RUTASY
                 <button onclick="toggleSidebar()" class="md:hidden ml-auto text-gray-300 hover:text-white"><i class="fa-solid fa-times"></i></button>
             </div>
@@ -128,7 +126,6 @@
                     <h2 id="page-title" class="text-xl font-bold text-gray-800">Dashboard</h2>
                 </div>
                 <div class="flex items-center gap-4">
-                    <!-- Tombol PWA Install (Akan muncul jika disupport browser) -->
                     <button id="btn-install-pwa" onclick="installPWA()" class="hidden bg-green-100 text-green-700 border border-green-300 hover:bg-green-200 font-bold px-3 py-1.5 rounded-full text-xs transition shadow-sm">
                         <i class="fa-solid fa-download"></i> Install App ke Perangkat
                     </button>
@@ -157,7 +154,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                         <div class="card bg-primary text-white"><p class="text-sm">Total Santri</p><h3 class="text-3xl font-bold" id="dash-santri">0</h3></div>
                         <div class="card bg-secondary text-white"><p class="text-sm">Total Guru</p><h3 class="text-3xl font-bold" id="dash-guru">0</h3></div>
-                        <div class="card bg-blue-600 text-white"><p class="text-sm">Pemasukan Bulan Ini</p><h3 class="text-3xl font-bold">Rp 12.500.000</h3></div>
+                        <div class="card bg-blue-600 text-white"><p class="text-sm">Pemasukan Bulan Ini</p><h3 class="text-3xl font-bold" id="dash-pemasukan">Rp 0</h3></div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="card"><h3 class="font-bold mb-4">Grafik Prestasi Keseluruhan</h3><canvas id="chart-prestasi-rutasy"></canvas></div>
@@ -215,9 +212,9 @@
                 <!-- VIEW: KEUANGAN -->
                 <div id="view-keuangan" class="view-section hidden">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 stats-keuangan">
-                        <div class="card border-l-4 border-primary"><p class="text-sm text-gray-500">Saldo Kas</p><h3 class="text-2xl font-bold">Rp 45.000.000</h3></div>
-                        <div class="card border-l-4 border-green-500"><p class="text-sm text-gray-500">Pemasukan (SPP/Infaq)</p><h3 class="text-2xl font-bold">Rp 12.500.000</h3></div>
-                        <div class="card border-l-4 border-red-500"><p class="text-sm text-gray-500">Pengeluaran</p><h3 class="text-2xl font-bold">Rp 3.200.000</h3></div>
+                        <div class="card border-l-4 border-primary"><p class="text-sm text-gray-500">Saldo Kas</p><h3 class="text-2xl font-bold" id="keu-saldo">Rp 0</h3></div>
+                        <div class="card border-l-4 border-green-500"><p class="text-sm text-gray-500">Pemasukan (SPP/Infaq)</p><h3 class="text-2xl font-bold" id="keu-pemasukan">Rp 0</h3></div>
+                        <div class="card border-l-4 border-red-500"><p class="text-sm text-gray-500">Pengeluaran</p><h3 class="text-2xl font-bold" id="keu-pengeluaran">Rp 0</h3></div>
                     </div>
                     
                     <!-- Form Pembayaran (Ortu Only) -->
@@ -431,7 +428,7 @@
                     <!-- Form Input Capaian Hafalan -->
                     <div class="card mb-6 form-input-hafalan">
                         <h3 class="font-bold mb-4 text-green-700">Input Capaian Belajar / Hafalan</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
+                        <div class="grid grid-cols-1 md:grid-cols-7 gap-3">
                             <input type="text" id="prog-nama" list="list-santri" placeholder="Cari Nama Santri..." class="border p-2 rounded md:col-span-2 bg-white">
                             <select id="prog-kategori" class="border p-2 rounded bg-white">
                                 <option value="Tahfidz">Tahfidz</option>
@@ -439,8 +436,9 @@
                                 <option value="Iqro">Iqro</option>
                             </select>
                             <input type="text" id="prog-surat" list="list-surat" placeholder="Surat / Jilid (Ketik)" class="border p-2 rounded bg-white">
-                            <input type="text" id="prog-ayat" placeholder="Ayat Terakhir / Halaman" class="border p-2 rounded">
-                            <button class="bg-primary hover:bg-dark text-white p-2 rounded transition" onclick="simpanProgresSantri()"><i class="fa-solid fa-save"></i> Simpan Progres</button>
+                            <input type="text" id="prog-ayat-dari" placeholder="Dari ayat.." class="border p-2 rounded">
+                            <input type="text" id="prog-ayat-sampai" placeholder="Sampai ayat.." class="border p-2 rounded">
+                            <button class="bg-primary hover:bg-dark text-white p-2 rounded transition" onclick="simpanProgresSantri()"><i class="fa-solid fa-save"></i> Simpan</button>
                         </div>
                     </div>
 
@@ -557,7 +555,7 @@
                         <p class="text-sm text-gray-500 mb-4">Hanya Admin Global yang dapat mengakses area sistem inti ini.</p>
                         <hr class="mb-4">
                         <h3 class="font-bold mb-4 text-red-600">Zona Bahaya</h3>
-                        <!-- Tombol Reset Semua Data (Sekarang 100% Membersihkan Memory) -->
+                        <!-- Tombol Reset Semua Data -->
                         <button onclick="hapusSemuaData()" class="bg-red-600 hover:bg-red-700 text-white font-bold w-full py-2 rounded shadow transition">
                             <i class="fa-solid fa-trash-can mr-2"></i> Reset Semua Data Sistem Permanen
                         </button>
@@ -669,12 +667,24 @@
         </div>
     </div>
 
+    <!-- Modal Konfirmasi Custom Sistem -->
+    <div id="modal-konfirmasi" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+        <div class="bg-white p-6 rounded-lg w-11/12 md:w-1/3 max-w-sm text-center shadow-xl">
+            <div class="text-red-500 text-5xl mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 class="font-bold text-xl mb-2 text-gray-800" id="konfirmasi-title">Konfirmasi</h3>
+            <p class="text-sm text-gray-600 mb-6" id="konfirmasi-msg">Apakah Anda yakin?</p>
+            <div class="flex justify-center gap-3">
+                <button onclick="tutupKonfirmasi()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded transition font-bold">Batal</button>
+                <button onclick="eksekusiKonfirmasi()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition font-bold">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // --- PWA SETUP & INSTALL PROMPT LOGIC ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Register script Service Worker dummy via Blob untuk memenuhi syarat PWA
                 const swCode = `
                     self.addEventListener('install', (e) => { self.skipWaiting(); });
                     self.addEventListener('fetch', (e) => { });
@@ -747,7 +757,24 @@
             }, 3000);
         }
 
-        // --- DATA STATE MANAGEMENT (Dengan perbaikan pengecekan Reset) ---
+        // --- CUSTOM MODAL KONFIRMASI ---
+        let actionConfirm = null;
+        function bukaKonfirmasi(title, text, callback) {
+            document.getElementById('konfirmasi-title').innerText = title;
+            document.getElementById('konfirmasi-msg').innerText = text;
+            actionConfirm = callback;
+            document.getElementById('modal-konfirmasi').classList.remove('hidden');
+        }
+        function tutupKonfirmasi() {
+            document.getElementById('modal-konfirmasi').classList.add('hidden');
+            actionConfirm = null;
+        }
+        function eksekusiKonfirmasi() {
+            if(actionConfirm) actionConfirm();
+            tutupKonfirmasi();
+        }
+
+        // --- DATA STATE MANAGEMENT ---
         let isCleared = localStorage.getItem('rutasy_cleared') === 'true';
 
         let dataSantri = JSON.parse(localStorage.getItem('rutasy_santri')) || (isCleared ? [] : [
@@ -1041,7 +1068,14 @@
             document.getElementById('ms-password').value = s.pass; 
             document.getElementById('modal-tambah-santri').classList.remove('hidden'); 
         }
-        function deleteSantri(index) { if (confirm(`Yakin ingin menghapus santri ${dataSantri[index].nama}?`)) { dataSantri.splice(index, 1); localStorage.setItem('rutasy_santri', JSON.stringify(dataSantri)); renderSantri(); renderBelumBayarSPP(); tampilkanNotif('Data Santri Berhasil Dihapus!'); } }
+        function deleteSantri(index) { 
+            bukaKonfirmasi('Hapus Santri', `Yakin ingin menghapus santri ${dataSantri[index].nama}?`, () => {
+                dataSantri.splice(index, 1); 
+                localStorage.setItem('rutasy_santri', JSON.stringify(dataSantri)); 
+                renderSantri(); renderBelumBayarSPP(); 
+                tampilkanNotif('Data Santri Berhasil Dihapus!'); 
+            }); 
+        }
         
         function prosesTambahSantri() {
             const idx = parseInt(document.getElementById('ms-index').value);
@@ -1053,7 +1087,14 @@
 
         function bukaModalTambahGuru() { document.getElementById('modal-guru-title').innerText = 'Tambah Data Guru Baru'; document.getElementById('mg-index').value = '-1'; document.querySelectorAll('#modal-tambah-guru input').forEach(inp => inp.value = ''); document.getElementById('modal-tambah-guru').classList.remove('hidden'); }
         function editGuru(index) { const g = dataGuru[index]; document.getElementById('modal-guru-title').innerText = 'Edit Data Guru'; document.getElementById('mg-index').value = index; document.getElementById('mg-nik').value = g.nik; document.getElementById('mg-nama').value = g.nama; document.getElementById('mg-lp').value = g.lp; document.getElementById('mg-ttl').value = g.ttl; document.getElementById('mg-alamat').value = g.alamat; document.getElementById('mg-bank').value = g.bank; document.getElementById('mg-wa').value = g.wa; document.getElementById('mg-gaji').value = g.gaji; document.getElementById('mg-username').value = g.user; document.getElementById('mg-password').value = g.pass; document.getElementById('modal-tambah-guru').classList.remove('hidden'); }
-        function deleteGuru(index) { if (confirm(`Yakin ingin menghapus guru ${dataGuru[index].nama}?`)) { dataGuru.splice(index, 1); localStorage.setItem('rutasy_guru', JSON.stringify(dataGuru)); renderGuru(); tampilkanNotif('Data Guru Berhasil Dihapus!'); } }
+        function deleteGuru(index) { 
+            bukaKonfirmasi('Hapus Guru', `Yakin ingin menghapus guru ${dataGuru[index].nama}?`, () => {
+                dataGuru.splice(index, 1); 
+                localStorage.setItem('rutasy_guru', JSON.stringify(dataGuru)); 
+                renderGuru(); 
+                tampilkanNotif('Data Guru Berhasil Dihapus!'); 
+            }); 
+        }
         
         function prosesTambahGuru() {
             const idx = parseInt(document.getElementById('mg-index').value);
@@ -1070,6 +1111,22 @@
 
         // --- KEUANGAN (SPP & INFAQ) ---
         function renderKeuangan() {
+            let sumRiwayat = dataKeuanganRiwayat.reduce((sum, r) => sum + parseInt(r.spp || 0) + parseInt(r.infaq || 0), 0);
+            
+            // Kalkulasi dinamis yang akan di set ke 0 apabila isCleared adalah true
+            let numPemasukan = isCleared ? sumRiwayat : (12500000 - 150000 + sumRiwayat); 
+            let numPengeluaran = isCleared ? 0 : 3200000;
+            let numSaldo = isCleared ? (numPemasukan - numPengeluaran) : (45000000 - 150000 + sumRiwayat);
+
+            const dPemasukan = document.getElementById('dash-pemasukan');
+            if(dPemasukan) dPemasukan.innerText = 'Rp ' + formatRupiah(numPemasukan);
+            const kSaldo = document.getElementById('keu-saldo');
+            if(kSaldo) kSaldo.innerText = 'Rp ' + formatRupiah(numSaldo);
+            const kPemasukan = document.getElementById('keu-pemasukan');
+            if(kPemasukan) kPemasukan.innerText = 'Rp ' + formatRupiah(numPemasukan);
+            const kPengeluaran = document.getElementById('keu-pengeluaran');
+            if(kPengeluaran) kPengeluaran.innerText = 'Rp ' + formatRupiah(numPengeluaran);
+
             const tbodyPengajuan = document.querySelector('#table-persetujuan tbody');
             tbodyPengajuan.innerHTML = '';
             dataKeuanganPengajuan.forEach(p => {
@@ -1312,9 +1369,12 @@
             const nama = document.getElementById('prog-nama').value;
             const kategori = document.getElementById('prog-kategori').value;
             const surat = document.getElementById('prog-surat').value;
-            const ayat = document.getElementById('prog-ayat').value;
+            const ayatDari = document.getElementById('prog-ayat-dari').value;
+            const ayatSampai = document.getElementById('prog-ayat-sampai').value;
 
-            if(!nama || !surat || !ayat) { tampilkanNotif('Tolong lengkapi form capaian sebelum menyimpan!'); return; }
+            if(!nama || !surat || !ayatDari || !ayatSampai) { tampilkanNotif('Tolong lengkapi form capaian sebelum menyimpan!'); return; }
+
+            const ayat = `${ayatDari} - ${ayatSampai}`;
 
             if(!riwayatProgres[nama]) riwayatProgres[nama] = [];
             let tgl = new Date().toLocaleDateString('id-ID');
@@ -1328,7 +1388,8 @@
 
             document.getElementById('prog-nama').value = '';
             document.getElementById('prog-surat').value = '';
-            document.getElementById('prog-ayat').value = '';
+            document.getElementById('prog-ayat-dari').value = '';
+            document.getElementById('prog-ayat-sampai').value = '';
         }
 
         function renderTabelProgres(query = '') {
@@ -1477,22 +1538,23 @@
 
         function filterTable(tableId, query) { const table = document.getElementById(tableId); const rows = table.getElementsByTagName('tr'); for (let i = 1; i < rows.length; i++) { let cell = rows[i].getElementsByTagName('td')[1]; if (cell) { let txtValue = cell.textContent || cell.innerText; rows[i].style.display = txtValue.toLowerCase().indexOf(query.toLowerCase()) > -1 ? "" : "none"; } } }
         
-        // Logika Reset Data Yang Ditingkatkan (100% Menghapus Data)
+        // Logika Reset Data (Dengan Konfirmasi Custom & Kalkulasi Dinamis Yang Sempurna)
         function hapusSemuaData() { 
-            let konfirmasi = confirm('PERINGATAN! Ini akan mereset seluruh data sistem secara permanen dan tidak dapat dikembalikan. Anda yakin ingin melanjutkan?'); 
-            if(konfirmasi) { 
+            bukaKonfirmasi('Reset Permanen', 'PERINGATAN! Ini akan mereset seluruh data sistem secara permanen dan tidak dapat dikembalikan. Anda yakin ingin melanjutkan?', () => {
                 localStorage.clear(); 
                 // Menanamkan flag agar sistem tahu data telah dihapus dan tidak boleh memuat dummy data lagi
                 localStorage.setItem('rutasy_cleared', 'true'); 
                 location.reload(); 
-            } 
+            }); 
         }
 
         // --- CHARTS LOGIC ---
         let dashboardChartGuru = null;
         function renderGlobalCharts() {
             if(!chartsRendered) {
-                new Chart(document.getElementById('chart-prestasi-rutasy'), { type: 'line', data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'], datasets: [{ label: 'Rata-rata Nilai', data: [82, 85, 84, 88, 91, 93], borderColor: '#047857', tension: 0.3 }] } });
+                let chart1Labels = isCleared ? [] : ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'];
+                let chart1Data = isCleared ? [] : [82, 85, 84, 88, 91, 93];
+                new Chart(document.getElementById('chart-prestasi-rutasy'), { type: 'line', data: { labels: chart1Labels, datasets: [{ label: 'Rata-rata Nilai', data: chart1Data, borderColor: '#047857', tension: 0.3 }] } });
                 chartsRendered = true;
             }
             
