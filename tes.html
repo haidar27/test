@@ -806,21 +806,11 @@
             tutupKonfirmasi();
         }
 
-        // --- DATA STATE MANAGEMENT ---
-        let isCleared = localStorage.getItem('rutasy_cleared') === 'true';
-
-        let dataSantri = JSON.parse(localStorage.getItem('rutasy_santri')) || (isCleared ? [] : [
-            {nis: 'S-001', nama: 'Ahmad Zaki', lp: 'L', ttl: 'Medan, 12-05-2015', alamat: 'Jl. Mawar No.1', wa: '08123456789', guru: 'Ustadz Hasan', status: 'Aktif', user: 'murid', pass: '123'}
-        ]);
-        
-        let dataGuru = JSON.parse(localStorage.getItem('rutasy_guru')) || (isCleared ? [] : [
-            {nik: 'G-001', nama: 'Ustadz Hasan', lp: 'L', ttl: 'Medan, 01-01-1990', alamat: 'Jl. Melati', bank: 'BSI - 12345678', wa: '0856112233', gaji: '75000', user: 'guru', pass: '123'}
-        ]);
-
+        // --- DATA STATE MANAGEMENT (Murni Array Kosong agar Bersih) ---
+        let dataSantri = JSON.parse(localStorage.getItem('rutasy_santri')) || [];
+        let dataGuru = JSON.parse(localStorage.getItem('rutasy_guru')) || [];
         let dataKeuanganPengajuan = JSON.parse(localStorage.getItem('rutasy_keu_pengajuan')) || [];
-        let dataKeuanganRiwayat = JSON.parse(localStorage.getItem('rutasy_keu_riwayat')) || (isCleared ? [] : [
-            {tgl: '01 Aug 2026', nama: 'Ahmad Zaki', bulan: 'Agustus', metode: 'Transfer Bank', spp: 100000, infaq: 50000}
-        ]);
+        let dataKeuanganRiwayat = JSON.parse(localStorage.getItem('rutasy_keu_riwayat')) || [];
 
         let dataSettings = JSON.parse(localStorage.getItem('rutasy_settings')) || {
             jamMasuk: '07:30', potongan: '1000', hariKerja: '24', geoRadius: '10', geoLat: '-3.595196', geoLng: '98.672223',
@@ -828,23 +818,10 @@
         };
 
         let riwayatAbsensi = JSON.parse(localStorage.getItem('rutasy_absen')) || {};
-        if(!isCleared && Object.keys(riwayatAbsensi).length === 0) {
-            riwayatAbsensi["Ahmad Zaki"] = [{pekan: "Pekan 1", sen: "Hadir", sel: "Hadir", rab: "Izin", kam: "Hadir"}];
-            localStorage.setItem('rutasy_absen', JSON.stringify(riwayatAbsensi));
-        }
-
         let absenGuruRecord = JSON.parse(localStorage.getItem('rutasy_absen_guru')) || [];
-
         let riwayatProgres = JSON.parse(localStorage.getItem('rutasy_progres_hafalan')) || {};
-
-        let eventsKalender = JSON.parse(localStorage.getItem('rutasy_kalender')) || (isCleared ? [] : [
-            { id: 1, name: 'Ujian Kenaikan Hafalan', date: '2026-08-21', pic: 'Ustadz Hasan' },
-            { id: 2, name: 'Haflah Akhirussanah', date: '2026-08-30', pic: 'Ustadzah Aisyah' }
-        ]);
-
-        let dataHaflah = JSON.parse(localStorage.getItem('rutasy_haflah')) || (isCleared ? {} : {
-            "2023": [{ nama: "Fatimah Zahra", total: "5 Juz", nilai: 92, kriteria: "Mumtaz" }]
-        });
+        let eventsKalender = JSON.parse(localStorage.getItem('rutasy_kalender')) || [];
+        let dataHaflah = JSON.parse(localStorage.getItem('rutasy_haflah')) || {};
 
         const daftarSurat = [
             "Al-Fatihah", "Al-Baqarah", "Ali 'Imran", "An-Nisa'", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Taubah", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra'", "Al-Kahf", "Maryam", "Taha", "Al-Anbiya'", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan", "Asy-Syu'ara'", "An-Naml", "Al-Qasas", "Al-'Ankabut", "Ar-Rum", "Luqman", "As-Sajdah", "Al-Ahzab", "Saba'", "Fatir", "Yasin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Asy-Syura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jasiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Az-Zariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadilah", "Al-Hasyr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Tagabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddassir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba'", "An-Nazi'at", "'Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Insyiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Ghasyiyah", "Al-Fajr", "Al-Balad", "Asy-Syams", "Al-Lail", "Ad-Duha", "Asy-Syarh", "At-Tin", "Al-'Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-'Adiyat", "Al-Qari'ah", "At-Takasur", "Al-'Asr", "Al-Humazah", "Al-Fil", "Quraisy", "Al-Ma'un", "Al-Kausar", "Al-Kafirun", "An-Nasr", "Al-Lahab", "Al-Ikhlas", "Al-Falaq", "An-Nas"
@@ -1040,6 +1017,38 @@
             }
         }
 
+        // --- DASHBOARD CHARTS ---
+        let chartPrestasiRutasy, chartPrestasiGuru;
+        function renderGlobalCharts() {
+            chartsRendered = true;
+            const ctx1 = document.getElementById('chart-prestasi-rutasy')?.getContext('2d');
+            const ctx2 = document.getElementById('chart-prestasi-guru')?.getContext('2d');
+
+            if(ctx1) {
+                if(chartPrestasiRutasy) chartPrestasiRutasy.destroy();
+                chartPrestasiRutasy = new Chart(ctx1, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Sangat Baik', 'Baik', 'Cukup'],
+                        datasets: [{ data: [15, 8, 2], backgroundColor: ['#047857', '#10b981', '#f59e0b'] }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            if(ctx2) {
+                if(chartPrestasiGuru) chartPrestasiGuru.destroy();
+                chartPrestasiGuru = new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: dataGuru.map(g => g.nama),
+                        datasets: [{ label: 'Rata-rata Capaian Jilid/Juz', data: dataGuru.map(() => Math.floor(Math.random() * 5) + 5), backgroundColor: '#047857' }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+        }
+
         // --- ENTITAS ---
         function updateGuruDropdown() {
             const select = document.getElementById('ms-guru');
@@ -1174,9 +1183,9 @@
         function renderKeuangan() {
             let sumRiwayat = dataKeuanganRiwayat.reduce((sum, r) => sum + parseInt(r.spp || 0) + parseInt(r.infaq || 0), 0);
             
-            let numPemasukan = isCleared ? sumRiwayat : (12500000 - 150000 + sumRiwayat); 
-            let numPengeluaran = isCleared ? 0 : 3200000;
-            let numSaldo = isCleared ? (numPemasukan - numPengeluaran) : (45000000 - 150000 + sumRiwayat);
+            let numPemasukan = sumRiwayat; 
+            let numPengeluaran = 0;
+            let numSaldo = numPemasukan - numPengeluaran;
 
             const dPemasukan = document.getElementById('dash-pemasukan');
             if(dPemasukan) dPemasukan.innerText = 'Rp ' + formatRupiah(numPemasukan);
@@ -1379,8 +1388,7 @@
         function hapusSemuaData() {
             bukaKonfirmasi('Reset Database Sistem', 'PERINGATAN! Semua data (Santri, Guru, Keuangan, Absen) akan dihapus secara permanen. Apakah Anda yakin?', () => {
                 localStorage.clear();
-                localStorage.setItem('rutasy_cleared', 'true');
-                tampilkanNotif("Seluruh data sistem berhasil dihapus.");
+                tampilkanNotif("Seluruh data sistem berhasil dihapus secara bersih.");
                 setTimeout(() => { location.reload(); }, 1500);
             });
         }
@@ -1606,7 +1614,7 @@
                                     <p class="font-bold text-gray-800">${ev.name}</p>
                                     <p class="text-xs text-gray-500"><i class="fa-solid fa-calendar mr-1"></i>${ev.date} | <i class="fa-solid fa-user-tie mr-1"></i>PIC: ${ev.pic || '-'}</p>
                                 </div>
-                                <button onclick="hapusEventKalender(${ev.id})" class="text-red-500 hover:text-red-700 text-xs btn-admin-only"><i class="fa-solid fa-trash"></i></button>
+                                <button onclick="hapusEventKalender(${ev.id})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
                             </li>
                         `;
                     });
@@ -1614,71 +1622,38 @@
             }
 
             const gridEl = document.getElementById('kalender-grid-bulanan');
-            if(!gridEl) return;
-            gridEl.innerHTML = '';
-
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            for(let i = 0; i < firstDay; i++) {
-                gridEl.innerHTML += `<div class="calendar-day bg-transparent"></div>`;
-            }
-
-            for(let d = 1; d <= daysInMonth; d++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                const hasEvent = eventsKalender.some(e => e.date === dateStr);
-
-                if(hasEvent) {
-                    gridEl.innerHTML += `<div class="calendar-day event cursor-pointer" onclick="lihatDetailKalender('${dateStr}')">${d}</div>`;
-                } else {
-                    gridEl.innerHTML += `<div class="calendar-day">${d}</div>`;
+            if(gridEl) {
+                gridEl.innerHTML = '';
+                for(let i=1; i<=31; i++) {
+                    let dateStr = `2026-08-${i < 10 ? '0'+i : i}`;
+                    let isEv = eventsKalender.some(e => e.date === dateStr);
+                    gridEl.innerHTML += `<div class="calendar-day ${isEv ? 'event' : ''}">${i}</div>`;
                 }
             }
         }
 
         function tambahEventKalender() {
-            const nama = document.getElementById('input-kal-nama').value;
+            const name = document.getElementById('input-kal-nama').value;
             const pic = document.getElementById('input-kal-pic').value;
-            const tgl = document.getElementById('input-kal-tgl').value;
+            const date = document.getElementById('input-kal-tgl').value;
 
-            if(!nama || !tgl) { tampilkanNotif('Harap isi Nama Program dan Tanggal!'); return; }
+            if(!name || !date) { tampilkanNotif('Harap lengkapi nama program dan tanggal!'); return; }
 
-            const newEv = { id: Date.now(), name: nama, date: tgl, pic: pic || '-' };
-            eventsKalender.push(newEv);
+            eventsKalender.push({ id: Date.now(), name, pic, date });
             localStorage.setItem('rutasy_kalender', JSON.stringify(eventsKalender));
+            renderKalenderInit();
+            tampilkanNotif('Agenda Berhasil Ditambahkan!');
 
             document.getElementById('input-kal-nama').value = '';
             document.getElementById('input-kal-pic').value = '';
             document.getElementById('input-kal-tgl').value = '';
-
-            renderKalenderInit();
-            tampilkanNotif('Jadwal Akademik Berhasil Ditambahkan!');
         }
 
         function hapusEventKalender(id) {
-            bukaKonfirmasi('Hapus Agenda', 'Yakin ingin menghapus agenda akademik ini?', () => {
-                eventsKalender = eventsKalender.filter(e => e.id !== id);
-                localStorage.setItem('rutasy_kalender', JSON.stringify(eventsKalender));
-                renderKalenderInit();
-                tampilkanNotif('Agenda Berhasil Dihapus!');
-            });
-        }
-
-        function lihatDetailKalender(dateStr) {
-            const matchedEvents = eventsKalender.filter(e => e.date === dateStr);
-            if(matchedEvents.length === 0) return;
-
-            document.getElementById('modal-kalender-tgl').innerText = `Agenda Tanggal: ${dateStr}`;
-            const content = document.getElementById('modal-kalender-content');
-            content.innerHTML = matchedEvents.map(e => `
-                <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <h4 class="font-bold text-green-800 text-base mb-1">${e.name}</h4>
-                    <p class="text-gray-700 text-xs mb-1"><b>Tanggal:</b> ${e.date}</p>
-                    <p class="text-gray-700 text-xs"><b>PIC (Penanggung Jawab):</b> ${e.pic || '-'}</p>
-                </div>
-            `).join('');
-
-            document.getElementById('modal-detail-kalender').classList.remove('hidden');
+            eventsKalender = eventsKalender.filter(e => e.id !== id);
+            localStorage.setItem('rutasy_kalender', JSON.stringify(eventsKalender));
+            renderKalenderInit();
+            tampilkanNotif('Agenda Berhasil Dihapus!');
         }
 
         // --- HAFLAH / ALUMNI ---
@@ -1692,28 +1667,28 @@
         }
 
         function simpanHaflah() {
-            const thn = document.getElementById('haflah-tahun').value;
+            const tahun = document.getElementById('haflah-tahun').value;
             const nama = document.getElementById('haflah-nama-select').value;
             const total = document.getElementById('haflah-total').value;
-            const nilai = parseInt(document.getElementById('haflah-nilai').value) || 0;
+            const nilai = document.getElementById('haflah-nilai').value;
 
-            if(!thn || !nama || !total) { tampilkanNotif('Harap lengkapi Tahun Angkatan, Nama Santri, dan Total Hafalan!'); return; }
+            if(!tahun || !nama || !total || !nilai) { tampilkanNotif('Harap lengkapi seluruh data Haflah!'); return; }
 
+            if(!dataHaflah[tahun]) dataHaflah[tahun] = [];
+            
             let kriteria = nilai >= 90 ? 'Mumtaz' : (nilai >= 80 ? 'Jayyid Jiddan' : 'Jayyid');
+            dataHaflah[tahun].push({ nama, total, nilai, kriteria });
 
-            if(!dataHaflah[thn]) dataHaflah[thn] = [];
-            dataHaflah[thn].push({ nama, total, nilai, kriteria });
-
-            let santriIndex = dataSantri.findIndex(s => s.nama.toLowerCase() === nama.toLowerCase());
-            if(santriIndex > -1) {
-                dataSantri[santriIndex].status = 'Alumni';
-                localStorage.setItem('rutasy_santri', JSON.stringify(dataSantri));
-                renderSantri();
-            }
+            // Ubah status santri di database menjadi Alumni
+            let sObj = dataSantri.find(s => s.nama === nama);
+            if(sObj) sObj.status = 'Alumni';
 
             localStorage.setItem('rutasy_haflah', JSON.stringify(dataHaflah));
+            localStorage.setItem('rutasy_santri', JSON.stringify(dataSantri));
+
+            renderSantri();
             renderTabelHaflah();
-            tampilkanNotif(`Santri ${nama} Berhasil Diluluskan ke Angkatan ${thn}!`);
+            tampilkanNotif('Data Alumni Berhasil Disimpan & Status Santri Diperbarui!');
 
             document.getElementById('haflah-total').value = '';
             document.getElementById('haflah-nilai').value = '';
@@ -1724,34 +1699,32 @@
             if(!container) return;
             container.innerHTML = '';
 
-            const years = Object.keys(dataHaflah).sort((a,b) => b - a);
-            if(years.length === 0) {
-                container.innerHTML = '<div class="card"><p class="text-gray-500 text-center italic">Belum ada data alumni haflah.</p></div>';
+            if(Object.keys(dataHaflah).length === 0) {
+                container.innerHTML = '<div class="card"><p class="text-gray-500 italic text-center">Belum ada data alumni Haflah.</p></div>';
                 return;
             }
 
-            years.forEach(yr => {
-                let items = dataHaflah[yr];
-                let rows = items.map(i => `
+            for(let thn in dataHaflah) {
+                let rows = dataHaflah[thn].map(d => `
                     <tr class="border-b">
-                        <td class="p-3 font-medium">${i.nama}</td>
-                        <td class="p-3 text-primary font-bold">${i.total}</td>
-                        <td class="p-3 font-bold">${i.nilai}</td>
-                        <td class="p-3"><span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-bold">${i.kriteria}</span></td>
+                        <td class="p-3 font-medium">${d.nama}</td>
+                        <td class="p-3">${d.total}</td>
+                        <td class="p-3 font-bold text-blue-600">${d.nilai}</td>
+                        <td class="p-3"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">${d.kriteria}</span></td>
                     </tr>
                 `).join('');
 
                 container.innerHTML += `
                     <div class="card mb-6">
-                        <h4 class="font-bold text-lg mb-3 text-dark border-b pb-2"><i class="fa-solid fa-graduation-cap text-primary mr-2"></i> Alumni Angkatan ${yr}</h4>
+                        <h4 class="font-bold text-primary mb-3">Angkatan Tahun ${thn}</h4>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
+                            <table class="w-full text-left text-sm border">
                                 <thead>
-                                    <tr class="table-header">
-                                        <th class="p-3">Nama Santri</th>
-                                        <th class="p-3">Capaian Hafalan</th>
-                                        <th class="p-3">Nilai Haflah</th>
-                                        <th class="p-3">Predikat</th>
+                                    <tr class="bg-gray-100">
+                                        <th class="p-3 border-b">Nama Santri</th>
+                                        <th class="p-3 border-b">Capaian Hafalan</th>
+                                        <th class="p-3 border-b">Nilai Kelulusan</th>
+                                        <th class="p-3 border-b">Predikat</th>
                                     </tr>
                                 </thead>
                                 <tbody>${rows}</tbody>
@@ -1759,50 +1732,7 @@
                         </div>
                     </div>
                 `;
-            });
-        }
-
-        // --- DASHBOARD CHARTS ---
-        let chartPrestasiInstance = null;
-        let chartGuruInstance = null;
-
-        function renderGlobalCharts() {
-            if (typeof Chart === 'undefined') return;
-
-            const ctx1 = document.getElementById('chart-prestasi-rutasy');
-            if (ctx1) {
-                if (chartPrestasiInstance) chartPrestasiInstance.destroy();
-                chartPrestasiInstance = new Chart(ctx1.getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Mumtaz (Sangat Baik)', 'Jayyid Jiddan (Baik)', 'Jayyid (Cukup)'],
-                        datasets: [{
-                            data: [65, 25, 10],
-                            backgroundColor: ['#047857', '#10b981', '#3b82f6']
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: true }
-                });
             }
-
-            const ctx2 = document.getElementById('chart-prestasi-guru');
-            if (ctx2) {
-                if (chartGuruInstance) chartGuruInstance.destroy();
-                chartGuruInstance = new Chart(ctx2.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: ['Kelompok Ust. Hasan', 'Kelompok Ustdz. Aisyah', 'Kelompok Ust. Ahmad'],
-                        datasets: [{
-                            label: 'Rata-rata Capaian Juz',
-                            data: [15, 18, 12],
-                            backgroundColor: '#047857'
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true } } }
-                });
-            }
-
-            chartsRendered = true;
         }
     </script>
 </body>
