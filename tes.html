@@ -131,10 +131,10 @@
 
                     <div class="relative cursor-pointer" onclick="toggleNotif()">
                         <i class="fa-solid fa-bell text-gray-500 text-xl"></i>
-                        <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 rounded-full">0</span>
-                        <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-white border rounded shadow-lg p-3 z-50">
-                            <p class="text-sm text-gray-800 font-bold">Notifikasi Akademik</p>
-                            <div id="notif-content" class="text-xs text-gray-600 mt-1">
+                        <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 rounded-full hidden">0</span>
+                        <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-72 bg-white border rounded shadow-lg p-3 z-50">
+                            <p class="text-sm text-gray-800 font-bold border-b pb-2 mb-2">Notifikasi Akademik</p>
+                            <div id="notif-content" class="text-xs text-gray-600 mt-1 max-h-64 overflow-y-auto">
                                 <!-- Notif di-generate dari js -->
                             </div>
                         </div>
@@ -156,8 +156,20 @@
                         <div class="card bg-blue-600 text-white"><p class="text-sm">Pemasukan Bulan Ini</p><h3 class="text-3xl font-bold" id="dash-pemasukan">Rp 0</h3></div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="card"><h3 class="font-bold mb-4">Grafik Prestasi Keseluruhan</h3><canvas id="chart-prestasi-rutasy"></canvas></div>
-                        <div class="card"><h3 class="font-bold mb-4">Rata-rata Prestasi Kelompok Guru</h3><canvas id="chart-prestasi-guru"></canvas></div>
+                        <div class="card">
+                            <h3 class="font-bold mb-4">Grafik Prestasi Keseluruhan</h3>
+                            <!-- Wrapper untuk chart agar tidak otomatis resize turun kebawah -->
+                            <div class="relative h-64 w-full">
+                                <canvas id="chart-prestasi-rutasy"></canvas>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3 class="font-bold mb-4">Rata-rata Prestasi Kelompok Guru</h3>
+                            <!-- Wrapper untuk chart agar tidak otomatis resize turun kebawah -->
+                            <div class="relative h-64 w-full">
+                                <canvas id="chart-prestasi-guru"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -326,7 +338,14 @@
                         <h4 class="font-bold text-gray-700 mb-3 border-b pb-2 text-sm"><i class="fa-solid fa-history"></i> Riwayat Absen Anda</h4>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm border" id="table-absen-guru-pribadi">
-                                <thead><tr class="bg-gray-100 text-gray-600"><th class="p-2">Tanggal & Waktu Absen</th><th class="p-2">Status</th></tr></thead>
+                                <thead>
+                                    <tr class="bg-gray-100 text-gray-600">
+                                        <th class="p-2">Tanggal & Waktu Absen</th>
+                                        <th class="p-2">Status</th>
+                                        <th class="p-2">Telat (Menit)</th>
+                                        <th class="p-2">Potongan</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     <!-- Dinamis lewat JS -->
                                 </tbody>
@@ -339,7 +358,15 @@
                         <h3 class="font-bold mb-4 text-blue-700">Riwayat Kehadiran Guru</h3>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm border" id="table-absen-guru-global">
-                                <thead><tr class="bg-gray-100 text-gray-600"><th class="p-2">Nama Guru</th><th class="p-2">Tanggal & Waktu Absen</th><th class="p-2">Status</th></tr></thead>
+                                <thead>
+                                    <tr class="bg-gray-100 text-gray-600">
+                                        <th class="p-2">Nama Guru</th>
+                                        <th class="p-2">Tanggal & Waktu Absen</th>
+                                        <th class="p-2">Status</th>
+                                        <th class="p-2">Telat (Menit)</th>
+                                        <th class="p-2">Potongan</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     <!-- Dinamis lewat JS -->
                                 </tbody>
@@ -681,7 +708,7 @@
             <p id="modal-progres-nama" class="text-gray-600 mb-4 font-bold border-b pb-2"></p>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm border">
-                    <thead><tr class="bg-gray-100 text-gray-600"><th class="p-2">Tanggal</th><th class="p-2">Kategori</th><th class="p-2">Surat / Jilid</th><th class="p-2">Capaian Ayat / Hal</th></tr></thead>
+                    <thead><tr class="bg-gray-100 text-gray-600"><th class="p-2">Tanggal</th><th class="p-2">Kategori</th><th class="p-2">Surat / Jilid</th><th class="p-2">Capaian (Ayat/Hal/Baris)</th></tr></thead>
                     <tbody id="modal-progres-list"></tbody>
                 </table>
             </div>
@@ -931,7 +958,7 @@
             renderKalenderInit(); renderSelectHaflahSantri(); renderTabelHaflah(); 
             renderTabelRiwayatAbsen(); renderDatalistSantri(); renderTabelProgres();
             renderAbsenGuruPribadi(); renderAbsenGuruGlobal(); renderBelumBayarSPP();
-            populateFilterGroups();
+            populateFilterGroups(); updateNotifikasiAkademik();
             
             const listSuratEl = document.getElementById('list-surat');
             if(listSuratEl) listSuratEl.innerHTML = daftarSurat.map(s => `<option value="${s}"></option>`).join('');
@@ -1179,6 +1206,14 @@
             if(dl) { dl.innerHTML = ''; dataSantri.forEach(s => { dl.innerHTML += `<option value="${s.nama}"></option>`; }); }
         }
 
+        function renderSelectHaflahSantri() {
+            const hs = document.getElementById('haflah-nama-select');
+            if(hs) {
+                hs.innerHTML = '<option value="">Pilih Santri (Dari Database Entitas)</option>';
+                dataSantri.forEach(s => { hs.innerHTML += `<option value="${s.nama}">${s.nama} (${s.nis})</option>`; });
+            }
+        }
+
         // --- KEUANGAN (SPP & INFAQ) ---
         function renderKeuangan() {
             let sumRiwayat = dataKeuanganRiwayat.reduce((sum, r) => sum + parseInt(r.spp || 0) + parseInt(r.infaq || 0), 0);
@@ -1395,9 +1430,46 @@
 
         // --- ABSENSI ---
         function absenGuruMasuk() {
-            let tgl = new Date().toLocaleString('id-ID');
+            let todayDateStr = new Date().toLocaleDateString('id-ID');
             let nama = loggedInSantri ? loggedInSantri.nama : 'Guru Unknown';
-            absenGuruRecord.unshift({ tgl: tgl, nama: nama, status: 'Hadir' });
+            
+            // Cek apakah sudah absen hari ini
+            let sudahAbsen = absenGuruRecord.find(a => a.nama === nama && a.tanggalOnly === todayDateStr);
+            if(sudahAbsen) {
+                tampilkanNotif('Anda sudah melakukan absensi masuk hari ini!');
+                return;
+            }
+
+            let tglFull = new Date().toLocaleString('id-ID');
+            let currentTime = new Date();
+            let hours = currentTime.getHours().toString().padStart(2, '0');
+            let mins = currentTime.getMinutes().toString().padStart(2, '0');
+
+            // Hitung Keterlambatan dan Potongan
+            let setJam = dataSettings.jamMasuk || '07:30';
+            let telatMenit = 0;
+            let potongan = 0;
+
+            let [setH, setM] = setJam.split(':').map(Number);
+            let targetTime = new Date();
+            targetTime.setHours(setH, setM, 0, 0);
+
+            if (currentTime > targetTime) {
+                let diffMs = currentTime - targetTime;
+                telatMenit = Math.floor(diffMs / 60000); // konversi ms ke menit
+                let tarifPotongan = parseInt(dataSettings.potongan) || 0;
+                potongan = telatMenit * tarifPotongan;
+            }
+
+            absenGuruRecord.unshift({ 
+                tgl: tglFull, 
+                tanggalOnly: todayDateStr, 
+                nama: nama, 
+                status: 'Hadir',
+                telat: telatMenit,
+                potongan: potongan
+            });
+
             localStorage.setItem('rutasy_absen_guru', JSON.stringify(absenGuruRecord));
             tampilkanNotif('Berhasil Absen Masuk Hari Ini!');
             renderAbsenGuruPribadi();
@@ -1409,9 +1481,17 @@
             if(!tbody) return;
             tbody.innerHTML = '';
             let myAbsen = absenGuruRecord.filter(a => loggedInSantri && a.nama === loggedInSantri.nama);
-            if(myAbsen.length === 0) { tbody.innerHTML = `<tr><td colspan="2" class="p-3 text-center text-gray-500 italic">Belum ada riwayat absensi.</td></tr>`; return; }
+            if(myAbsen.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-500 italic">Belum ada riwayat absensi.</td></tr>`; return; }
             myAbsen.forEach(a => {
-                tbody.innerHTML += `<tr class="border-b"><td class="p-2">${a.tgl}</td><td class="p-2 text-green-600 font-bold"><i class="fa-solid fa-check-circle mr-1"></i> ${a.status}</td></tr>`;
+                let infoTelat = a.telat > 0 ? `<span class="text-red-500 font-bold">${a.telat} Menit</span>` : `<span class="text-green-500 font-bold">Tepat Waktu</span>`;
+                let infoPotongan = a.potongan > 0 ? `Rp ${formatRupiah(a.potongan)}` : `-`;
+                tbody.innerHTML += `
+                    <tr class="border-b">
+                        <td class="p-2">${a.tgl}</td>
+                        <td class="p-2 text-green-600 font-bold"><i class="fa-solid fa-check-circle mr-1"></i> ${a.status}</td>
+                        <td class="p-2">${infoTelat}</td>
+                        <td class="p-2 text-red-600 font-bold">${infoPotongan}</td>
+                    </tr>`;
             });
         }
 
@@ -1419,9 +1499,18 @@
             const tbody = document.querySelector('#table-absen-guru-global tbody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            if(absenGuruRecord.length === 0) { tbody.innerHTML = `<tr><td colspan="3" class="p-3 text-center text-gray-500 italic">Belum ada riwayat absensi.</td></tr>`; return; }
+            if(absenGuruRecord.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-500 italic">Belum ada riwayat absensi.</td></tr>`; return; }
             absenGuruRecord.forEach(a => {
-                tbody.innerHTML += `<tr class="border-b hover:bg-gray-50 transition"><td class="p-2 font-bold">${a.nama}</td><td class="p-2">${a.tgl}</td><td class="p-2 text-green-600 font-bold"><i class="fa-solid fa-check-circle mr-1"></i> ${a.status}</td></tr>`;
+                let infoTelat = a.telat > 0 ? `<span class="text-red-500 font-bold">${a.telat} Menit</span>` : `<span class="text-green-500 font-bold">Tepat Waktu</span>`;
+                let infoPotongan = a.potongan > 0 ? `Rp ${formatRupiah(a.potongan)}` : `-`;
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50 transition">
+                        <td class="p-2 font-bold">${a.nama}</td>
+                        <td class="p-2">${a.tgl}</td>
+                        <td class="p-2 text-green-600 font-bold"><i class="fa-solid fa-check-circle mr-1"></i> ${a.status}</td>
+                        <td class="p-2">${infoTelat}</td>
+                        <td class="p-2 text-red-600 font-bold">${infoPotongan}</td>
+                    </tr>`;
             });
         }
 
@@ -1500,7 +1589,22 @@
         }
 
         // --- PROGRES HAFALAN & UJIAN ---
-        function sesuaikanFormProgres() {}
+        function sesuaikanFormProgres() {
+            const kat = document.getElementById('prog-kategori').value;
+            const inputSurat = document.getElementById('prog-surat');
+            const inputDari = document.getElementById('prog-ayat-dari');
+            const inputSampai = document.getElementById('prog-ayat-sampai');
+
+            if (kat === 'Iqro') {
+                inputSurat.placeholder = "Jilid Iqro (Ketik)";
+                inputDari.placeholder = "Halaman..";
+                inputSampai.placeholder = "Baris..";
+            } else {
+                inputSurat.placeholder = "Surat / Jilid (Ketik)";
+                inputDari.placeholder = "Dari ayat..";
+                inputSampai.placeholder = "Sampai ayat..";
+            }
+        }
 
         function simpanProgresSantri() {
             const nama = document.getElementById('prog-nama').value;
@@ -1554,12 +1658,13 @@
                 tbody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-gray-500 italic">Belum ada riwayat progres.</td></tr>';
             } else {
                 list.forEach(p => {
+                    let capaianText = p.kat === 'Iqro' ? `Hal ${p.dari} - Baris ${p.sampai}` : `Ayat ${p.dari} - ${p.sampai}`;
                     tbody.innerHTML += `
                         <tr class="border-b">
                             <td class="p-2">${p.tgl}</td>
                             <td class="p-2 font-bold text-gray-700">${p.kat}</td>
                             <td class="p-2 text-primary font-medium">${p.surat}</td>
-                            <td class="p-2">Ayat ${p.dari} - ${p.sampai}</td>
+                            <td class="p-2">${capaianText}</td>
                         </tr>
                     `;
                 });
@@ -1580,7 +1685,7 @@
                 data: {
                     labels: ['Pekan 1', 'Pekan 2', 'Pekan 3', 'Pekan 4'],
                     datasets: [{
-                        label: 'Perkembangan Hafalan (Halaman)',
+                        label: 'Perkembangan Hafalan',
                         data: [5, 12, 18, 25],
                         borderColor: '#047857',
                         backgroundColor: 'rgba(4, 120, 87, 0.1)',
@@ -1592,10 +1697,73 @@
             });
         }
 
-        // --- KALENDER AKADEMIK ---
+        // --- KALENDER AKADEMIK & NOTIFIKASI ---
+        function hitungHmin(tglTarget) {
+            const target = new Date(tglTarget);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            target.setHours(0,0,0,0);
+            const diffTime = target - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if(diffDays === 0) return "Hari Ini";
+            if(diffDays > 0) return `H-${diffDays}`;
+            return `Telah Berlalu`;
+        }
+
+        function bukaDetailKalender(nama, tgl, pic) {
+            document.getElementById('modal-kalender-tgl').innerText = "Detail Agenda Akademik";
+            let hMin = hitungHmin(tgl);
+            document.getElementById('modal-kalender-content').innerHTML = `
+                <p><b>Nama Agenda:</b> ${nama}</p>
+                <p><b>Tanggal Pelaksanaan:</b> ${tgl}</p>
+                <p><b>Penanggung Jawab (PIC):</b> ${pic || '-'}</p>
+                <p><b>Status Waktu:</b> <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded font-bold">${hMin}</span></p>
+            `;
+            document.getElementById('modal-detail-kalender').classList.remove('hidden');
+        }
+
+        function updateNotifikasiAkademik() {
+            const notifContent = document.getElementById('notif-content');
+            const notifBadge = document.getElementById('notif-badge');
+            if(!notifContent || !notifBadge) return;
+            
+            notifContent.innerHTML = '';
+            let count = 0;
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            // Sorting by date terdekat
+            let sortedEvents = [...eventsKalender].sort((a,b) => new Date(a.tgl) - new Date(b.tgl));
+
+            sortedEvents.forEach(ev => {
+                const target = new Date(ev.tgl);
+                target.setHours(0,0,0,0);
+                if(target >= today) {
+                    count++;
+                    let hMin = hitungHmin(ev.tgl);
+                    notifContent.innerHTML += `
+                        <div class="border-b py-2 cursor-pointer hover:bg-gray-50 transition" onclick="bukaDetailKalender('${ev.nama}', '${ev.tgl}', '${ev.pic}')">
+                            <p class="font-bold text-gray-800">${ev.nama}</p>
+                            <p class="text-xs text-blue-600 font-medium"><i class="fa-solid fa-clock"></i> ${ev.tgl} (${hMin})</p>
+                        </div>
+                    `;
+                }
+            });
+
+            if(count === 0) {
+                notifContent.innerHTML = '<p class="text-gray-500 italic py-2">Tidak ada agenda terdekat.</p>';
+                notifBadge.classList.add('hidden');
+            } else {
+                notifBadge.innerText = count;
+                notifBadge.classList.remove('hidden');
+            }
+        }
+
         function renderKalenderInit() {
-            const year = 2026;
-            const month = 7; // Agustus (Index 7)
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
             const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             
             const namaBulanEl = document.getElementById('nama-bulan-ini');
@@ -1607,91 +1775,86 @@
                 if(eventsKalender.length === 0) {
                     listEl.innerHTML = '<li class="p-3 text-center text-gray-500 italic">Belum ada agenda akademik.</li>';
                 } else {
-                    eventsKalender.forEach((ev) => {
+                    let sorted = [...eventsKalender].sort((a,b) => new Date(a.tgl) - new Date(b.tgl));
+                    sorted.forEach((ev) => {
                         listEl.innerHTML += `
-                            <li class="p-3 flex justify-between items-center hover:bg-gray-50">
+                            <li class="p-3 flex justify-between items-center hover:bg-gray-50 cursor-pointer" onclick="bukaDetailKalender('${ev.nama}', '${ev.tgl}', '${ev.pic}')">
                                 <div>
-                                    <p class="font-bold text-gray-800">${ev.name}</p>
-                                    <p class="text-xs text-gray-500"><i class="fa-solid fa-calendar mr-1"></i>${ev.date} | <i class="fa-solid fa-user-tie mr-1"></i>PIC: ${ev.pic || '-'}</p>
+                                    <p class="font-bold text-gray-800">${ev.nama}</p>
+                                    <p class="text-xs text-gray-500"><i class="fa-solid fa-user"></i> ${ev.pic || '-'}</p>
                                 </div>
-                                <button onclick="hapusEventKalender(${ev.id})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
+                                <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">${ev.tgl}</span>
                             </li>
                         `;
                     });
                 }
             }
+            renderGridKalenderBulanan(year, month);
+            updateNotifikasiAkademik();
+        }
 
-            const gridEl = document.getElementById('kalender-grid-bulanan');
-            if(gridEl) {
-                gridEl.innerHTML = '';
-                for(let i=1; i<=31; i++) {
-                    let dateStr = `2026-08-${i < 10 ? '0'+i : i}`;
-                    let isEv = eventsKalender.some(e => e.date === dateStr);
-                    gridEl.innerHTML += `<div class="calendar-day ${isEv ? 'event' : ''}">${i}</div>`;
+        function renderGridKalenderBulanan(year, month) {
+            const grid = document.getElementById('kalender-grid-bulanan');
+            if(!grid) return;
+            grid.innerHTML = '';
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                grid.innerHTML += `<div class="calendar-day opacity-0"></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                let dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                let event = eventsKalender.find(e => e.tgl === dateStr);
+                
+                if (event) {
+                    grid.innerHTML += `<div class="calendar-day event shadow" onclick="bukaDetailKalender('${event.nama}', '${event.tgl}', '${event.pic}')">${day}</div>`;
+                } else {
+                    grid.innerHTML += `<div class="calendar-day">${day}</div>`;
                 }
             }
         }
-
+        
         function tambahEventKalender() {
-            const name = document.getElementById('input-kal-nama').value;
-            const pic = document.getElementById('input-kal-pic').value;
-            const date = document.getElementById('input-kal-tgl').value;
-
-            if(!name || !date) { tampilkanNotif('Harap lengkapi nama program dan tanggal!'); return; }
-
-            eventsKalender.push({ id: Date.now(), name, pic, date });
+            let nama = document.getElementById('input-kal-nama').value;
+            let pic = document.getElementById('input-kal-pic').value;
+            let tgl = document.getElementById('input-kal-tgl').value;
+            if(!nama || !tgl) { tampilkanNotif('Nama agenda dan tanggal wajib diisi!'); return; }
+            eventsKalender.push({nama, pic, tgl});
             localStorage.setItem('rutasy_kalender', JSON.stringify(eventsKalender));
-            renderKalenderInit();
-            tampilkanNotif('Agenda Berhasil Ditambahkan!');
-
+            
             document.getElementById('input-kal-nama').value = '';
             document.getElementById('input-kal-pic').value = '';
             document.getElementById('input-kal-tgl').value = '';
-        }
 
-        function hapusEventKalender(id) {
-            eventsKalender = eventsKalender.filter(e => e.id !== id);
-            localStorage.setItem('rutasy_kalender', JSON.stringify(eventsKalender));
             renderKalenderInit();
-            tampilkanNotif('Agenda Berhasil Dihapus!');
+            tampilkanNotif('Agenda Akademik Ditambahkan!');
         }
 
-        // --- HAFLAH / ALUMNI ---
-        function renderSelectHaflahSantri() {
-            const select = document.getElementById('haflah-nama-select');
-            if(!select) return;
-            select.innerHTML = '<option value="">Pilih Santri (Dari Database Entitas)</option>';
-            dataSantri.forEach(s => {
-                select.innerHTML += `<option value="${s.nama}">${s.nama} (${s.nis})</option>`;
-            });
-        }
-
+        // --- HAFLAH ---
         function simpanHaflah() {
-            const tahun = document.getElementById('haflah-tahun').value;
+            const thn = document.getElementById('haflah-tahun').value;
             const nama = document.getElementById('haflah-nama-select').value;
             const total = document.getElementById('haflah-total').value;
             const nilai = document.getElementById('haflah-nilai').value;
 
-            if(!tahun || !nama || !total || !nilai) { tampilkanNotif('Harap lengkapi seluruh data Haflah!'); return; }
+            if(!thn || !nama || !total) { tampilkanNotif('Lengkapi data Haflah!'); return; }
 
-            if(!dataHaflah[tahun]) dataHaflah[tahun] = [];
-            
-            let kriteria = nilai >= 90 ? 'Mumtaz' : (nilai >= 80 ? 'Jayyid Jiddan' : 'Jayyid');
-            dataHaflah[tahun].push({ nama, total, nilai, kriteria });
-
-            // Ubah status santri di database menjadi Alumni
-            let sObj = dataSantri.find(s => s.nama === nama);
-            if(sObj) sObj.status = 'Alumni';
-
+            if(!dataHaflah[thn]) dataHaflah[thn] = [];
+            dataHaflah[thn].push({ nama, total, nilai });
             localStorage.setItem('rutasy_haflah', JSON.stringify(dataHaflah));
-            localStorage.setItem('rutasy_santri', JSON.stringify(dataSantri));
 
-            renderSantri();
+            // Ubah status santri menjadi Alumni
+            let idxSantri = dataSantri.findIndex(s => s.nama === nama);
+            if(idxSantri > -1) {
+                dataSantri[idxSantri].status = 'Alumni';
+                localStorage.setItem('rutasy_santri', JSON.stringify(dataSantri));
+                renderSantri(); renderBelumBayarSPP();
+            }
+
             renderTabelHaflah();
-            tampilkanNotif('Data Alumni Berhasil Disimpan & Status Santri Diperbarui!');
-
-            document.getElementById('haflah-total').value = '';
-            document.getElementById('haflah-nilai').value = '';
+            tampilkanNotif('Santri Berhasil Diluluskan ke Haflah!');
         }
 
         function renderTabelHaflah() {
@@ -1699,41 +1862,24 @@
             if(!container) return;
             container.innerHTML = '';
 
-            if(Object.keys(dataHaflah).length === 0) {
-                container.innerHTML = '<div class="card"><p class="text-gray-500 italic text-center">Belum ada data alumni Haflah.</p></div>';
-                return;
-            }
-
             for(let thn in dataHaflah) {
-                let rows = dataHaflah[thn].map(d => `
-                    <tr class="border-b">
-                        <td class="p-3 font-medium">${d.nama}</td>
-                        <td class="p-3">${d.total}</td>
-                        <td class="p-3 font-bold text-blue-600">${d.nilai}</td>
-                        <td class="p-3"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">${d.kriteria}</span></td>
-                    </tr>
-                `).join('');
-
-                container.innerHTML += `
-                    <div class="card mb-6">
-                        <h4 class="font-bold text-primary mb-3">Angkatan Tahun ${thn}</h4>
+                let html = `
+                    <div class="card mb-4 border-l-4 border-green-500">
+                        <h4 class="font-bold text-green-700 mb-3"><i class="fa-solid fa-graduation-cap"></i> Angkatan Tahun ${thn}</h4>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm border">
-                                <thead>
-                                    <tr class="bg-gray-100">
-                                        <th class="p-3 border-b">Nama Santri</th>
-                                        <th class="p-3 border-b">Capaian Hafalan</th>
-                                        <th class="p-3 border-b">Nilai Kelulusan</th>
-                                        <th class="p-3 border-b">Predikat</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${rows}</tbody>
-                            </table>
-                        </div>
-                    </div>
+                                <thead><tr class="bg-gray-100"><th class="p-2 border">Nama Santri</th><th class="p-2 border">Total Hafalan</th><th class="p-2 border">Nilai Kelulusan</th></tr></thead>
+                                <tbody>
                 `;
+                dataHaflah[thn].forEach(h => {
+                    html += `<tr><td class="p-2 border font-medium">${h.nama}</td><td class="p-2 border text-gray-600">${h.total}</td><td class="p-2 border font-bold text-blue-600">${h.nilai}</td></tr>`;
+                });
+                html += `</tbody></table></div></div>`;
+                container.innerHTML += html;
             }
+            if(Object.keys(dataHaflah).length === 0) container.innerHTML = '<p class="text-gray-500 italic">Belum ada data riwayat alumni (Haflah).</p>';
         }
+
     </script>
 </body>
 </html>
